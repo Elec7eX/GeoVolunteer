@@ -1,0 +1,13 @@
+{
+  "title.app": "GEO Volunteer",
+  "label.login.email": "E-Mail",
+  "label.login.benutzername": "Benutzername",
+  "label.login.passwort": "Passwort",
+  "button.login": "Login",
+  "button.anmelden": "Neu Anmelden",
+  "button.registrieren": "Registrieren",
+  "button.zurueck": "Zurück",
+  "placeholder.login.benutzername": "Benutzername eingeben",
+  "placeholder.login.email": "Email eingeben",
+  "placeholder.login.passwort": "Passwort eingeben"
+}
