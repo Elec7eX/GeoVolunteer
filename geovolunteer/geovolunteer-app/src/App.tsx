@@ -1,15 +1,16 @@
 import React from "react";
-import "./App.css";
+import "./css/App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "./components/HomePage";
 import { Login } from "./login/Login";
 import { AuthProvider } from "./hooks/useAuth";
-import { Secret } from "./components/Secret";
 import { ProtectedRoute } from "./roots/ProtectedRoute";
 import i18n from "./i18n";
-import { Footer } from "./components/footer/Footer";
-import { Header } from "./components/header/Header";
+import Map from "./components/karte/Map";
+import Organisaiton from "./components/organisation/Organisation";
+import AktivitaetenOverview from "./components/aktivitaeten/AktivitaetenOverview";
+import AktivitaetDetailPage from "./components/aktivitaeten/AktivitaetDetailPage";
 
 const App: React.FC = () => {
   console.log(i18n);
@@ -25,17 +26,39 @@ const App: React.FC = () => {
               path="/"
               element={
                 <ProtectedRoute>
-                  <Header />
                   <HomePage />
-                  <Footer />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/secret"
+              path="/aktivitäten"
               element={
                 <ProtectedRoute>
-                  <Secret />
+                  <AktivitaetenOverview />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/aktivitäten/detail"
+              element={
+                <ProtectedRoute>
+                  <AktivitaetDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/map"
+              element={
+                <ProtectedRoute>
+                  <Map />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/organisation"
+              element={
+                <ProtectedRoute>
+                  <Organisaiton />
                 </ProtectedRoute>
               }
             />

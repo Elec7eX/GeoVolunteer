@@ -6,7 +6,6 @@ import { Form as FormikForm, Formik, FormikHelpers } from "formik";
 import { useTranslation } from "react-i18next";
 import { Registration } from "./Registration";
 import userService from "../services/UserServices";
-import axios from "axios";
 
 export type LoginType = {
   username?: string;
