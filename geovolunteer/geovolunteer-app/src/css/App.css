@@ -16,6 +16,7 @@
 .header {
   background: linear-gradient(to bottom, rgb(32, 32, 255), green, white);
   border: 1px solid red;
+<<<<<<< Upstream, based on origin/main
 }
 
 .body {
@@ -122,3 +123,82 @@ input.error {
   font-weight: 900;
   font-size: 1.5rem;
 }
+=======
+  padding: 10px;
+}
+
+.body {
+  flex: 1; /* Nimmt den verfügbaren Platz ein */
+  overflow-y: auto; /* Scrollbar für den vertikalen Inhalt */
+}
+
+.footer {
+  background: linear-gradient(to top, rgb(32, 32, 255), green, white);
+  color: white;
+  text-align: center;
+  padding: 10px;
+}
+
+.login {
+  background-color: red;
+  text-align: left;
+  background-color: whitesmoke;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Zentriert den Inhalt horizontal */
+  justify-content: center; /* Zentriert den Inhalt vertikal */
+  color: white;
+  padding: 10px; /* Fügt etwas Abstand zum Rand hinzu */
+  box-sizing: border-box; /* Stel */
+  width: 100%; /* Nimmt die volle Breite des übergeordneten Elements ein */
+  height: 100%; /* Nimmt die volle Höhe des übergeordneten Elements ein */
+  justify-content: center; /* Horizontale Zentrierung */
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+input.error {
+  border-color: red;
+}
+
+.input-feedback {
+  color: red;
+  margin-top: 0.25rem;
+}
+
+.custom-icon {
+  font-size: 27px;
+  font-weight: bold;
+  color: white;
+}
+
+.custom-icon:hover {
+  opacity: 0.7;
+}
+
+.custom-icon:active {
+  opacity: 0.3;
+}
+
+.header-title {
+  border: 1px solid red;
+  text-align: center;
+  font-weight: bold;
+  font-size: 24px;
+  color: white;
+  flex: 1;
+}
+
+.profile-icon {
+  margin-left: auto; /* Pushes the icon to the right */
+}
+
+.navbar-brand {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  line-height: 1; /* Adjust this value as needed */
+}
+>>>>>>> 38cde22 Header & Footer design
