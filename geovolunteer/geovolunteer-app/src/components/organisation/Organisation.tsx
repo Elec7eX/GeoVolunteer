@@ -5,7 +5,7 @@ import { Footer } from "../footer/Footer";
 export default function Organisaiton() {
   return (
     <>
-      <Header title={t("title.organisation.overview")} />
+      <Header title={t("organisation.overview.title")} />
       <div className="body">Organisation</div>
       <Footer />
     </>

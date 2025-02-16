@@ -7,7 +7,7 @@ import { t } from "i18next";
 export default function HomePage() {
   return (
     <>
-      <Header title={t("title.app")}/>
+      <Header title={t("home.title")}/>
       <div className="body">
         <p>
           Location analysis is closely linked to GIS. First of all, site
