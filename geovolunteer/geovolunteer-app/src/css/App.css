@@ -16,13 +16,13 @@
 .header {
   background: linear-gradient(to bottom, rgb(32, 32, 255), green, white);
   border: 1px solid red;
-  padding: 8px;
 }
 
 .body {
   flex: 1; /* Nimmt den verfügbaren Platz ein */
   overflow-y: auto; /* Scrollbar für den vertikalen Inhalt */
   background-color: rgb(250, 250, 250);
+  padding: 10px;
 }
 
 .footer {
@@ -82,18 +82,7 @@ input.error {
   font-weight: bold;
   font-size: 24px;
   color: white;
-  flex: 1;
-}
-
-.profile-icon {
-  margin-left: auto; /* Pushes the icon to the right */
-}
-
-.navbar-brand {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  line-height: 1; /* Adjust this value as needed */
+  padding: 8px;
 }
 
 /* the sizin of map container */

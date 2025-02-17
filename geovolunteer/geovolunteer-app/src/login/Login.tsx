@@ -66,7 +66,7 @@ export function Login() {
     <>
       {initialValues && (
         <div className="login">
-          <h1>{t("title.app")}</h1>
+          <h1>{t("home.title")}</h1>
           {!isRegistrationPage && (
             <Formik
               initialValues={initialValues}

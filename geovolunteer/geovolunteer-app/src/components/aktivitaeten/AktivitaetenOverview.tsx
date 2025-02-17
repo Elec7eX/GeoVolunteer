@@ -4,13 +4,14 @@ import { Footer } from "../footer/Footer";
 import { Card, CardBody, CardHeader } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { BsHeartPulse } from "react-icons/bs";
+import { CiCirclePlus } from "react-icons/ci";
 
 export default function AktivitaetenOverview() {
   const navigate = useNavigate();
 
-  const navigateToDetail = () =>{
+  const navigateToDetail = () => {
     return navigate("/aktivitäten/detail");
-  } 
+  };
 
   return (
     <>
@@ -22,13 +23,16 @@ export default function AktivitaetenOverview() {
         <div>
           <Card onClick={navigateToDetail}>
             <CardHeader>
-              <BsHeartPulse style={{marginRight: 5}}/>
+              <BsHeartPulse style={{ marginRight: 5 }} />
               Aktivitäts-Titel
             </CardHeader>
             <CardBody>Aktivitäts-Detail</CardBody>
           </Card>
           <Card style={{ marginTop: 10 }}>
-            <CardHeader>Second Card</CardHeader>
+            <CardHeader>
+              <BsHeartPulse style={{ marginRight: 5 }} />
+              Second Card
+            </CardHeader>
             <CardBody>Second Card Body</CardBody>
           </Card>
         </div>
@@ -38,11 +42,17 @@ export default function AktivitaetenOverview() {
         </h5>
         <div>
           <Card onClick={navigateToDetail}>
-            <CardHeader>Aktivitäts-Titel</CardHeader>
+            <CardHeader>
+              <BsHeartPulse style={{ marginRight: 5 }} />
+              Aktivitäts-Titel
+            </CardHeader>
             <CardBody>Aktivitäts-Detail</CardBody>
           </Card>
           <Card style={{ marginTop: 10 }}>
-            <CardHeader>Second Card</CardHeader>
+            <CardHeader>
+              <BsHeartPulse style={{ marginRight: 5 }} />
+              Second Card
+            </CardHeader>
             <CardBody>Second Card Body</CardBody>
           </Card>
         </div>

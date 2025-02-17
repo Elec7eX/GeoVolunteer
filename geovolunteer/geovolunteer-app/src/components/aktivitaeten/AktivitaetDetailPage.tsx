@@ -2,7 +2,7 @@ import { t } from "i18next";
 import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
 import { useNavigate } from "react-router-dom";
-import { Breadcrumb } from "react-bootstrap";
+import { Breadcrumb, Card } from "react-bootstrap";
 
 export default function AktivitaetDetailPage() {
   const navigate = useNavigate();
@@ -17,7 +17,9 @@ export default function AktivitaetDetailPage() {
         }}
       />
       <div className="body">
-        DETAIL_ÜBERSICHT
+        <Card>
+          Detail
+        </Card>
       </div>
       <Footer />
     </>
