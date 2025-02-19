@@ -26,14 +26,18 @@ export default function AktivitaetenOverview() {
               <BsHeartPulse style={{ marginRight: 5 }} />
               Aktivitäts-Titel
             </CardHeader>
-            <CardBody>Aktivitäts-Detail</CardBody>
+            <CardBody>
+              <Card.Text>Aktivitäts-Detail</Card.Text>
+            </CardBody>
           </Card>
           <Card style={{ marginTop: 10 }}>
             <CardHeader>
               <BsHeartPulse style={{ marginRight: 5 }} />
               Second Card
             </CardHeader>
-            <CardBody>Second Card Body</CardBody>
+            <CardBody>
+              <Card.Text>Second Card Body</Card.Text>
+            </CardBody>
           </Card>
         </div>
         <hr />
@@ -46,14 +50,18 @@ export default function AktivitaetenOverview() {
               <BsHeartPulse style={{ marginRight: 5 }} />
               Aktivitäts-Titel
             </CardHeader>
-            <CardBody>Aktivitäts-Detail</CardBody>
+            <CardBody>
+              <Card.Text>Aktivitäts-Detail</Card.Text>
+            </CardBody>
           </Card>
           <Card style={{ marginTop: 10 }}>
             <CardHeader>
               <BsHeartPulse style={{ marginRight: 5 }} />
               Second Card
             </CardHeader>
-            <CardBody>Second Card Body</CardBody>
+            <CardBody>
+              <Card.Text>Second Card Body</Card.Text>
+            </CardBody>
           </Card>
         </div>
       </div>

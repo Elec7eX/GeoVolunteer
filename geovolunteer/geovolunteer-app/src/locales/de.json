@@ -16,5 +16,6 @@
   "organisation.overview.title": "Organisation",
   "placeholder.login.benutzername": "Benutzername eingeben",
   "placeholder.login.email": "Email eingeben",
-  "placeholder.login.passwort": "Passwort eingeben"
+  "placeholder.login.passwort": "Passwort eingeben",
+  "ressourcen.detail.title": "Ressource Detail"
 }

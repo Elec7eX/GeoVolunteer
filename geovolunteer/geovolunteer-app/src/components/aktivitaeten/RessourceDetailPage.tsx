@@ -1,19 +1,19 @@
 import { t } from "i18next";
-import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
-import { useNavigate } from "react-router-dom";
-import { Breadcrumb, Card, Col, Row } from "react-bootstrap";
+import { Card, Row, Col } from "react-bootstrap";
+import { Footer } from "../footer/Footer";
 
-export default function AktivitaetDetailPage() {
-  const navigate = useNavigate();
+export default function RessourceDetailPage() {
   return (
     <>
       <Header
-        title={t("aktivitaeten.detail.title")}
+        title={t("ressourcen.detail.title")}
         breadcrumb={{
           main: t("aktivitaeten.overview.title"),
           detail: t("aktivitaeten.detail.title"),
-          navigate: "/aktivitäten/detail/ressourceDetail",
+          ressource: t("ressourcen.detail.title"),
+          navigate: "/aktivitäten",
+          navigateDetail: "/aktivitäten/detail"
         }}
       />
       <div className="body">
@@ -47,7 +47,7 @@ export default function AktivitaetDetailPage() {
             <Card.Title>Zeitliche Verfügbarkeit</Card.Title>
             <Card.Text>Beschreibung hier</Card.Text>
           </Card.Body>
-          <Card.Body onClick={() => navigate("/aktivitäten/detail/ressourceDetail")}>
+          <Card.Body>
             <Row>
               <Col md={3}>
                 <Card.Img

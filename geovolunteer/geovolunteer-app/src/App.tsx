@@ -11,6 +11,7 @@ import Map from "./components/karte/Map";
 import Organisaiton from "./components/organisation/Organisation";
 import AktivitaetenOverview from "./components/aktivitaeten/AktivitaetenOverview";
 import AktivitaetDetailPage from "./components/aktivitaeten/AktivitaetDetailPage";
+import RessourceDetailPage from "./components/aktivitaeten/RessourceDetailPage";
 
 const App: React.FC = () => {
   console.log(i18n);
@@ -43,6 +44,14 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <AktivitaetDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/aktivitäten/detail/ressourceDetail"
+              element={
+                <ProtectedRoute>
+                  <RessourceDetailPage />
                 </ProtectedRoute>
               }
             />
