@@ -11,9 +11,8 @@ export default function AktivitaetDetailPage() {
       <Header
         title={t("aktivitaeten.detail.title")}
         breadcrumb={{
-          main: t("aktivitaeten.overview.title"),
-          detail: t("aktivitaeten.detail.title"),
-          navigate: "/aktivitäten/detail/ressourceDetail",
+          title: t("aktivitaeten.overview.title"),
+          navigate: "/aktivitäten",
         }}
       />
       <div className="body">

@@ -11,15 +11,13 @@ import { CgProfile } from "react-icons/cg";
 import { useAuth } from "../../hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { IoIosArrowBack } from "react-icons/io";
 
 type Props = {
   title: string;
   breadcrumb?: {
-    main: string;
-    detail: string;
-    ressource?: string;
+    title: string;
     navigate: string;
-    navigateDetail?: string;
   };
 };
 
@@ -60,26 +58,9 @@ export const Header = (props: Props) => {
           </Row>
           {props.breadcrumb && (
             <Row>
-              <Breadcrumb>
-                <Breadcrumb.Item
-                  onClick={() => navigate(props.breadcrumb!.navigate)}
-                >
-                  {props.breadcrumb.main}
-                </Breadcrumb.Item>
-                {props.breadcrumb.ressource ? (
-                  <>
-                    <Breadcrumb.Item onClick={() => navigate(props.breadcrumb!.navigateDetail!)}>{props.breadcrumb.detail}</Breadcrumb.Item>
-                    <Breadcrumb.Item active>
-                      {props.breadcrumb.ressource}
-                    </Breadcrumb.Item>
-                  </>
-                ) : (
-                  <>
-                    <Breadcrumb.Item active>
-                      {props.breadcrumb.detail}
-                    </Breadcrumb.Item>
-                  </>
-                )}
+              <Breadcrumb onClick={() => navigate(props.breadcrumb!.navigate)}>
+                <IoIosArrowBack style={{width: 27, height: 27, color: "white"}} />
+                <div style={{color: "white"}}>{props.breadcrumb.title}</div>
               </Breadcrumb>
             </Row>
           )}

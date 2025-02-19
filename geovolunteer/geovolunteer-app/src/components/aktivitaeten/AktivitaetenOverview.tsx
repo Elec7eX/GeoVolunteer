@@ -65,7 +65,7 @@ export default function AktivitaetenOverview() {
           </Card>
         </div>
       </div>
-      <Footer />
+      <Footer displayAddAktivitaet/>
     </>
   );
 }
