@@ -1,6 +1,6 @@
 import { useState, ChangeEvent } from "react";
-import IUserData from "../types/User";
 import userService from "../services/UserServices";
+import { UserModel } from "../types/Types";
 
 export default function AddUser() {
   const initialBenutzerState = {
@@ -9,7 +9,7 @@ export default function AddUser() {
     nachname: "",
     geburtsDatum: "",
   };
-  const [benutzer, setBenutzer] = useState<IUserData>(initialBenutzerState);
+  const [benutzer, setBenutzer] = useState<UserModel>(initialBenutzerState);
   const [submitted, setSubmitted] = useState<boolean>(false);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {

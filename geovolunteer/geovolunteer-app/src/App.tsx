@@ -7,15 +7,12 @@ import { Login } from "./login/Login";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedRoute } from "./roots/ProtectedRoute";
 import i18n from "./i18n";
-<<<<<<< Upstream, based on origin/main
 import Map from "./components/karte/Map";
 import Organisaiton from "./components/organisation/Organisation";
 import AktivitaetenOverview from "./components/aktivitaeten/AktivitaetenOverview";
 import AktivitaetDetailPage from "./components/aktivitaeten/AktivitaetDetailPage";
 import RessourceDetailPage from "./components/aktivitaeten/RessourceDetailPage";
 import AktivitaetDetail from "./components/aktivitaeten/AktivitaetDetail";
-=======
->>>>>>> 38cde22 Header & Footer design
 
 const App: React.FC = () => {
   console.log(i18n);

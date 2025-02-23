@@ -1,5 +1,4 @@
 import {
-<<<<<<< Upstream, based on origin/main
   Breadcrumb,
   Col,
   Container,
@@ -31,26 +30,9 @@ export const Header = (props: Props) => {
     logout();
   };
 
-=======
-  Button,
-  Col,
-  Container,
-  Navbar,
-  NavDropdown,
-  Row,
-} from "react-bootstrap";
-import { CgProfile } from "react-icons/cg";
-
-type Props = {
-  title: string;
-};
-
-export const Header = (props: Props) => {
->>>>>>> 38cde22 Header & Footer design
   return (
     <>
       <div className="header">
-<<<<<<< Upstream, based on origin/main
         <Container>
           <Row>
             <Col md={2}>
@@ -83,28 +65,6 @@ export const Header = (props: Props) => {
             </Row>
           )}
         </Container>
-=======
-        <Navbar expand="lg">
-          <Container>
-            <div style={{ flex: 2, textAlign: "right" }}>
-              <Row>
-                <Col>
-                  <Navbar.Brand>
-                    {<div className="header-title">{props.title}</div>}
-                  </Navbar.Brand>
-                </Col>
-                <Col>
-                  <NavDropdown title={<CgProfile className="custom-icon profile-icon" size={27} />} id="collapsible-nav-dropdown">
-                    <NavDropdown.Item href="/secret">
-                      Separated link
-                    </NavDropdown.Item>
-                  </NavDropdown>
-                </Col>
-              </Row>
-            </div>
-          </Container>
-        </Navbar>
->>>>>>> 38cde22 Header & Footer design
       </div>
     </>
   );

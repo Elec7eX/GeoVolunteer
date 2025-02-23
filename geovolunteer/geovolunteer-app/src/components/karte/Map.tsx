@@ -32,13 +32,13 @@ export default function Map() {
     iconSize: [38, 38],
   });
 
-  const createCustomClusterIcon= (cluster: any) => {
+  const createCustomClusterIcon = (cluster: any) => {
     return divIcon({
       html: `<span class="cluster-icon">${cluster.getChildCount()}</span>`,
       className: "cluster-icon",
-      iconSize: point(33, 33, true)
-    })
-  }
+      iconSize: point(33, 33, true),
+    });
+  };
 
   return (
     <>
@@ -47,7 +47,8 @@ export default function Map() {
         <MapContainer
           center={[48.30639, 14.28611]}
           zoom={13}
-          scrollWheelZoom={false}
+          scrollWheelZoom={true}
+          style={{ height: "765px" }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
