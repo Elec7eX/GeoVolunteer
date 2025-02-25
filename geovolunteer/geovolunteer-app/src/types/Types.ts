@@ -15,21 +15,19 @@ export interface AdresseModel {
 }
 
 export interface MarkerModel {
-    id?: any | null,
     latitude: number,
     longitude: number
 }
 
 export interface RessourceModel {
-    id?: any | null,
+    name: string
 }
 
 export interface AktivitaetModel {
-    id?: any | null,
     name: string,
     beschreibung: string,
-    addressInput: AdressInputEnum | null,
-    adresse?: AdresseModel,
-    marker?: MarkerModel,
+    addressInput: AdressInputEnum,
+    adresse: AdresseModel,
+    marker: MarkerModel,
     ressource: RessourceModel,
 }

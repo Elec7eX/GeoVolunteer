@@ -9,8 +9,17 @@ import {
   FormikValues,
 } from "formik";
 import { useEffect, useState } from "react";
-import { AktivitaetModel } from "../../types/Types";
+import { AdresseModel, AktivitaetModel } from "../../types/Types";
 import { AdressInputEnum } from "../../enums/Enums";
+import {
+  MapContainer,
+  Marker,
+  TileLayer,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { Icon } from "leaflet";
 
 interface FormularResult {
   values: AktivitaetModel;
@@ -25,12 +34,97 @@ export default function AktivitaetDetail() {
       name: "",
       beschreibung: "",
       addressInput: AdressInputEnum.Manual,
+      adresse: {
+        strasse: "",
+        hausnummer: "",
+        plz: "",
+        ort: "",
+      },
+      marker: {
+        latitude: 0,
+        longitude: 0,
+      },
       ressource: {
-        id: "",
+        name: "",
       },
     };
     setInitialValues(model);
   }, []);
+
+  const customIcon = new Icon({
+    iconUrl: require("../../icons/marker-icon.png"),
+    iconSize: [38, 38],
+  });
+
+  const [position, setPosition]: any = useState(null);
+  const [address, setAddress] = useState("");
+
+  // Custom hook to handle map click events
+  const MapClickHandler = () => {
+    useMapEvents({
+      click: async (event: any) => {
+        const { lat, lng } = event.latlng;
+        setPosition([lat, lng]);
+
+        // Fetch address using Nominatim API
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+        );
+        const data = await response.json();
+
+        if (data && data.display_name) {
+          setAddress(data.display_name);
+          if (data.address) {
+            const address = {
+              strasse: data.address.road,
+              hausnummer: data.address.house_number,
+              plz: data.address.postcode,
+              ort: data.address.city,
+            };
+            setInitialValues((prevForm: any) => ({
+              ...prevForm,
+              adresse: {
+                strasse: data.address.road,
+                hausnummer: data.address.house_number,
+                plz: data.address.postcode,
+                ort: data.address.city,
+              },
+            }));
+            /*setInitialValues((prevForm: AktivitaetModel | undefined) => ({
+              ...(prevForm || {
+                // Fallback to an empty object or default values
+                adresse: {
+                  strasse: "",
+                  hausnummer: "",
+                  plz: "",
+                  ort: "",
+                },
+                name: "", // Add other default values as necessary
+                beschreibung: "",
+                addressInput: AdressInputEnum.Manual, // Replace with actual default
+                marker: {
+                  latitude: 0,
+                  longitude: 0,
+                },
+                ressource: {
+                  name: "",
+                },
+              }),
+              adresse: {
+                ...(prevForm?.adresse || {}), // Spread existing adresse or use an empty object
+                strasse: data.address.road,
+                hausnummer: data.address.house_number,
+                plz: data.address.postcode,
+                ort: data.address.city,
+              },
+            }));*/
+          }
+        }
+      },
+    });
+
+    return null; // This component doesn't render anything
+  };
 
   const handleSubmit = async (result: FormularResult) => {};
 
@@ -40,7 +134,7 @@ export default function AktivitaetDetail() {
         <>
           <Header title={t("aktivitaeten.create.title")} />
           <div className="body">
-            <Card style={{ height: "100%" }}>
+            <Card style={{ height: "1000px" }}>
               <Formik
                 initialValues={initialValues}
                 onSubmit={(values, formikBag) =>
@@ -165,6 +259,32 @@ export default function AktivitaetDetail() {
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
+                        </Form.Group>
+                      </>
+                    )}
+                    {values.addressInput === AdressInputEnum.Map && (
+                      <>
+                        <MapContainer
+                          center={[48.30639, 14.28611]}
+                          zoom={13}
+                          style={{ height: "512px", width: "100%" }}
+                        >
+                          <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                          />
+                          {/* Use the custom hook for handling clicks */}
+                          <MapClickHandler />
+                          {position && (
+                            <Marker position={position} icon={customIcon}>
+                              <Popup>{address}</Popup>
+                            </Marker>
+                          )}
+                        </MapContainer>
+                        <Form.Group>
+                          <Form.Text>
+                            {address && <div>Address: {address}</div>}
+                          </Form.Text>
                         </Form.Group>
                       </>
                     )}
