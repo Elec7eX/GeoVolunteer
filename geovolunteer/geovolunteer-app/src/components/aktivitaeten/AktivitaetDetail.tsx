@@ -28,6 +28,14 @@ interface FormularResult {
 
 export default function AktivitaetDetail() {
   const [initialValues, setInitialValues] = useState<AktivitaetModel>();
+  const [position, setPosition]: any = useState(null);
+  const [address, setAddress] = useState("");
+
+  const [strasse, setStrasse] = useState<string>();
+  const [hausnummer, setHausnummer] = useState<string>();
+  const [plz, setPlz] = useState<string>();
+  const [ort, setOrt] = useState<string>();
+  const [selectedDate, setSelectedDate] = useState<Date>();
 
   useEffect(() => {
     const model: AktivitaetModel = {
@@ -56,9 +64,6 @@ export default function AktivitaetDetail() {
     iconSize: [38, 38],
   });
 
-  const [position, setPosition]: any = useState(null);
-  const [address, setAddress] = useState("");
-
   // Custom hook to handle map click events
   const MapClickHandler = () => {
     useMapEvents({
@@ -75,49 +80,10 @@ export default function AktivitaetDetail() {
         if (data && data.display_name) {
           setAddress(data.display_name);
           if (data.address) {
-            const address = {
-              strasse: data.address.road,
-              hausnummer: data.address.house_number,
-              plz: data.address.postcode,
-              ort: data.address.city,
-            };
-            setInitialValues((prevForm: any) => ({
-              ...prevForm,
-              adresse: {
-                strasse: data.address.road,
-                hausnummer: data.address.house_number,
-                plz: data.address.postcode,
-                ort: data.address.city,
-              },
-            }));
-            /*setInitialValues((prevForm: AktivitaetModel | undefined) => ({
-              ...(prevForm || {
-                // Fallback to an empty object or default values
-                adresse: {
-                  strasse: "",
-                  hausnummer: "",
-                  plz: "",
-                  ort: "",
-                },
-                name: "", // Add other default values as necessary
-                beschreibung: "",
-                addressInput: AdressInputEnum.Manual, // Replace with actual default
-                marker: {
-                  latitude: 0,
-                  longitude: 0,
-                },
-                ressource: {
-                  name: "",
-                },
-              }),
-              adresse: {
-                ...(prevForm?.adresse || {}), // Spread existing adresse or use an empty object
-                strasse: data.address.road,
-                hausnummer: data.address.house_number,
-                plz: data.address.postcode,
-                ort: data.address.city,
-              },
-            }));*/
+            setStrasse(data.address.road);
+            setHausnummer(data.address.house_number);
+            setPlz(data.address.postcode);
+            setOrt(data.address.city);
           }
         }
       },
@@ -134,7 +100,7 @@ export default function AktivitaetDetail() {
         <>
           <Header title={t("aktivitaeten.create.title")} />
           <div className="body">
-            <Card style={{ height: "1000px" }}>
+            <Card style={{ height: "100%" }}>
               <Formik
                 initialValues={initialValues}
                 onSubmit={(values, formikBag) =>
@@ -219,8 +185,8 @@ export default function AktivitaetDetail() {
                           <Form.Control
                             id="strasse"
                             type="text"
-                            value={values.adresse?.strasse}
-                            onChange={handleChange}
+                            value={strasse}
+                            onChange={(e) => setStrasse(e.target.value)}
                             onBlur={handleBlur}
                           />
                         </Form.Group>
@@ -231,35 +197,37 @@ export default function AktivitaetDetail() {
                           <Form.Control
                             id="hausnummer"
                             type="text"
-                            value={values.adresse?.hausnummer}
-                            onChange={handleChange}
+                            value={hausnummer}
+                            onChange={(e) => setHausnummer(e.target.value)}
                             onBlur={handleBlur}
                           />
                         </Form.Group>
-                        <Form.Group className="mb-3">
+                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                        <Form.Group className="mb-3" style={{flex: 1, marginRight: '10px'}}>
                           <Form.Label>
                             {t("aktivitaeten.detail.adress.plz")}
                           </Form.Label>
                           <Form.Control
                             id="plz"
                             type="text"
-                            value={values.adresse?.plz}
-                            onChange={handleChange}
+                            value={plz}
+                            onChange={(e) => setPlz(e.target.value)}
                             onBlur={handleBlur}
                           />
                         </Form.Group>
-                        <Form.Group className="mb-3">
+                        <Form.Group className="mb-3" style={{flex: 1}}>
                           <Form.Label>
                             {t("aktivitaeten.detail.adress.ort")}
                           </Form.Label>
                           <Form.Control
                             id="ort"
                             type="text"
-                            value={values.adresse?.ort}
-                            onChange={handleChange}
+                            value={ort}
+                            onChange={(e) => setOrt(e.target.value)}
                             onBlur={handleBlur}
                           />
                         </Form.Group>
+                        </div>
                       </>
                     )}
                     {values.addressInput === AdressInputEnum.Map && (
@@ -288,6 +256,11 @@ export default function AktivitaetDetail() {
                         </Form.Group>
                       </>
                     )}
+                    <Form.Group>
+                      <Form.Label>Date</Form.Label>
+                      <Form.Control type="date" />
+                      <Form.Control type="time" />
+                    </Form.Group>
                   </FormikForm>
                 )}
               </Formik>
