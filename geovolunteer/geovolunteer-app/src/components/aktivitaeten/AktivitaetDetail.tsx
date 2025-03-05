@@ -1,7 +1,7 @@
 import { init, t } from "i18next";
 import { Header } from "../header/Header";
 import { Footer } from "../footer/Footer";
-import { Card, Form } from "react-bootstrap";
+import { Card, Col, Form, Row } from "react-bootstrap";
 import {
   Form as FormikForm,
   Formik,
@@ -35,7 +35,11 @@ export default function AktivitaetDetail() {
   const [hausnummer, setHausnummer] = useState<string>();
   const [plz, setPlz] = useState<string>();
   const [ort, setOrt] = useState<string>();
-  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [startDate, setStartDate] = useState(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  const [endDate, setEndDate] = useState(new Date().toString());
+  const [startTime, setStartTime] = useState(new Date().toString());
+  const [endTime, setEndTime] = useState(new Date().toString());
+
 
   useEffect(() => {
     const model: AktivitaetModel = {
@@ -100,7 +104,7 @@ export default function AktivitaetDetail() {
         <>
           <Header title={t("aktivitaeten.create.title")} />
           <div className="body">
-            <Card style={{ height: "100%" }}>
+            <Card style={{ height: "auto" }}>
               <Formik
                 initialValues={initialValues}
                 onSubmit={(values, formikBag) =>
@@ -178,64 +182,88 @@ export default function AktivitaetDetail() {
                     </div>
                     {values.addressInput === AdressInputEnum.Manual && (
                       <>
+                        <Row>
+                          <Col sm={9}>
+                            <Form.Group className="mb-3">
+                              <Form.Label>
+                                {t("aktivitaeten.detail.adress.strasse")}
+                              </Form.Label>
+                              <Form.Control
+                                id="strasse"
+                                type="text"
+                                value={strasse}
+                                onChange={(e) => setStrasse(e.target.value)}
+                                onBlur={handleBlur} />
+                            </Form.Group>
+                          </Col>
+                          <Col>
+                              <Form.Group className="mb-3">
+                              <Form.Label>
+                                {t("aktivitaeten.detail.adress.hausnummer")}
+                              </Form.Label>
+                              <Form.Control
+                                id="hausnummer"
+                                type="text"
+                                value={hausnummer}
+                                onChange={(e) => setHausnummer(e.target.value)}
+                                onBlur={handleBlur} />
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col sm={4}>
+                            <Form.Group className="mb-3" style={{flex: 1, marginRight: '10px'}}>
+                              <Form.Label>
+                                {t("aktivitaeten.detail.adress.plz")}
+                              </Form.Label>
+                              <Form.Control
+                                id="plz"
+                                type="text"
+                                value={plz}
+                                onChange={(e) => setPlz(e.target.value)}
+                                onBlur={handleBlur}
+                              />
+                            </Form.Group>
+                          </Col>
+                          <Col>
+                            <Form.Group className="mb-3" style={{flex: 1}}>
+                              <Form.Label>
+                                {t("aktivitaeten.detail.adress.ort")}
+                              </Form.Label>
+                              <Form.Control
+                                id="ort"
+                                type="text"
+                                value={ort}
+                                onChange={(e) => setOrt(e.target.value)}
+                                onBlur={handleBlur}
+                              />
+                            </Form.Group>
+                          </Col>
+                        </Row>
                         <Form.Group className="mb-3">
                           <Form.Label>
-                            {t("aktivitaeten.detail.adress.strasse")}
-                          </Form.Label>
-                          <Form.Control
-                            id="strasse"
-                            type="text"
-                            value={strasse}
-                            onChange={(e) => setStrasse(e.target.value)}
-                            onBlur={handleBlur}
-                          />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                          <Form.Label>
-                            {t("aktivitaeten.detail.adress.hausnummer")}
-                          </Form.Label>
-                          <Form.Control
-                            id="hausnummer"
-                            type="text"
-                            value={hausnummer}
-                            onChange={(e) => setHausnummer(e.target.value)}
-                            onBlur={handleBlur}
-                          />
-                        </Form.Group>
-                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                        <Form.Group className="mb-3" style={{flex: 1, marginRight: '10px'}}>
-                          <Form.Label>
-                            {t("aktivitaeten.detail.adress.plz")}
+                            Koordinaten
                           </Form.Label>
                           <Form.Control
                             id="plz"
                             type="text"
-                            value={plz}
-                            onChange={(e) => setPlz(e.target.value)}
-                            onBlur={handleBlur}
+                            disabled
+                            value={"test"}
                           />
                         </Form.Group>
-                        <Form.Group className="mb-3" style={{flex: 1}}>
-                          <Form.Label>
-                            {t("aktivitaeten.detail.adress.ort")}
-                          </Form.Label>
-                          <Form.Control
-                            id="ort"
-                            type="text"
-                            value={ort}
-                            onChange={(e) => setOrt(e.target.value)}
-                            onBlur={handleBlur}
-                          />
-                        </Form.Group>
-                        </div>
                       </>
                     )}
                     {values.addressInput === AdressInputEnum.Map && (
                       <>
+                        <Form.Group className="mb-3">
+                          <Form.Text>
+                            {address && <div>Address: {address}</div>}
+                          </Form.Text>
+                        </Form.Group>
                         <MapContainer
                           center={[48.30639, 14.28611]}
                           zoom={13}
-                          style={{ height: "512px", width: "100%" }}
+                          style={{ height: "512px", width: "100%", marginBottom: "2rem"}}
                         >
                           <TileLayer
                             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -249,18 +277,36 @@ export default function AktivitaetDetail() {
                             </Marker>
                           )}
                         </MapContainer>
-                        <Form.Group>
-                          <Form.Text>
-                            {address && <div>Address: {address}</div>}
-                          </Form.Text>
-                        </Form.Group>
                       </>
                     )}
-                    <Form.Group>
-                      <Form.Label>Date</Form.Label>
-                      <Form.Control type="date" />
-                      <Form.Control type="time" />
-                    </Form.Group>
+                    <Row>
+                      <Col>
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t('aktivitaeten.detail.startDate')}</Form.Label>
+                          <Form.Control type="date" value={startDate} onChange={(e) => setStartDate(e.target.value!)}/>
+                        </Form.Group>
+                      </Col>
+                      <Col>
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t('aktivitaeten.detail.endDate')}</Form.Label>
+                          <Form.Control type="date" value={endDate} onChange={(e) => setEndDate(e.target.value!)}/>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col>
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t('aktivitaeten.detail.startTime')}</Form.Label>
+                          <Form.Control type="time" value={startTime} onChange={(e) => setStartTime(e.target.value!)}/>
+                        </Form.Group>
+                      </Col>
+                      <Col>
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t('aktivitaeten.detail.endTime')}</Form.Label>
+                          <Form.Control type="time" value={endTime} onChange={(e) => setEndTime(e.target.value!)}/>
+                        </Form.Group>
+                      </Col>
+                    </Row>
                   </FormikForm>
                 )}
               </Formik>
