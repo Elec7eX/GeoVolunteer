@@ -14,7 +14,7 @@ export interface AdresseModel {
     ort: string
 }
 
-export interface MarkerModel {
+export interface KoordinatenModel {
     latitude: number,
     longitude: number
 }
@@ -28,6 +28,7 @@ export interface AktivitaetModel {
     beschreibung: string,
     addressInput: AdressInputEnum,
     adresse: AdresseModel,
-    marker: MarkerModel,
+    koordinaten: KoordinatenModel,
+    teilnehmeranzahl: number,
     ressource: RessourceModel,
 }
