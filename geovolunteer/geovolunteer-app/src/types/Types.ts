@@ -30,5 +30,11 @@ export interface AktivitaetModel {
     adresse: AdresseModel,
     koordinaten: KoordinatenModel,
     teilnehmeranzahl: number,
+    transport: string,
+    verpflegung: string,
+    vorname: string,
+    nachname: string,
+    email: string,
+    telefon: string,
     ressource: RessourceModel,
 }

@@ -1,4 +1,5 @@
-import { init, t } from "i18next";
+import * as Yup from "yup";
+import { t } from "i18next";
 import { Header } from "../header/Header";
 import { Footer } from "../footer/Footer";
 import { Button, Card, Col, Form, Row } from "react-bootstrap";
@@ -21,6 +22,7 @@ import {
 import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 interface FormularResult {
   values: AktivitaetModel;
@@ -64,6 +66,12 @@ export default function AktivitaetDetail() {
         longitude: 0,
       },
       teilnehmeranzahl: 0,
+      transport: "",
+      verpflegung: "",
+      vorname: "",
+      nachname: "",
+      email: "",
+      telefon: "",
       ressource: {
         name: "",
       },
@@ -103,8 +111,58 @@ export default function AktivitaetDetail() {
       },
     });
 
-    return null; // This component doesn't render anything
+    return null;
   };
+
+  const getCoordinates = async (e: any) => {
+    e.preventDefault();
+    if (strasse !== "" && hausnummer !== "" && plz !== "" && ort !== "") {
+      const address = `${strasse} ${hausnummer}, ${plz} ${ort}`;
+      try {
+        const response = await axios.get(
+          `https://nominatim.openstreetmap.org/search`,
+          {
+            params: {
+              q: address,
+              format: "json",
+              addressdetails: 1,
+            },
+          }
+        );
+
+        if (response.data.length > 0) {
+          const { lat, lon } = response.data[0];
+          setLatitude(lat);
+          setLongitude(lon);
+        } else {
+          alert("Adresse nicht gefunden");
+        }
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Koordinaten:", error);
+      }
+    } else {
+      setLatitude(0);
+      setLongitude(0);
+    }
+  };
+
+  function validationFirstPage(): Yup.ObjectSchema<AktivitaetModel> {
+    let shape = Yup.object().shape({
+      name: Yup.string().required("required"),
+      beschreibung: Yup.string().required("Required"),
+      addresse: Yup.object().shape({
+        strasse: Yup.string().required("Strasse is required"), // Add a message for clarity
+        hausnummer: Yup.string().required("Hausnummer is required"),
+        plz: Yup.string().required("PLZ is required"),
+        ort: Yup.string().required("Ort is required"),
+      }),
+      koordinaten: Yup.object().shape({
+        latitude: Yup.number().required("Latitude is required"), // Correct spelling if needed
+        longitude: Yup.number().required("Longitude is required"),
+      }),
+    }) as any;
+    return shape;
+  }
 
   const handleSubmit = async (result: FormularResult) => {};
 
@@ -127,7 +185,7 @@ export default function AktivitaetDetail() {
                   handleSubmit({ values, formikBag })
                 }
                 enableReinitialize
-                validationSchema={currentPage === 0 ? undefined : undefined}
+                validationSchema={validationFirstPage}
               >
                 {({
                   values,
@@ -147,6 +205,11 @@ export default function AktivitaetDetail() {
                           </Form.Label>
                           <Form.Control
                             id="name"
+                            className={
+                              errors.name && touched.name
+                                ? "text-input error"
+                                : "text-input"
+                            }
                             type="text"
                             value={values.name}
                             onChange={handleChange}
@@ -159,6 +222,11 @@ export default function AktivitaetDetail() {
                           </Form.Label>
                           <Form.Control
                             id="beschreibung"
+                            className={
+                              errors.name && touched.name
+                                ? "text-input error"
+                                : "text-input"
+                            }
                             type="text"
                             value={values.beschreibung}
                             onChange={handleChange}
@@ -212,9 +280,20 @@ export default function AktivitaetDetail() {
                                   </Form.Label>
                                   <Form.Control
                                     id="strasse"
+                                    className={
+                                      errors.name && touched.name
+                                        ? "text-input error"
+                                        : "text-input"
+                                    }
                                     type="text"
                                     value={strasse}
-                                    onChange={(e) => setStrasse(e.target.value)}
+                                    onChange={(e) => {
+                                      setStrasse(e.target.value);
+                                      setFieldValue(
+                                        "adresse.strasse",
+                                        e.target.value
+                                      );
+                                    }}
                                     onBlur={handleBlur}
                                   />
                                 </Form.Group>
@@ -226,11 +305,20 @@ export default function AktivitaetDetail() {
                                   </Form.Label>
                                   <Form.Control
                                     id="hausnummer"
+                                    className={
+                                      errors.name && touched.name
+                                        ? "text-input error"
+                                        : "text-input"
+                                    }
                                     type="text"
                                     value={hausnummer}
-                                    onChange={(e) =>
-                                      setHausnummer(e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                      setHausnummer(e.target.value);
+                                      setFieldValue(
+                                        "adresse.hausnummer",
+                                        e.target.value
+                                      );
+                                    }}
                                     onBlur={handleBlur}
                                   />
                                 </Form.Group>
@@ -247,9 +335,20 @@ export default function AktivitaetDetail() {
                                   </Form.Label>
                                   <Form.Control
                                     id="plz"
+                                    className={
+                                      errors.name && touched.name
+                                        ? "text-input error"
+                                        : "text-input"
+                                    }
                                     type="text"
                                     value={plz}
-                                    onChange={(e) => setPlz(e.target.value)}
+                                    onChange={(e) => {
+                                      setPlz(e.target.value);
+                                      setFieldValue(
+                                        "strasse.plz",
+                                        e.target.value
+                                      );
+                                    }}
                                     onBlur={handleBlur}
                                   />
                                 </Form.Group>
@@ -264,12 +363,34 @@ export default function AktivitaetDetail() {
                                   </Form.Label>
                                   <Form.Control
                                     id="ort"
+                                    className={
+                                      errors.name && touched.name
+                                        ? "text-input error"
+                                        : "text-input"
+                                    }
                                     type="text"
                                     value={ort}
-                                    onChange={(e) => setOrt(e.target.value)}
+                                    onChange={(e) => {
+                                      setOrt(e.target.value);
+                                      setFieldValue(
+                                        "strasse.ort",
+                                        e.target.value
+                                      );
+                                    }}
                                     onBlur={handleBlur}
                                   />
                                 </Form.Group>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col style={{ textAlign: "right" }}>
+                                <Button
+                                  variant="primary"
+                                  size="sm"
+                                  onClick={(e) => getCoordinates(e)}
+                                >
+                                  {t("button.coordinates")}
+                                </Button>
                               </Col>
                             </Row>
                             <Form.Group className="mb-3">
@@ -283,6 +404,7 @@ export default function AktivitaetDetail() {
                                     type="text"
                                     disabled
                                     value={latitude}
+                                    onChange={(e) => setFieldValue('koordinaten.latitude', e.target.value)}
                                   />
                                 </Col>
                                 <Col sm={6}>
@@ -291,6 +413,7 @@ export default function AktivitaetDetail() {
                                     type="text"
                                     disabled
                                     value={longitude}
+                                    onChange={(e) => setFieldValue('koordinaten.longitude', e.target.value)}
                                   />
                                 </Col>
                               </Row>
@@ -335,6 +458,11 @@ export default function AktivitaetDetail() {
                               </Form.Label>
                               <Form.Control
                                 type="date"
+                                className={
+                                  errors.name && touched.name
+                                    ? "text-input error"
+                                    : "text-input"
+                                }
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value!)}
                               />
@@ -347,6 +475,11 @@ export default function AktivitaetDetail() {
                               </Form.Label>
                               <Form.Control
                                 type="date"
+                                className={
+                                  errors.name && touched.name
+                                    ? "text-input error"
+                                    : "text-input"
+                                }
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value!)}
                               />
@@ -361,6 +494,11 @@ export default function AktivitaetDetail() {
                               </Form.Label>
                               <Form.Control
                                 type="time"
+                                className={
+                                  errors.name && touched.name
+                                    ? "text-input error"
+                                    : "text-input"
+                                }
                                 value={startTime}
                                 onChange={(e) => setStartTime(e.target.value!)}
                               />
@@ -373,6 +511,11 @@ export default function AktivitaetDetail() {
                               </Form.Label>
                               <Form.Control
                                 type="time"
+                                className={
+                                  errors.name && touched.name
+                                    ? "text-input error"
+                                    : "text-input"
+                                }
                                 value={endTime}
                                 onChange={(e) => setEndTime(e.target.value!)}
                               />
@@ -398,7 +541,7 @@ export default function AktivitaetDetail() {
                           <Form.Control
                             id="transport"
                             type="text"
-                            value={values.name}
+                            value={values.transport}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
@@ -410,7 +553,7 @@ export default function AktivitaetDetail() {
                           <Form.Control
                             id="verpflegung"
                             type="text"
-                            value={values.name}
+                            value={values.verpflegung}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
@@ -426,7 +569,7 @@ export default function AktivitaetDetail() {
                               <Form.Control
                                 id="vorname"
                                 type="text"
-                                value={values.name}
+                                value={values.vorname}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
                               />
@@ -440,7 +583,7 @@ export default function AktivitaetDetail() {
                               <Form.Control
                                 id="nachname"
                                 type="text"
-                                value={values.name}
+                                value={values.nachname}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
                               />
@@ -454,7 +597,7 @@ export default function AktivitaetDetail() {
                           <Form.Control
                             id="email"
                             type="text"
-                            value={values.name}
+                            value={values.email}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
@@ -466,7 +609,7 @@ export default function AktivitaetDetail() {
                           <Form.Control
                             id="telefon"
                             type="text"
-                            value={values.name}
+                            value={values.telefon}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
@@ -494,8 +637,10 @@ export default function AktivitaetDetail() {
                       </Col>
                       <Col>
                         <Button
+                          className="shadow"
+                          id="save"
                           variant="primary"
-                          onClick={() => setCurrentPage(currentPage + 1)}
+                          type="submit"
                         >
                           {t("button.weiter")}
                         </Button>
