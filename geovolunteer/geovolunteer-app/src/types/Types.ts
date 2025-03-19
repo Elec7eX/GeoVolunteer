@@ -37,4 +37,8 @@ export interface AktivitaetModel {
     email: string,
     telefon: string,
     ressource: RessourceModel,
+    startDatum: string,
+    endDatum: string,
+    startZeit: string,
+    endZeit: string
 }

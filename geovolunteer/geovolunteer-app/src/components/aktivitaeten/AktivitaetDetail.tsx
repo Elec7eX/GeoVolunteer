@@ -75,6 +75,10 @@ export default function AktivitaetDetail() {
       ressource: {
         name: "",
       },
+      startDatum: "",
+      endDatum: "",
+      startZeit: "",
+      endZeit: ""
     };
     setInitialValues(model);
   }, []);
@@ -205,6 +209,7 @@ export default function AktivitaetDetail() {
                           </Form.Label>
                           <Form.Control
                             id="name"
+                            name="name"
                             className={
                               errors.name && touched.name
                                 ? "text-input error"
@@ -222,6 +227,7 @@ export default function AktivitaetDetail() {
                           </Form.Label>
                           <Form.Control
                             id="beschreibung"
+                            name="beschreibung"
                             className={
                               errors.name && touched.name
                                 ? "text-input error"
@@ -280,6 +286,7 @@ export default function AktivitaetDetail() {
                                   </Form.Label>
                                   <Form.Control
                                     id="strasse"
+                                    name="adresse.strasse"
                                     className={
                                       errors.name && touched.name
                                         ? "text-input error"
@@ -305,6 +312,7 @@ export default function AktivitaetDetail() {
                                   </Form.Label>
                                   <Form.Control
                                     id="hausnummer"
+                                    name="adresse.hausnummer"
                                     className={
                                       errors.name && touched.name
                                         ? "text-input error"
@@ -335,6 +343,7 @@ export default function AktivitaetDetail() {
                                   </Form.Label>
                                   <Form.Control
                                     id="plz"
+                                    name="adresse.plz"
                                     className={
                                       errors.name && touched.name
                                         ? "text-input error"
@@ -363,6 +372,7 @@ export default function AktivitaetDetail() {
                                   </Form.Label>
                                   <Form.Control
                                     id="ort"
+                                    name="adresse.ort"
                                     className={
                                       errors.name && touched.name
                                         ? "text-input error"
@@ -401,6 +411,7 @@ export default function AktivitaetDetail() {
                                 <Col sm={6}>
                                   <Form.Control
                                     id="latitude"
+                                    name="koordinaten.latitude"
                                     type="text"
                                     disabled
                                     value={latitude}
@@ -410,6 +421,7 @@ export default function AktivitaetDetail() {
                                 <Col sm={6}>
                                   <Form.Control
                                     id="longitude"
+                                    name="koordinaten.longitude"
                                     type="text"
                                     disabled
                                     value={longitude}
@@ -458,13 +470,15 @@ export default function AktivitaetDetail() {
                               </Form.Label>
                               <Form.Control
                                 type="date"
+                                id="startDatum"
+                                name="startDatum"
                                 className={
                                   errors.name && touched.name
                                     ? "text-input error"
                                     : "text-input"
                                 }
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value!)}
+                                value={values.startDatum}
+                                onChange={handleChange}
                               />
                             </Form.Group>
                           </Col>
@@ -474,14 +488,16 @@ export default function AktivitaetDetail() {
                                 {t("aktivitaeten.detail.endDate")}
                               </Form.Label>
                               <Form.Control
+                                id="endDatum"
+                                name="endDatum"
                                 type="date"
                                 className={
                                   errors.name && touched.name
                                     ? "text-input error"
                                     : "text-input"
                                 }
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value!)}
+                                value={values.endDatum}
+                                onChange={handleChange}
                               />
                             </Form.Group>
                           </Col>
@@ -493,14 +509,16 @@ export default function AktivitaetDetail() {
                                 {t("aktivitaeten.detail.startTime")}
                               </Form.Label>
                               <Form.Control
+                                id="startZeit"
+                                name="startZeit"
                                 type="time"
                                 className={
                                   errors.name && touched.name
                                     ? "text-input error"
                                     : "text-input"
                                 }
-                                value={startTime}
-                                onChange={(e) => setStartTime(e.target.value!)}
+                                value={values.startZeit}
+                                onChange={handleChange}
                               />
                             </Form.Group>
                           </Col>
@@ -510,14 +528,16 @@ export default function AktivitaetDetail() {
                                 {t("aktivitaeten.detail.endTime")}
                               </Form.Label>
                               <Form.Control
+                                id="endZeit"
+                                name="endZeit"
                                 type="time"
                                 className={
                                   errors.name && touched.name
                                     ? "text-input error"
                                     : "text-input"
                                 }
-                                value={endTime}
-                                onChange={(e) => setEndTime(e.target.value!)}
+                                value={values.endZeit}
+                                onChange={handleChange}
                               />
                             </Form.Group>
                           </Col>
