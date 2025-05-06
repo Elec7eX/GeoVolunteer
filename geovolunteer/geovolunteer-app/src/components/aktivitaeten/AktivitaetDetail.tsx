@@ -8,6 +8,7 @@ import {
   Formik,
   FormikHelpers,
   FormikValues,
+  useFormikContext,
 } from "formik";
 import { useEffect, useState } from "react";
 import { AdresseModel, AktivitaetModel } from "../../types/Types";
@@ -37,18 +38,8 @@ export default function AktivitaetDetail() {
   const [position, setPosition]: any = useState(null);
   const [address, setAddress] = useState("");
 
-  const [strasse, setStrasse] = useState<string>();
-  const [hausnummer, setHausnummer] = useState<string>();
-  const [plz, setPlz] = useState<string>();
-  const [ort, setOrt] = useState<string>();
   const [latitude, setLatitude] = useState<number>(0);
   const [longitude, setLongitude] = useState<number>(0);
-  const [startDate, setStartDate] = useState(
-    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  );
-  const [endDate, setEndDate] = useState(new Date().toString());
-  const [startTime, setStartTime] = useState(new Date().toString());
-  const [endTime, setEndTime] = useState(new Date().toString());
 
   useEffect(() => {
     const model: AktivitaetModel = {
@@ -78,7 +69,7 @@ export default function AktivitaetDetail() {
       startDatum: "",
       endDatum: "",
       startZeit: "",
-      endZeit: ""
+      endZeit: "",
     };
     setInitialValues(model);
   }, []);
@@ -90,6 +81,13 @@ export default function AktivitaetDetail() {
 
   // Custom hook to handle map click events
   const MapClickHandler = () => {
+    const formikContext = useFormikContext();
+
+    if (!formikContext) {
+      console.error("MapClickHandler must be used within a Formik context.");
+    }
+
+    const { setFieldValue } = formikContext;
     useMapEvents({
       click: async (event: any) => {
         const { lat, lng } = event.latlng;
@@ -104,10 +102,10 @@ export default function AktivitaetDetail() {
         if (data && data.display_name) {
           setAddress(data.display_name);
           if (data.address) {
-            setStrasse(data.address.road);
-            setHausnummer(data.address.house_number);
-            setPlz(data.address.postcode);
-            setOrt(data.address.city);
+            setFieldValue("adresse.strasse", data.address.road);
+            setFieldValue("adresse.hausnummer", data.address.house_number);
+            setFieldValue("adresse.plz", data.address.postcode);
+            setFieldValue("adresse.ort", data.address.city);
             setLatitude(data.lat);
             setLongitude(data.lon);
           }
@@ -118,10 +116,14 @@ export default function AktivitaetDetail() {
     return null;
   };
 
-  const getCoordinates = async (e: any) => {
-    e.preventDefault();
-    if (strasse !== "" && hausnummer !== "" && plz !== "" && ort !== "") {
-      const address = `${strasse} ${hausnummer}, ${plz} ${ort}`;
+  const getCoordinates = async (adresse: AdresseModel) => {
+    if (
+      adresse.strasse !== "" &&
+      adresse.hausnummer !== "" &&
+      adresse.plz !== "" &&
+      adresse.ort !== ""
+    ) {
+      const address = `${adresse.strasse} ${adresse.hausnummer}, ${adresse.plz} ${adresse.ort}`;
       try {
         const response = await axios.get(
           `https://nominatim.openstreetmap.org/search`,
@@ -154,7 +156,7 @@ export default function AktivitaetDetail() {
     let shape = Yup.object().shape({
       name: Yup.string().required("required"),
       beschreibung: Yup.string().required("Required"),
-      addresse: Yup.object().shape({
+      adresse: Yup.object().shape({
         strasse: Yup.string().required("Strasse is required"), // Add a message for clarity
         hausnummer: Yup.string().required("Hausnummer is required"),
         plz: Yup.string().required("PLZ is required"),
@@ -168,7 +170,9 @@ export default function AktivitaetDetail() {
     return shape;
   }
 
-  const handleSubmit = async (result: FormularResult) => {};
+  const handleSubmit = async (result: FormularResult) => {
+    console.log("Submit clicked!!!");
+  };
 
   return (
     <>
@@ -216,7 +220,6 @@ export default function AktivitaetDetail() {
                                 : "text-input"
                             }
                             type="text"
-                            value={values.name}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
@@ -234,7 +237,6 @@ export default function AktivitaetDetail() {
                                 : "text-input"
                             }
                             type="text"
-                            value={values.beschreibung}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
@@ -293,14 +295,8 @@ export default function AktivitaetDetail() {
                                         : "text-input"
                                     }
                                     type="text"
-                                    value={strasse}
-                                    onChange={(e) => {
-                                      setStrasse(e.target.value);
-                                      setFieldValue(
-                                        "adresse.strasse",
-                                        e.target.value
-                                      );
-                                    }}
+                                    value={values.adresse.strasse}
+                                    onChange={handleChange}
                                     onBlur={handleBlur}
                                   />
                                 </Form.Group>
@@ -319,14 +315,8 @@ export default function AktivitaetDetail() {
                                         : "text-input"
                                     }
                                     type="text"
-                                    value={hausnummer}
-                                    onChange={(e) => {
-                                      setHausnummer(e.target.value);
-                                      setFieldValue(
-                                        "adresse.hausnummer",
-                                        e.target.value
-                                      );
-                                    }}
+                                    value={values.adresse.hausnummer}
+                                    onChange={handleChange}
                                     onBlur={handleBlur}
                                   />
                                 </Form.Group>
@@ -350,14 +340,8 @@ export default function AktivitaetDetail() {
                                         : "text-input"
                                     }
                                     type="text"
-                                    value={plz}
-                                    onChange={(e) => {
-                                      setPlz(e.target.value);
-                                      setFieldValue(
-                                        "strasse.plz",
-                                        e.target.value
-                                      );
-                                    }}
+                                    value={values.adresse.plz}
+                                    onChange={handleChange}
                                     onBlur={handleBlur}
                                   />
                                 </Form.Group>
@@ -379,14 +363,8 @@ export default function AktivitaetDetail() {
                                         : "text-input"
                                     }
                                     type="text"
-                                    value={ort}
-                                    onChange={(e) => {
-                                      setOrt(e.target.value);
-                                      setFieldValue(
-                                        "strasse.ort",
-                                        e.target.value
-                                      );
-                                    }}
+                                    value={values.adresse.ort}
+                                    onChange={handleChange}
                                     onBlur={handleBlur}
                                   />
                                 </Form.Group>
@@ -397,7 +375,10 @@ export default function AktivitaetDetail() {
                                 <Button
                                   variant="primary"
                                   size="sm"
-                                  onClick={(e) => getCoordinates(e)}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getCoordinates(values.adresse);
+                                  }}
                                 >
                                   {t("button.coordinates")}
                                 </Button>
@@ -415,7 +396,7 @@ export default function AktivitaetDetail() {
                                     type="text"
                                     disabled
                                     value={latitude}
-                                    onChange={(e) => setFieldValue('koordinaten.latitude', e.target.value)}
+                                    onChange={handleChange}
                                   />
                                 </Col>
                                 <Col sm={6}>
@@ -425,7 +406,7 @@ export default function AktivitaetDetail() {
                                     type="text"
                                     disabled
                                     value={longitude}
-                                    onChange={(e) => setFieldValue('koordinaten.longitude', e.target.value)}
+                                    onChange={handleChange}
                                   />
                                 </Col>
                               </Row>
@@ -549,7 +530,6 @@ export default function AktivitaetDetail() {
                           <Form.Control
                             id="teilnehmerzahl"
                             type="text"
-                            value={values.teilnehmeranzahl}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
@@ -636,34 +616,48 @@ export default function AktivitaetDetail() {
                         </Form.Group>
                       </>
                     )}
+                    {currentPage === 1 && <></>}
                     <Row>
+                      <>{console.log(currentPage)}</>
                       <Col style={{ textAlign: "right" }}>
                         {currentPage === 0 && (
                           <Button
+                            className="shadow"
                             variant="secondary"
                             onClick={() => navigate("/aktivitäten")}
                           >
                             {t("button.cancel")}
                           </Button>
                         )}
-                        {currentPage === 1 && (
+                        {(currentPage === 1 || currentPage === 2) && (
                           <Button
+                            className="shadow"
                             variant="secondary"
                             onClick={() => setCurrentPage(currentPage - 1)}
                           >
-                            {t("button.zurueck")}
+                            {t("button.back")}
                           </Button>
                         )}
                       </Col>
                       <Col>
-                        <Button
-                          className="shadow"
-                          id="save"
-                          variant="primary"
-                          type="submit"
-                        >
-                          {t("button.weiter")}
-                        </Button>
+                        {(currentPage === 0 || currentPage === 1) && (
+                          <Button
+                            className="shadow"
+                            variant="primary"
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                          >
+                            {t("button.next")}
+                          </Button>
+                        )}
+                        {currentPage === 2 && (
+                          <Button
+                            type="submit"
+                            className="shadow"
+                            variant="primary"
+                          >
+                            {t("button.save")}
+                          </Button>
+                        )}
                       </Col>
                     </Row>
                   </FormikForm>

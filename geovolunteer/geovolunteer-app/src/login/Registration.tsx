@@ -155,7 +155,7 @@ export function Registration(props: Props) {
                     disabled={isSubmitting}
                     onClick={() => handleBack()}
                   >
-                    {t("button.zurueck")}
+                    {t("button.back")}
                   </Button>
                 </Row>
               </Col>
