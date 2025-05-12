@@ -37,7 +37,11 @@ export interface RessourceModel {
 export interface AktivitaetModel {
     name: string,
     beschreibung: string,
+<<<<<<< Upstream, based on origin/main
     addresseInput?: AdressInputEnum,
+=======
+    addresseInput: AdressInputEnum,
+>>>>>>> 18183cf ressource done
     adresse: AdresseModel,
     koordinaten: KoordinatenModel,
     teilnehmeranzahl: number,
