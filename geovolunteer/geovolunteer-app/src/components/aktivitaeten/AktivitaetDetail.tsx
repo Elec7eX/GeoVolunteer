@@ -7,7 +7,6 @@ import {
   Form as FormikForm,
   Formik,
   FormikHelpers,
-  FormikValues,
   useFormikContext,
 } from "formik";
 import { useEffect, useState } from "react";
@@ -24,6 +23,7 @@ import "leaflet/dist/leaflet.css";
 import { Icon } from "leaflet";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import aktivitaetService from "../../services/AktivitaetService";
 
 interface FormularResult {
   values: AktivitaetModel;
@@ -37,15 +37,19 @@ export default function AktivitaetDetail() {
   const [initialValues, setInitialValues] = useState<AktivitaetModel>();
   const [position, setPosition]: any = useState(null);
   const [address, setAddress] = useState("");
-
   const [latitude, setLatitude] = useState<number>(0);
   const [longitude, setLongitude] = useState<number>(0);
+
+  const [ressourcePosition, setRessourcePosition]: any = useState(null);
+  const [ressourceAddress, setRessourceAddress] = useState("");
+  const [ressourceLatitude, setRessourceLatitude] = useState<number>(0);
+  const [ressourceLongitude, setRessourceLongitude] = useState<number>(0);
 
   useEffect(() => {
     const model: AktivitaetModel = {
       name: "",
       beschreibung: "",
-      addressInput: AdressInputEnum.Manual,
+      addresseInput: AdressInputEnum.Manual,
       adresse: {
         strasse: "",
         hausnummer: "",
@@ -65,6 +69,25 @@ export default function AktivitaetDetail() {
       telefon: "",
       ressource: {
         name: "",
+        beschreibung: "",
+        addresseInput: AdressInputEnum.Manual,
+        adresse: {
+          strasse: "",
+          hausnummer: "",
+          plz: "",
+          ort: "",
+        },
+        koordinaten: {
+          latitude: 0,
+          longitude: 0,
+        },
+        materialien: "",
+        sicherheitsanforderungen: "",
+        anmerkung: "",
+        vorname: "",
+        nachname: "",
+        email: "",
+        telefon: "",
       },
       startDatum: "",
       endDatum: "",
@@ -79,15 +102,9 @@ export default function AktivitaetDetail() {
     iconSize: [38, 38],
   });
 
-  // Custom hook to handle map click events
   const MapClickHandler = () => {
-    const formikContext = useFormikContext();
+    const { setFieldValue } = useFormikContext();
 
-    if (!formikContext) {
-      console.error("MapClickHandler must be used within a Formik context.");
-    }
-
-    const { setFieldValue } = formikContext;
     useMapEvents({
       click: async (event: any) => {
         const { lat, lng } = event.latlng;
@@ -116,7 +133,45 @@ export default function AktivitaetDetail() {
     return null;
   };
 
-  const getCoordinates = async (adresse: AdresseModel) => {
+  const MapClickHandlerRessource = () => {
+    const { setFieldValue } = useFormikContext();
+
+    useMapEvents({
+      click: async (event: any) => {
+        const { lat, lng } = event.latlng;
+        setRessourcePosition([lat, lng]);
+
+        // Fetch address using Nominatim API
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+        );
+        const data = await response.json();
+
+        if (data && data.display_name) {
+          setRessourceAddress(data.display_name);
+          if (data.address) {
+            setFieldValue("ressource.adresse.strasse", data.address.road);
+            setFieldValue(
+              "ressource.adresse.hausnummer",
+              data.address.house_number
+            );
+            setFieldValue("ressource.adresse.plz", data.address.postcode);
+            setFieldValue("ressource.adresse.ort", data.address.city);
+            setRessourceLatitude(data.lat);
+            setRessourceLongitude(data.lon);
+          }
+        }
+      },
+    });
+
+    return null;
+  };
+
+  const getCoordinatesBySetter = async (
+    adresse: AdresseModel,
+    setLatitudeFunc: (lat: number) => void,
+    setLongitudeFunc: (lon: number) => void
+  ) => {
     if (
       adresse.strasse !== "" &&
       adresse.hausnummer !== "" &&
@@ -138,8 +193,8 @@ export default function AktivitaetDetail() {
 
         if (response.data.length > 0) {
           const { lat, lon } = response.data[0];
-          setLatitude(lat);
-          setLongitude(lon);
+          setLatitudeFunc(lat);
+          setLongitudeFunc(lon);
         } else {
           alert("Adresse nicht gefunden");
         }
@@ -147,9 +202,21 @@ export default function AktivitaetDetail() {
         console.error("Fehler beim Abrufen der Koordinaten:", error);
       }
     } else {
-      setLatitude(0);
-      setLongitude(0);
+      setLatitudeFunc(0);
+      setLongitudeFunc(0);
     }
+  };
+
+  const getCoordinates = async (adresse: AdresseModel) => {
+    await getCoordinatesBySetter(adresse, setLatitude, setLongitude);
+  };
+
+  const getRessourceCoordinates = async (adresse: AdresseModel) => {
+    await getCoordinatesBySetter(
+      adresse,
+      setRessourceLatitude,
+      setRessourceLongitude
+    );
   };
 
   function validationFirstPage(): Yup.ObjectSchema<AktivitaetModel> {
@@ -157,13 +224,13 @@ export default function AktivitaetDetail() {
       name: Yup.string().required("required"),
       beschreibung: Yup.string().required("Required"),
       adresse: Yup.object().shape({
-        strasse: Yup.string().required("Strasse is required"), // Add a message for clarity
+        strasse: Yup.string().required("Strasse is required"),
         hausnummer: Yup.string().required("Hausnummer is required"),
         plz: Yup.string().required("PLZ is required"),
         ort: Yup.string().required("Ort is required"),
       }),
       koordinaten: Yup.object().shape({
-        latitude: Yup.number().required("Latitude is required"), // Correct spelling if needed
+        latitude: Yup.number().required("Latitude is required"),
         longitude: Yup.number().required("Longitude is required"),
       }),
     }) as any;
@@ -171,7 +238,10 @@ export default function AktivitaetDetail() {
   }
 
   const handleSubmit = async (result: FormularResult) => {
-    console.log("Submit clicked!!!");
+    console.log(result.values);
+    await aktivitaetService.create(result.values).then(() => {
+      console.log("SUCCESS");
+    });
   };
 
   return (
@@ -220,6 +290,7 @@ export default function AktivitaetDetail() {
                                 : "text-input"
                             }
                             type="text"
+                            value={values.name}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
@@ -232,11 +303,12 @@ export default function AktivitaetDetail() {
                             id="beschreibung"
                             name="beschreibung"
                             className={
-                              errors.name && touched.name
+                              errors.beschreibung && touched.beschreibung
                                 ? "text-input error"
                                 : "text-input"
                             }
                             type="text"
+                            value={values.beschreibung}
                             onChange={handleChange}
                             onBlur={handleBlur}
                           />
@@ -248,13 +320,13 @@ export default function AktivitaetDetail() {
                               type="radio"
                               label={t("aktivitaeten.detail.adress.manual")}
                               name="addressInputMethod"
-                              value={AdressInputEnum.Manual} // Use enum value here
+                              value={AdressInputEnum.Manual}
                               checked={
-                                values.addressInput === AdressInputEnum.Manual
+                                values.addresseInput === AdressInputEnum.Manual
                               }
                               onChange={(e) =>
                                 setFieldValue(
-                                  "addressInput",
+                                  "addresseInput",
                                   e.target.value as AdressInputEnum
                                 )
                               }
@@ -265,20 +337,20 @@ export default function AktivitaetDetail() {
                               type="radio"
                               label={t("aktivitaeten.detail.adress.map")}
                               name="addressInputMethod"
-                              value={AdressInputEnum.Map} // Use enum value here
+                              value={AdressInputEnum.Map}
                               checked={
-                                values.addressInput === AdressInputEnum.Map
+                                values.addresseInput === AdressInputEnum.Map
                               }
                               onChange={(e) =>
                                 setFieldValue(
-                                  "addressInput",
+                                  "addresseInput",
                                   e.target.value as AdressInputEnum
                                 )
                               }
                             />
                           </Form.Group>
                         </div>
-                        {values.addressInput === AdressInputEnum.Manual && (
+                        {values.addresseInput === AdressInputEnum.Manual && (
                           <>
                             <Row>
                               <Col sm={9}>
@@ -290,7 +362,8 @@ export default function AktivitaetDetail() {
                                     id="strasse"
                                     name="adresse.strasse"
                                     className={
-                                      errors.name && touched.name
+                                      errors.adresse?.strasse &&
+                                      touched.adresse?.strasse
                                         ? "text-input error"
                                         : "text-input"
                                     }
@@ -310,7 +383,8 @@ export default function AktivitaetDetail() {
                                     id="hausnummer"
                                     name="adresse.hausnummer"
                                     className={
-                                      errors.name && touched.name
+                                      errors.adresse?.hausnummer &&
+                                      touched.adresse?.hausnummer
                                         ? "text-input error"
                                         : "text-input"
                                     }
@@ -335,7 +409,8 @@ export default function AktivitaetDetail() {
                                     id="plz"
                                     name="adresse.plz"
                                     className={
-                                      errors.name && touched.name
+                                      errors.adresse?.plz &&
+                                      touched.adresse?.plz
                                         ? "text-input error"
                                         : "text-input"
                                     }
@@ -358,7 +433,8 @@ export default function AktivitaetDetail() {
                                     id="ort"
                                     name="adresse.ort"
                                     className={
-                                      errors.name && touched.name
+                                      errors.adresse?.ort &&
+                                      touched.adresse?.ort
                                         ? "text-input error"
                                         : "text-input"
                                     }
@@ -370,6 +446,33 @@ export default function AktivitaetDetail() {
                                 </Form.Group>
                               </Col>
                             </Row>
+                            <Form.Group className="mb-3">
+                              <Form.Label>
+                                {t("aktivitaeten.detail.koordinaten")}
+                              </Form.Label>
+                              <Row>
+                                <Col sm={6}>
+                                  <Form.Control
+                                    id="latitude"
+                                    name="koordinaten.latitude"
+                                    type="number"
+                                    disabled
+                                    value={latitude}
+                                    onChange={handleChange}
+                                  />
+                                </Col>
+                                <Col sm={6}>
+                                  <Form.Control
+                                    id="longitude"
+                                    name="koordinaten.longitude"
+                                    type="number"
+                                    disabled
+                                    value={longitude}
+                                    onChange={handleChange}
+                                  />
+                                </Col>
+                              </Row>
+                            </Form.Group>
                             <Row>
                               <Col style={{ textAlign: "right" }}>
                                 <Button
@@ -384,36 +487,9 @@ export default function AktivitaetDetail() {
                                 </Button>
                               </Col>
                             </Row>
-                            <Form.Group className="mb-3">
-                              <Form.Label>
-                                {t("aktivitaeten.detail.koordinaten")}
-                              </Form.Label>
-                              <Row>
-                                <Col sm={6}>
-                                  <Form.Control
-                                    id="latitude"
-                                    name="koordinaten.latitude"
-                                    type="text"
-                                    disabled
-                                    value={latitude}
-                                    onChange={handleChange}
-                                  />
-                                </Col>
-                                <Col sm={6}>
-                                  <Form.Control
-                                    id="longitude"
-                                    name="koordinaten.longitude"
-                                    type="text"
-                                    disabled
-                                    value={longitude}
-                                    onChange={handleChange}
-                                  />
-                                </Col>
-                              </Row>
-                            </Form.Group>
                           </>
                         )}
-                        {values.addressInput === AdressInputEnum.Map && (
+                        {values.addresseInput === AdressInputEnum.Map && (
                           <>
                             <Form.Group className="mb-3">
                               <Form.Text>
@@ -433,7 +509,6 @@ export default function AktivitaetDetail() {
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                               />
-                              {/* Use the custom hook for handling clicks */}
                               <MapClickHandler />
                               {position && (
                                 <Marker position={position} icon={customIcon}>
@@ -454,7 +529,7 @@ export default function AktivitaetDetail() {
                                 id="startDatum"
                                 name="startDatum"
                                 className={
-                                  errors.name && touched.name
+                                  errors.startDatum && touched.startDatum
                                     ? "text-input error"
                                     : "text-input"
                                 }
@@ -473,7 +548,7 @@ export default function AktivitaetDetail() {
                                 name="endDatum"
                                 type="date"
                                 className={
-                                  errors.name && touched.name
+                                  errors.endDatum && touched.endDatum
                                     ? "text-input error"
                                     : "text-input"
                                 }
@@ -494,7 +569,7 @@ export default function AktivitaetDetail() {
                                 name="startZeit"
                                 type="time"
                                 className={
-                                  errors.name && touched.name
+                                  errors.startZeit && touched.startZeit
                                     ? "text-input error"
                                     : "text-input"
                                 }
@@ -513,7 +588,7 @@ export default function AktivitaetDetail() {
                                 name="endZeit"
                                 type="time"
                                 className={
-                                  errors.name && touched.name
+                                  errors.endZeit && touched.endZeit
                                     ? "text-input error"
                                     : "text-input"
                                 }
@@ -528,18 +603,20 @@ export default function AktivitaetDetail() {
                             {t("aktivitaeten.detail.teilnehmerzahl")}
                           </Form.Label>
                           <Form.Control
-                            id="teilnehmerzahl"
-                            type="text"
+                            id="teilnehmeranzahl"
+                            name="teilnehmeranzahl"
+                            type="number"
+                            value={values.teilnehmeranzahl}
                             onChange={handleChange}
-                            onBlur={handleBlur}
                           />
                         </Form.Group>
                         <Form.Group className="mb-3">
                           <Form.Label>
-                            {t("aktivitaeten.detail.kontakt.transport")}
+                            {t("aktivitaeten.detail.transport")}
                           </Form.Label>
                           <Form.Control
                             id="transport"
+                            name="transport"
                             type="text"
                             value={values.transport}
                             onChange={handleChange}
@@ -548,10 +625,11 @@ export default function AktivitaetDetail() {
                         </Form.Group>
                         <Form.Group className="mb-3">
                           <Form.Label>
-                            {t("aktivitaeten.detail.kontakt.verpflegung")}
+                            {t("aktivitaeten.detail.verpflegung")}
                           </Form.Label>
                           <Form.Control
                             id="verpflegung"
+                            name="verpflegung"
                             type="text"
                             value={values.verpflegung}
                             onChange={handleChange}
@@ -568,6 +646,7 @@ export default function AktivitaetDetail() {
                               </Form.Label>
                               <Form.Control
                                 id="vorname"
+                                name="vorname"
                                 type="text"
                                 value={values.vorname}
                                 onChange={handleChange}
@@ -582,6 +661,7 @@ export default function AktivitaetDetail() {
                               </Form.Label>
                               <Form.Control
                                 id="nachname"
+                                name="nachname"
                                 type="text"
                                 value={values.nachname}
                                 onChange={handleChange}
@@ -596,6 +676,7 @@ export default function AktivitaetDetail() {
                           </Form.Label>
                           <Form.Control
                             id="email"
+                            name="email"
                             type="text"
                             value={values.email}
                             onChange={handleChange}
@@ -608,6 +689,7 @@ export default function AktivitaetDetail() {
                           </Form.Label>
                           <Form.Control
                             id="telefon"
+                            name="telefon"
                             type="text"
                             value={values.telefon}
                             onChange={handleChange}
@@ -616,7 +698,539 @@ export default function AktivitaetDetail() {
                         </Form.Group>
                       </>
                     )}
-                    {currentPage === 1 && <></>}
+                    {currentPage === 1 && (
+                      <>
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t("ressourcen.detail.name")}</Form.Label>
+                          <Form.Control
+                            id="ressourcename"
+                            name="ressource.name"
+                            className={
+                              errors.ressource?.name && touched.ressource?.name
+                                ? "text-input error"
+                                : "text-input"
+                            }
+                            type="text"
+                            value={values.ressource.name}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                          <Form.Label>
+                            {t("ressourcen.detail.beschreibung")}
+                          </Form.Label>
+                          <Form.Control
+                            id="ressourcebeschreibung"
+                            name="ressource.beschreibung"
+                            className={
+                              errors.ressource?.beschreibung &&
+                              touched.ressource?.beschreibung
+                                ? "text-input error"
+                                : "text-input"
+                            }
+                            type="text"
+                            value={values.ressource.beschreibung}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          />
+                        </Form.Group>
+                        <div className="mb-3">
+                          <Form.Group className="d-flex align-items-center">
+                            <Form.Check
+                              id="ressourcemanual"
+                              type="radio"
+                              label={t("ressourcen.detail.adress.manual")}
+                              name="addressInputMethod"
+                              value={AdressInputEnum.Manual}
+                              checked={
+                                values.ressource.addresseInput ===
+                                AdressInputEnum.Manual
+                              }
+                              onChange={(e) =>
+                                setFieldValue(
+                                  "ressource.addresseInput",
+                                  e.target.value as AdressInputEnum
+                                )
+                              }
+                              className="me-3"
+                            />
+                            <Form.Check
+                              id="ressourcemap"
+                              type="radio"
+                              label={t("ressourcen.detail.adress.map")}
+                              name="addressInputMethod"
+                              value={AdressInputEnum.Map}
+                              checked={
+                                values.ressource.addresseInput ===
+                                AdressInputEnum.Map
+                              }
+                              onChange={(e) =>
+                                setFieldValue(
+                                  "ressource.addresseInput",
+                                  e.target.value as AdressInputEnum
+                                )
+                              }
+                            />
+                          </Form.Group>
+                        </div>
+                        {values.ressource.addresseInput ===
+                          AdressInputEnum.Manual && (
+                          <>
+                            <Row>
+                              <Col sm={9}>
+                                <Form.Group className="mb-3">
+                                  <Form.Label>
+                                    {t("ressourcen.detail.adress.strasse")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="ressourcestrasse"
+                                    name="ressource.adresse.strasse"
+                                    className={
+                                      errors.ressource?.adresse?.strasse &&
+                                      touched.ressource?.adresse?.strasse
+                                        ? "text-input error"
+                                        : "text-input"
+                                    }
+                                    type="text"
+                                    value={values.ressource.adresse.strasse}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                  />
+                                </Form.Group>
+                              </Col>
+                              <Col>
+                                <Form.Group className="mb-3">
+                                  <Form.Label>
+                                    {t("ressourcen.detail.adress.hausnummer")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="ressourcehausnummer"
+                                    name="ressource.adresse.hausnummer"
+                                    className={
+                                      errors.ressource?.adresse?.hausnummer &&
+                                      touched.ressource?.adresse?.hausnummer
+                                        ? "text-input error"
+                                        : "text-input"
+                                    }
+                                    type="text"
+                                    value={values.ressource.adresse.hausnummer}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                  />
+                                </Form.Group>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col sm={4}>
+                                <Form.Group
+                                  className="mb-3"
+                                  style={{ flex: 1, marginRight: "10px" }}
+                                >
+                                  <Form.Label>
+                                    {t("ressourcen.detail.adress.plz")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="ressourceplz"
+                                    name="ressource.adresse.plz"
+                                    className={
+                                      errors.ressource?.adresse?.plz &&
+                                      touched.ressource?.adresse?.plz
+                                        ? "text-input error"
+                                        : "text-input"
+                                    }
+                                    type="text"
+                                    value={values.ressource.adresse.plz}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                  />
+                                </Form.Group>
+                              </Col>
+                              <Col>
+                                <Form.Group
+                                  className="mb-3"
+                                  style={{ flex: 1 }}
+                                >
+                                  <Form.Label>
+                                    {t("ressourcen.detail.adress.ort")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="ressourceort"
+                                    name="ressource.adresse.ort"
+                                    className={
+                                      errors.ressource?.adresse?.ort &&
+                                      touched.ressource?.adresse?.ort
+                                        ? "text-input error"
+                                        : "text-input"
+                                    }
+                                    type="text"
+                                    value={values.ressource.adresse.ort}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                  />
+                                </Form.Group>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col style={{ textAlign: "right" }}>
+                                <Button
+                                  variant="primary"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setFieldValue(
+                                      "ressource.adresse.strasse",
+                                      values.adresse.strasse
+                                    );
+                                    setFieldValue(
+                                      "ressource.adresse.hausnummer",
+                                      values.adresse.hausnummer
+                                    );
+                                    setFieldValue(
+                                      "ressource.adresse.plz",
+                                      values.adresse.plz
+                                    );
+                                    setFieldValue(
+                                      "ressource.adresse.ort",
+                                      values.adresse.ort
+                                    );
+                                    setRessourceLatitude(latitude);
+                                    setRessourceLongitude(longitude);
+                                  }}
+                                >
+                                  {t("button.aktivitaeten.adresse")}
+                                </Button>
+                              </Col>
+                            </Row>
+                            <Form.Group className="mb-3">
+                              <Form.Label>
+                                {t("ressourcen.detail.koordinaten")}
+                              </Form.Label>
+                              <Row>
+                                <Col sm={6}>
+                                  <Form.Control
+                                    id="latitude"
+                                    name="ressource.koordinaten.latitude"
+                                    type="text"
+                                    disabled
+                                    value={ressourceLatitude}
+                                    onChange={handleChange}
+                                  />
+                                </Col>
+                                <Col sm={6}>
+                                  <Form.Control
+                                    id="longitude"
+                                    name="ressource.koordinaten.longitude"
+                                    type="text"
+                                    disabled
+                                    value={ressourceLongitude}
+                                    onChange={handleChange}
+                                  />
+                                </Col>
+                              </Row>
+                            </Form.Group>
+                            <Row>
+                              <Col style={{ textAlign: "right" }}>
+                                <Button
+                                  variant="primary"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    getRessourceCoordinates(
+                                      values.ressource.adresse
+                                    );
+                                  }}
+                                >
+                                  {t("button.coordinates")}
+                                </Button>
+                              </Col>
+                            </Row>
+                          </>
+                        )}
+                        {values.ressource.addresseInput ===
+                          AdressInputEnum.Map && (
+                          <>
+                            <Form.Group className="mb-3">
+                              <Form.Text>
+                                {ressourceAddress && (
+                                  <div>Address: {ressourceAddress}</div>
+                                )}
+                              </Form.Text>
+                            </Form.Group>
+                            <MapContainer
+                              center={[48.30639, 14.28611]}
+                              zoom={13}
+                              style={{
+                                height: "512px",
+                                width: "100%",
+                                marginBottom: "2rem",
+                              }}
+                            >
+                              <TileLayer
+                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                              />
+                              <MapClickHandlerRessource />
+                              {ressourcePosition && (
+                                <Marker
+                                  position={ressourcePosition}
+                                  icon={customIcon}
+                                >
+                                  <Popup>{ressourceAddress}</Popup>
+                                </Marker>
+                              )}
+                            </MapContainer>
+                          </>
+                        )}
+                        <Row>
+                          <Form.Group className="mb-3">
+                            <Form.Label>
+                              {t("ressourcen.detail.materialien")}
+                            </Form.Label>
+                            <Form.Control
+                              id="materialien"
+                              name="ressource.materialien"
+                              type="text"
+                              value={values.ressource.materialien}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                          </Form.Group>
+                        </Row>
+                        <Row>
+                          <Form.Group className="mb-3">
+                            <Form.Label>
+                              {t("ressourcen.detail.sicherheitsanforderungen")}
+                            </Form.Label>
+                            <Form.Control
+                              id="sicherheitsanforderungen"
+                              name="ressource.sicherheitsanforderungen"
+                              type="text"
+                              value={values.ressource.sicherheitsanforderungen}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                          </Form.Group>
+                        </Row>
+                        <Row>
+                          <Form.Group className="mb-3">
+                            <Form.Label>
+                              {t("ressourcen.detail.anmerkung")}
+                            </Form.Label>
+                            <Form.Control
+                              id="anmerkung"
+                              name="ressource.anmerkung"
+                              type="text"
+                              value={values.ressource.anmerkung}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                          </Form.Group>
+                        </Row>
+                        <hr />
+                        <h5 style={{ marginTop: 30 }}>Kontakt Informationen</h5>
+                        <Row>
+                          <Col>
+                            <Form.Group className="mb-3">
+                              <Form.Label>
+                                {t("aktivitaeten.detail.kontakt.vorname")}
+                              </Form.Label>
+                              <Form.Control
+                                id="ressourcevorname"
+                                name="ressource.vorname"
+                                type="text"
+                                value={values.ressource.vorname}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                              />
+                            </Form.Group>
+                          </Col>
+                          <Col>
+                            <Form.Group className="mb-3">
+                              <Form.Label>
+                                {t("aktivitaeten.detail.kontakt.nachname")}
+                              </Form.Label>
+                              <Form.Control
+                                id="ressourcenachname"
+                                name="ressource.nachname"
+                                type="text"
+                                value={values.ressource.nachname}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                              />
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                        <Form.Group className="mb-3">
+                          <Form.Label>
+                            {t("aktivitaeten.detail.kontakt.email")}
+                          </Form.Label>
+                          <Form.Control
+                            id="ressourceemail"
+                            name="ressource.email"
+                            type="text"
+                            value={values.ressource.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          />
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                          <Form.Label>
+                            {t("aktivitaeten.detail.kontakt.telefon")}
+                          </Form.Label>
+                          <Form.Control
+                            id="ressourcetelefon"
+                            name="ressource.telefon"
+                            type="text"
+                            value={values.ressource.telefon}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          />
+                        </Form.Group>
+                      </>
+                    )}
+                    {currentPage === 1 && (
+                      <Col className="mb-4" style={{ textAlign: "right" }}>
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setFieldValue("ressource.vorname", values.vorname);
+                            setFieldValue(
+                              "ressource.nachname",
+                              values.nachname
+                            );
+                            setFieldValue("ressource.email", values.email);
+                            setFieldValue("ressource.telefon", values.telefon);
+                          }}
+                        >
+                          {t("button.aktivitaeten.adresse")}
+                        </Button>
+                      </Col>
+                    )}
+                    {currentPage === 2 && (
+                      <>
+                        <h4>{t("aktivitaeten.detail.title")}</h4>
+                        <div className="mb-3 mt-4">
+                          <div>
+                            {t("aktivitaeten.detail.name")}: {values.name}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.beschreibung")}:{" "}
+                            {values.beschreibung}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.adress.strasse")}:{" "}
+                            {values.adresse.strasse}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.adress.hausnummer")}:{" "}
+                            {values.adresse.hausnummer}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.adress.plz")}:{" "}
+                            {values.adresse.plz}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.adress.ort")}:{" "}
+                            {values.adresse.ort}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.koordinaten")}: Latitude '
+                            {latitude}', Longitude '{longitude}'
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.startDate")}:{" "}
+                            {values.startDatum}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.endDate")}:{" "}
+                            {values.endDatum}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.startTime")}:{" "}
+                            {values.startZeit}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.endTime")}: {values.endZeit}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.teilnehmerzahl")}:{" "}
+                            {values.teilnehmeranzahl}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.transport")}:{" "}
+                            {values.transport}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.verpflegung")}:{" "}
+                            {values.verpflegung}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.kontakt.vorname")}:{" "}
+                            {values.vorname}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.kontakt.nachname")}:{" "}
+                            {values.nachname}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.kontakt.email")}:{" "}
+                            {values.email}
+                          </div>
+                          <div>
+                            {t("aktivitaeten.detail.kontakt.telefon")}:{" "}
+                            {values.telefon}
+                          </div>
+                        </div>
+                        <hr />
+                        <h4>{t("ressourcen.detail.uebersicht")}</h4>
+                        <div className="mb-3 mt-4">
+                          <div>
+                            {t("ressourcen.detail.name")}:{" "}
+                            {values.ressource.name}
+                          </div>
+                          <div>
+                            {t("ressourcen.detail.beschreibung")}:{" "}
+                            {values.ressource.beschreibung}
+                          </div>
+                          <div>
+                            {t("ressourcen.detail.adress.strasse")}:{" "}
+                            {values.ressource.adresse.strasse}
+                          </div>
+                          <div>
+                            {t("ressourcen.detail.adress.hausnummer")}:{" "}
+                            {values.ressource.adresse.hausnummer}
+                          </div>
+                          <div>
+                            {t("ressourcen.detail.adress.plz")}:{" "}
+                            {values.ressource.adresse.plz}
+                          </div>
+                          <div>
+                            {t("ressourcen.detail.adress.ort")}:{" "}
+                            {values.ressource.adresse.ort}
+                          </div>
+                          <div>
+                            {t("ressourcen.detail.koordinaten")}: Latitude '
+                            {ressourceLatitude}', Longitude '
+                            {ressourceLongitude}'
+                          </div>
+                          <div>
+                            {t("ressourcen.detail.materialien")}:{" "}
+                            {values.ressource.materialien}
+                          </div>
+                          <div>
+                            {t("ressourcen.detail.sicherheitsanforderungen")}:{" "}
+                            {values.ressource.sicherheitsanforderungen}
+                          </div>
+                          <div>
+                            {t("ressourcen.detail.anmerkung")}:{" "}
+                            {values.ressource.anmerkung}
+                          </div>
+                        </div>
+                      </>
+                    )}
                     <Row>
                       <>{console.log(currentPage)}</>
                       <Col style={{ textAlign: "right" }}>

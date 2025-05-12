@@ -20,13 +20,24 @@ export interface KoordinatenModel {
 }
 
 export interface RessourceModel {
-    name: string
+    name: string,
+    beschreibung: string,
+    addresseInput: AdressInputEnum,
+    adresse: AdresseModel,
+    koordinaten: KoordinatenModel,
+    materialien: string,
+    sicherheitsanforderungen: string,
+    anmerkung: string,
+    vorname: string,
+    nachname: string,
+    email: string,
+    telefon: string
 }
 
 export interface AktivitaetModel {
     name: string,
     beschreibung: string,
-    addressInput: AdressInputEnum,
+    addresseInput?: AdressInputEnum,
     adresse: AdresseModel,
     koordinaten: KoordinatenModel,
     teilnehmeranzahl: number,
