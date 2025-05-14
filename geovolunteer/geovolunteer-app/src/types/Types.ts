@@ -7,24 +7,16 @@ export interface UserModel {
     geburtsDatum: string  
 }
 
-export interface AdresseModel {
-    strasse: string,
-    hausnummer: string,
-    plz: string,
-    ort: string
-}
-
-export interface KoordinatenModel {
-    latitude: number,
-    longitude: number
-}
-
 export interface RessourceModel {
     name: string,
     beschreibung: string,
     addresseInput: AdressInputEnum,
-    adresse: AdresseModel,
-    koordinaten: KoordinatenModel,
+    strasse: string,
+    hausnummer: string,
+    plz: string,
+    ort: string
+    latitude: number,
+    longitude: number,
     materialien: string,
     sicherheitsanforderungen: string,
     anmerkung: string,
@@ -37,13 +29,13 @@ export interface RessourceModel {
 export interface AktivitaetModel {
     name: string,
     beschreibung: string,
-<<<<<<< Upstream, based on origin/main
-    addresseInput?: AdressInputEnum,
-=======
     addresseInput: AdressInputEnum,
->>>>>>> 18183cf ressource done
-    adresse: AdresseModel,
-    koordinaten: KoordinatenModel,
+    strasse: string,
+    hausnummer: string,
+    plz: string,
+    ort: string
+    latitude: number,
+    longitude: number,
     teilnehmeranzahl: number,
     transport: string,
     verpflegung: string,

@@ -45,10 +45,7 @@
   "placeholder.login.email": "Email eingeben",
   "placeholder.login.passwort": "Passwort eingeben",
   "ressourcen.detail.title": "Ressource Detail",
-<<<<<<< Upstream, based on origin/main
   "ressourcen.detail.uebersicht": "Ressource Übersicht",
-=======
->>>>>>> 18183cf ressource done
   "ressourcen.create.title": "Ressource Erstellen",
   "ressourcen.detail.name": "Ressourcenname",
   "ressourcen.detail.beschreibung": "Beschreibung",
