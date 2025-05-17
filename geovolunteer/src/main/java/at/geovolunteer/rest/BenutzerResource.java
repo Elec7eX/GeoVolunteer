@@ -22,21 +22,21 @@ import at.geovolunteer.service.BenutzerService;
 @RestController
 @RequestMapping("/api")
 public class BenutzerResource {
-	
+
 	@Autowired
 	private BenutzerService service;
-	
+
 	@PostMapping("/auth")
 	public ResponseEntity<?> login(@RequestBody LoginType request) {
 		System.out.println("AAAAA");
-        Benutzer benutzer = service.authenticate(request.getUsername(), request.getPassword());
-        if (benutzer != null) {
-            return ResponseEntity.ok(request);
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ungültige Anmeldedaten");
-        }
-    }
-	
+		Benutzer benutzer = service.authenticate(request.getUsername(), request.getPassword());
+		if (benutzer != null) {
+			return ResponseEntity.ok(request);
+		} else {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ungültige Anmeldedaten");
+		}
+	}
+
 	@GetMapping(value = "/benutzer", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Benutzer>> getAllBenutzer() {
 		try {
@@ -92,7 +92,7 @@ public class BenutzerResource {
 	@DeleteMapping("/remove/{id}")
 	public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") long id) {
 		try {
-			service.deleteById(id);
+			// service.deleteById(id);
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -102,7 +102,7 @@ public class BenutzerResource {
 	@DeleteMapping("/deleteAll")
 	public ResponseEntity<HttpStatus> deleteAllTutorials() {
 		try {
-			service.deleteAll();
+			// service.deleteAll();
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

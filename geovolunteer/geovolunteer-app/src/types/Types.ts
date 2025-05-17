@@ -27,6 +27,7 @@ export interface RessourceModel {
 }
 
 export interface AktivitaetModel {
+    id?: number,
     name: string,
     beschreibung: string,
     addresseInput: AdressInputEnum,

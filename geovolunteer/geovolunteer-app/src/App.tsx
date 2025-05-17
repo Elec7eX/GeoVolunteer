@@ -41,7 +41,7 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/aktivitäten/detail"
+              path="/aktivitäten/detail/:id"
               element={
                 <ProtectedRoute>
                   <AktivitaetDetailPage />

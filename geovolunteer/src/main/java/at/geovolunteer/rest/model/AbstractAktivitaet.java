@@ -2,8 +2,11 @@ package at.geovolunteer.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.MappedSuperclass;
+
 @JsonIgnoreProperties(value = { "addresseInput" })
-public abstract class AbstractAktivitaetModel {
+@MappedSuperclass
+public abstract class AbstractAktivitaet {
 
 	private String name;
 	private String beschreibung;

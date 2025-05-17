@@ -1,11 +1,36 @@
 import { t } from "i18next";
 import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
-import { useNavigate } from "react-router-dom";
-import { Breadcrumb, Card, Col, Row } from "react-bootstrap";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { Card, Col, Row } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { AktivitaetModel } from "../../types/Types";
+import aktivitaetService from "../../services/AktivitaetService";
 
 export default function AktivitaetDetailPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const location = useLocation();
+
+  const aktivitaetFromState = location.state?.aktivitaet;
+
+  const [aktivitaet, setAktivitaet] = useState<AktivitaetModel | null>(null);
+
+  useEffect(() => {
+    if (aktivitaetFromState) {
+      setAktivitaet(aktivitaetFromState);
+    } else {
+      aktivitaetService
+        .getById(id!)
+        .then((resp) => {
+          setAktivitaet(resp.data);
+        })
+        .catch(() => alert("Fehler beim Laden der Daten"));
+    }
+  }, [id, aktivitaetFromState]);
+
+  if (!aktivitaet) return <div>Lädt...</div>;
+
   return (
     <>
       <Header
@@ -27,7 +52,7 @@ export default function AktivitaetDetailPage() {
                 />
               </Col>
               <Col>
-                <Card.Title>Title</Card.Title>
+                <Card.Title>{aktivitaet.name}</Card.Title>
                 <Card.Text>Organisationsbeschreibung hier</Card.Text>
               </Col>
             </Row>
@@ -46,7 +71,9 @@ export default function AktivitaetDetailPage() {
             <Card.Title>Zeitliche Verfügbarkeit</Card.Title>
             <Card.Text>Beschreibung hier</Card.Text>
           </Card.Body>
-          <Card.Body onClick={() => navigate("/aktivitäten/detail/ressourceDetail")}>
+          <Card.Body
+            onClick={() => navigate("/aktivitäten/detail/ressourceDetail")}
+          >
             <Row>
               <Col md={3}>
                 <Card.Img
