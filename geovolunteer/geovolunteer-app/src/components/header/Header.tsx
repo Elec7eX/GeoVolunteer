@@ -22,12 +22,12 @@ type Props = {
 };
 
 export const Header = (props: Props) => {
-  const { logout }: any = useAuth();
+  const { _logout }: any = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
+    _logout();
   };
 
   return (
@@ -59,8 +59,10 @@ export const Header = (props: Props) => {
           {props.breadcrumb && (
             <Row>
               <Breadcrumb onClick={() => navigate(props.breadcrumb!.navigate)}>
-                <IoIosArrowBack style={{width: 27, height: 27, color: "white"}} />
-                <div style={{color: "white"}}>{props.breadcrumb.title}</div>
+                <IoIosArrowBack
+                  style={{ width: 27, height: 27, color: "white" }}
+                />
+                <div style={{ color: "white" }}>{props.breadcrumb.title}</div>
               </Breadcrumb>
             </Row>
           )}

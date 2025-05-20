@@ -1,9 +1,14 @@
 import http from "../http-common";
-import { LoginType } from "../login/Login";
 import { UserModel } from "../types/Types";
 
-const login = (data: LoginType) => {
-  return http.post<any>("/auth", data);
+const BASE_URL = "/benutzer"
+
+const login = (data: UserModel) => {
+  return http.post<UserModel>(BASE_URL + "/login", data);
+};
+
+const create = (data: UserModel) => {
+  return http.post<UserModel>(BASE_URL +"/create", data);
 };
 
 const getAll = () => {
@@ -12,10 +17,6 @@ const getAll = () => {
 
 const get = (id: any) => {
   return http.get<UserModel>(`/users/${id}`);
-};
-
-const create = (data: UserModel) => {
-  return http.post<UserModel>("/create", data);
 };
 
 const update = (id: any, data: UserModel) => {

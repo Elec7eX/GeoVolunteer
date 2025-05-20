@@ -50,21 +50,22 @@ export default function AktivitaetenOverview() {
           {t("aktivitaeten.overview.created.title")}
         </h5>
         <div>
-          {aktivitaeten.map((aktivitaet) => (
-            <Card
-              key={aktivitaet.id}
-              onClick={() => navigateToDetail(aktivitaet)}
-              style={{ marginBottom: 10 }}
-            >
-              <CardHeader>
-                <BsHeartPulse style={{ marginRight: 5 }} />
-                {aktivitaet.name}
-              </CardHeader>
-              <CardBody>
-                <Card.Text>{aktivitaet.beschreibung}</Card.Text>
-              </CardBody>
-            </Card>
-          ))}
+          {aktivitaeten.length > 0 &&
+            aktivitaeten.map((aktivitaet) => (
+              <Card
+                key={aktivitaet.id}
+                onClick={() => navigateToDetail(aktivitaet)}
+                style={{ marginBottom: 10 }}
+              >
+                <CardHeader>
+                  <BsHeartPulse style={{ marginRight: 5 }} />
+                  {aktivitaet.name}
+                </CardHeader>
+                <CardBody>
+                  <Card.Text>{aktivitaet.beschreibung}</Card.Text>
+                </CardBody>
+              </Card>
+            ))}
         </div>
         <hr style={{ marginTop: 30 }} />
         <h5 style={{ marginTop: 30 }}>

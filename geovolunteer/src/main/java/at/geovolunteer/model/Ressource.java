@@ -1,4 +1,4 @@
-package at.geovolunteer.rest.model;
+package at.geovolunteer.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

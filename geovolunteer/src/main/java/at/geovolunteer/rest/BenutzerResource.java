@@ -20,20 +20,29 @@ import at.geovolunteer.model.Benutzer;
 import at.geovolunteer.service.BenutzerService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/geo/benutzer")
 public class BenutzerResource {
 
 	@Autowired
 	private BenutzerService service;
 
-	@PostMapping("/auth")
-	public ResponseEntity<?> login(@RequestBody LoginType request) {
-		System.out.println("AAAAA");
-		Benutzer benutzer = service.authenticate(request.getUsername(), request.getPassword());
+	@PostMapping("/login")
+	public ResponseEntity<Benutzer> login(@RequestBody LoginType loginRequest) {
+		Benutzer benutzer = service.authenticate(loginRequest);
 		if (benutzer != null) {
-			return ResponseEntity.ok(request);
+			return ResponseEntity.ok(benutzer);
 		} else {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ungültige Anmeldedaten");
+			return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	@PostMapping("/create")
+	public ResponseEntity<?> create(@RequestBody Benutzer user) {
+		try {
+			Benutzer entity = service.create(user);
+			return new ResponseEntity<>(entity, HttpStatus.CREATED);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -57,20 +66,6 @@ public class BenutzerResource {
 			return new ResponseEntity<>(tutorialData.get(), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
-	}
-
-	@PostMapping("/create")
-	public ResponseEntity<Benutzer> create(@RequestBody Benutzer user) {
-		try {
-			Benutzer _user = new Benutzer();
-			_user.setVorname(user.getVorname());
-			_user.setNachname(user.getNachname());
-			_user.setGeburtsDatum(user.getGeburtsDatum());
-			service.save(_user);
-			return new ResponseEntity<>(_user, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

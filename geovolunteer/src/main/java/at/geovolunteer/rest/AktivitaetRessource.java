@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import at.geovolunteer.rest.model.Aktivitaet;
+import at.geovolunteer.model.Aktivitaet;
 import at.geovolunteer.service.AktivitaetService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/geo/aktivitaet")
 public class AktivitaetRessource {
 
 	@Autowired
 	private AktivitaetService service;
 
 	@GetMapping(value = "/aktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Aktivitaet>> getAllBenutzer() {
+	public ResponseEntity<List<Aktivitaet>> getAllAktivitaeten() {
 		try {
 			List<Aktivitaet> list = service.getAll();
 			if (CollectionUtils.isEmpty(list)) {
@@ -38,8 +38,8 @@ public class AktivitaetRessource {
 		}
 	}
 
-	@GetMapping("/aktivitaet/{id}")
-	public ResponseEntity<Aktivitaet> getBenutzerById(@PathVariable("id") long id) {
+	@GetMapping("/{id}")
+	public ResponseEntity<Aktivitaet> getAktivitaetById(@PathVariable("id") long id) {
 		Optional<Aktivitaet> entity = service.getById(id);
 		if (entity.isPresent()) {
 			return new ResponseEntity<>(entity.get(), HttpStatus.OK);
@@ -48,7 +48,7 @@ public class AktivitaetRessource {
 		}
 	}
 
-	@PostMapping("/aktivitaet/create")
+	@PostMapping("/create")
 	public ResponseEntity<?> create(@RequestBody Aktivitaet request) {
 		System.out.println(request);
 		Aktivitaet entity = service.create(request);

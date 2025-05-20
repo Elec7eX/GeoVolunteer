@@ -1,11 +1,17 @@
 package at.geovolunteer.model;
 
-import java.time.LocalDate;
+import java.util.Calendar;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
 
 @Data
@@ -16,47 +22,74 @@ public class Benutzer {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String vorname;
-	private String nachname;
-	private String username;
-	private LocalDate geburtsDatum;
-	private String email;
+	@Enumerated(EnumType.STRING)
+	private Rolle rolle;
+
+	private String login;
 	private String password;
+	private String email;
+	private String telefon;
 	private String strasse;
 	private String hausnummer;
 	private String plz;
 	private String ort;
+	private String land;
+	private byte[] logo;
 
-	public long getId() {
+	// Organisation
+	private String name;
+	private String webseite;
+	private String beschreibung;
+
+	// Freiwillige
+	private String vorname;
+	private String nachname;
+	@Temporal(TemporalType.DATE)
+	@JsonDeserialize(using = CalendarDeserializer.class)
+	private Calendar geburtsDatum;
+	@Temporal(TemporalType.DATE)
+	@JsonDeserialize(using = CalendarDeserializer.class)
+	private Calendar verfuegbarVonDatum;
+	@Temporal(TemporalType.DATE)
+	@JsonDeserialize(using = CalendarDeserializer.class)
+	private Calendar verfuegbarBisDatum;
+	@Temporal(TemporalType.TIME)
+	@JsonDeserialize(using = CalendarTimeDeserializer.class)
+	private Calendar verfuegbarVonZeit;
+	@Temporal(TemporalType.TIME)
+	@JsonDeserialize(using = CalendarTimeDeserializer.class)
+	private Calendar verfuegbarBisZeit;
+
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
-	public String getVorname() {
-		return vorname;
+	public Rolle getRolle() {
+		return rolle;
 	}
 
-	public void setVorname(String vorname) {
-		this.vorname = vorname;
+	public void setRolle(Rolle rolle) {
+		this.rolle = rolle;
 	}
 
-	public String getNachname() {
-		return nachname;
+	public String getLogin() {
+		return login;
 	}
 
-	public void setNachname(String nachname) {
-		this.nachname = nachname;
+	public void setLogin(String login) {
+		this.login = login;
 	}
 
-	public LocalDate getGeburtsDatum() {
-		return geburtsDatum;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setGeburtsDatum(LocalDate geburtsDatum) {
-		this.geburtsDatum = geburtsDatum;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getEmail() {
@@ -67,12 +100,12 @@ public class Benutzer {
 		this.email = email;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getTelefon() {
+		return telefon;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setTelefon(String telefon) {
+		this.telefon = telefon;
 	}
 
 	public String getStrasse() {
@@ -107,12 +140,100 @@ public class Benutzer {
 		this.ort = ort;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getLand() {
+		return land;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setLand(String land) {
+		this.land = land;
+	}
+
+	public byte[] getLogo() {
+		return logo;
+	}
+
+	public void setLogo(byte[] logo) {
+		this.logo = logo;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getWebseite() {
+		return webseite;
+	}
+
+	public void setWebseite(String webseite) {
+		this.webseite = webseite;
+	}
+
+	public String getBeschreibung() {
+		return beschreibung;
+	}
+
+	public void setBeschreibung(String beschreibung) {
+		this.beschreibung = beschreibung;
+	}
+
+	public String getVorname() {
+		return vorname;
+	}
+
+	public void setVorname(String vorname) {
+		this.vorname = vorname;
+	}
+
+	public String getNachname() {
+		return nachname;
+	}
+
+	public void setNachname(String nachname) {
+		this.nachname = nachname;
+	}
+
+	public Calendar getGeburtsDatum() {
+		return geburtsDatum;
+	}
+
+	public void setGeburtsDatum(Calendar geburtsDatum) {
+		this.geburtsDatum = geburtsDatum;
+	}
+
+	public Calendar getVerfuegbarVonDatum() {
+		return verfuegbarVonDatum;
+	}
+
+	public void setVerfuegbarVonDatum(Calendar verfuegbarVonDatum) {
+		this.verfuegbarVonDatum = verfuegbarVonDatum;
+	}
+
+	public Calendar getVerfuegbarBisDatum() {
+		return verfuegbarBisDatum;
+	}
+
+	public void setVerfuegbarBisDatum(Calendar verfuegbarBisDatum) {
+		this.verfuegbarBisDatum = verfuegbarBisDatum;
+	}
+
+	public Calendar getVerfuegbarVonZeit() {
+		return verfuegbarVonZeit;
+	}
+
+	public void setVerfuegbarVonZeit(Calendar verfuegbarVonZeit) {
+		this.verfuegbarVonZeit = verfuegbarVonZeit;
+	}
+
+	public Calendar getVerfuegbarBisZeit() {
+		return verfuegbarBisZeit;
+	}
+
+	public void setVerfuegbarBisZeit(Calendar verfuegbarBisZeit) {
+		this.verfuegbarBisZeit = verfuegbarBisZeit;
 	}
 
 }

@@ -116,8 +116,4 @@ const App: React.FC = () => {
   );*/
 };
 
-const CheckAuth = ({ children }: { children: React.ReactElement }) => {
-  return children;
-};
-
 export default App;

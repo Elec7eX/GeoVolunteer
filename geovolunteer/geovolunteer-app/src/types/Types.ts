@@ -1,10 +1,14 @@
 import { AdressInputEnum } from "../enums/Enums"
 
 export interface UserModel {
-    id?: any | null,
-    vorname: string,
-    nachname: string,
-    geburtsDatum: string  
+    id?: number,
+    rolle?: string,
+    login: string,
+    email?: string,
+    password: string,
+    vorname?: string,
+    nachname?: string,
+    geburtsDatum?: string  
 }
 
 export interface RessourceModel {

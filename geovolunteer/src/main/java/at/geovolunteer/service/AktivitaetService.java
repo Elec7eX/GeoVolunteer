@@ -6,8 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import at.geovolunteer.model.Aktivitaet;
 import at.geovolunteer.model.repo.AktivitaetRepository;
-import at.geovolunteer.rest.model.Aktivitaet;
 
 @Service
 public class AktivitaetService {

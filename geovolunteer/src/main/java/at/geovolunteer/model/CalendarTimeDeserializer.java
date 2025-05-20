@@ -1,4 +1,4 @@
-package at.geovolunteer.rest.model;
+package at.geovolunteer.model;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -11,8 +11,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
-public class CalendarDeserializer extends JsonDeserializer<Calendar> {
-	private static final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+public class CalendarTimeDeserializer extends JsonDeserializer<Calendar> {
+	private static final DateFormat dateFormat = new SimpleDateFormat("HH:mm");
 
 	@Override
 	public Calendar deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {

@@ -4,54 +4,48 @@ import { useAuth } from "../hooks/useAuth";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { Form as FormikForm, Formik, FormikHelpers } from "formik";
 import { useTranslation } from "react-i18next";
-
-type RegistrationType = {
-  username?: string;
-  email?: string;
-  password?: string;
-};
+import { UserModel } from "../types/Types";
+import userService from "../services/UserServices";
 
 interface Props {
   handleBack: () => void;
 }
 
 interface FormularResult {
-  values: RegistrationType;
-  formikBag: FormikHelpers<RegistrationType>;
+  values: UserModel;
+  formikBag: FormikHelpers<UserModel>;
 }
 
 export function Registration(props: Props) {
   const { handleBack } = props;
   const { t } = useTranslation();
-  const { login }: any = useAuth();
-  const [initialValues, setInitialValues] = useState<RegistrationType>();
+  const { _login }: any = useAuth();
+  const [initialValues, setInitialValues] = useState<UserModel>();
+  const rollenOptionen = [
+    { value: "ADMIN", label: "Admin" },
+    { value: "ORGANISATION", label: "Organisation" },
+    { value: "FREIWILLIGE", label: "Freiwillige" },
+  ];
 
   useEffect(() => {
     setInitialValues({
-      username: "",
+      rolle: "ADMIN",
+      login: "",
       email: "",
       password: "",
     });
   }, []);
 
   const handleSubmit = async (result: FormularResult) => {
-    const { username, email, password } = result.values;
-    if (
-      username === "user" &&
-      password === "password" &&
-      email === "user@aon.at"
-    ) {
-      // Replace with actual authentication logic
-      await login({ username });
-    } else {
-      alert("Invalid username or password");
-    }
+    userService.create(result.values).then(async (response) => {
+      await _login(response.data);
+    });
   };
 
   function validationLogin(): Yup.ObjectSchema<any> {
     let shape = Yup.object().shape({
       email: Yup.string().required("Required"),
-      username: Yup.string()
+      login: Yup.string()
         .required("required")
         .min(2, "Too Short!")
         .max(50, "Too Long!"),
@@ -69,26 +63,29 @@ export function Registration(props: Props) {
           enableReinitialize
           validationSchema={validationLogin}
         >
-          {({
-            values,
-            errors,
-            touched,
-            handleChange,
-            handleBlur,
-            isSubmitting,
-          }) => (
+          {({ errors, touched, handleChange, handleBlur, isSubmitting }) => (
             <FormikForm className="rounded p-4">
               <Form.Group className="mb-3">
-                <Form.Label>{t("label.login.benutzername")}</Form.Label>
+                <Form.Label>{t("label.login.rolle")}</Form.Label>
+                <Form.Select id="rolle" name="rolle" onChange={handleChange}>
+                  {rollenOptionen.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-3">
+                <Form.Label>{t("label.login.login")}</Form.Label>
                 <Form.Control
-                  id="username"
-                  placeholder={t("placeholder.login.benutzername")}
+                  id="login"
+                  name="login"
+                  placeholder={t("placeholder.login.login")}
                   type="text"
-                  value={values.username}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className={
-                    errors.username && touched.username
+                    errors.login && touched.login
                       ? "text-input error"
                       : "text-input"
                   }
@@ -99,9 +96,9 @@ export function Registration(props: Props) {
                 <Form.Label>{t("label.login.email")}</Form.Label>
                 <Form.Control
                   id="email"
+                  name="email"
                   placeholder={t("placeholder.login.email")}
                   type="text"
-                  value={values.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className={
@@ -116,9 +113,9 @@ export function Registration(props: Props) {
                 <Form.Label>{t("label.login.passwort")}</Form.Label>
                 <Form.Control
                   id="password"
+                  name="password"
                   placeholder={t("placeholder.login.passwort")}
                   type="password"
-                  value={values.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   className={

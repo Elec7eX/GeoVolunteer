@@ -8,7 +8,7 @@ import { Registration } from "./Registration";
 import userService from "../services/UserServices";
 
 export type LoginType = {
-  username?: string;
+  login?: string;
   password?: string;
 };
 
@@ -19,41 +19,29 @@ interface FormularResult {
 
 export function Login() {
   const { t } = useTranslation();
-  const { login }: any = useAuth();
+  const { _login }: any = useAuth();
   const [initialValues, setInitialValues] = useState<LoginType>();
   const [isRegistrationPage, setIsRegistrationPage] = useState<boolean>(false);
 
   useEffect(() => {
     setInitialValues({
-      username: "",
+      login: "",
       password: "",
     });
   }, []);
 
-  const loogg = async (username: string, password: string) => {
-    try {
-      await userService.login({ username, password }).then(() => {
-        login({ username, password });
-      });
-    } catch (error) {
-      console.error("Login failed:", error);
-      throw error; // Handle error appropriately
-    }
-  };
-
   const handleSubmit = async (result: FormularResult) => {
-    const { username, password } = result.values;
-    if (username !== undefined && password !== undefined) {
-      loogg(username, password).then((data: any) => {
-        console.log(data);
+    const { login, password } = result.values;
+    if (login !== undefined && password !== undefined) {
+      await userService.login({ login, password }).then((response) => {
+        _login(response.data);
       });
     }
   };
 
   function validationLogin(): Yup.ObjectSchema<any> {
     let shape = Yup.object().shape({
-      // email: Yup.string().required("Required"),
-      username: Yup.string()
+      login: Yup.string()
         .required("required")
         .min(2, "Too Short!")
         .max(50, "Too Long!"),
@@ -77,7 +65,6 @@ export function Login() {
               validationSchema={validationLogin}
             >
               {({
-                values,
                 errors,
                 touched,
                 handleChange,
@@ -86,16 +73,16 @@ export function Login() {
               }) => (
                 <FormikForm className="rounded p-4">
                   <Form.Group className="mb-3">
-                    <Form.Label>{t("label.login.benutzername")}</Form.Label>
+                    <Form.Label>{t("label.login.login")}</Form.Label>
                     <Form.Control
-                      id="username"
-                      placeholder={t("placeholder.login.benutzername")}
+                      id="login"
+                      name="login"
+                      placeholder={t("placeholder.login.login")}
                       type="text"
-                      value={values.username}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className={
-                        errors.username && touched.username
+                        errors.login && touched.login
                           ? "text-input error"
                           : "text-input"
                       }
@@ -106,9 +93,9 @@ export function Login() {
                     <Form.Label>{t("label.login.passwort")}</Form.Label>
                     <Form.Control
                       id="password"
+                      name="password"
                       placeholder={t("placeholder.login.passwort")}
                       type="password"
-                      value={values.password}
                       onChange={handleChange}
                       onBlur={handleBlur}
                       className={
