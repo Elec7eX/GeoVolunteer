@@ -79,7 +79,7 @@ export function Login() {
                     <Form.Control
                       id="login"
                       name="login"
-                      placeholder={t("placeholder.login.login")}
+                      placeholder={t("placeholder.login.login")} 
                       type="text"
                       onChange={handleChange}
                       onBlur={handleBlur}

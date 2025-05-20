@@ -18,7 +18,7 @@ interface FormularResult {
 }
 
 export function Registration(props: Props) {
-  const { handleBack } = props;
+  const { handleBack } = props; 
   const { t } = useTranslation();
   const { _login }: any = useAuth();
   const [initialValues, setInitialValues] = useState<UserModel>();

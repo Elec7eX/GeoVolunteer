@@ -4,11 +4,12 @@ import { Header } from "../header/Header";
 import { Card, Col, Row } from "react-bootstrap";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { UserModel } from "../../types/Types";
+import { UserModel, UserType } from "../../types/Types";
 import { IoPersonOutline } from "react-icons/io5";
 import { VerticalDivider } from "../../utils/Utils";
 import { PiMapPinArea } from "react-icons/pi";
 import MapComponent from "../karte/MapComponent";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 export default function FreiwilligeDetailPage() {
   const location = useLocation();
@@ -60,6 +61,13 @@ export default function FreiwilligeDetailPage() {
                   )}
                   {user.email}
                 </Card.Text>
+                {user.rolle === UserType.ADMIN && (
+                  <Row style={{ textAlign: "end" }}>
+                    <Col>
+                      <RiDeleteBinLine size={25} />
+                    </Col>
+                  </Row>
+                )}
               </Col>
             </Row>
           </Card.Body>

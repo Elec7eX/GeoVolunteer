@@ -32,15 +32,19 @@ export const Footer = (props: Props) => {
                 <div className="text-white">{t("footer.icon.uebersicht")}</div>
               </div>
             </Col>
-            <Col className="text-center">
-              <div>
-                <BsHeartPulse
-                  className="text-white custom-icon"
-                  onClick={() => navigate("/aktivitäten")}
-                />
-                <div className="text-white">{t("footer.icon.aktivitaet")}</div>
-              </div>
-            </Col>
+            {user.rolle !== UserType.ADMIN && (
+              <Col className="text-center">
+                <div>
+                  <BsHeartPulse
+                    className="text-white custom-icon"
+                    onClick={() => navigate("/aktivitäten")}
+                  />
+                  <div className="text-white">
+                    {t("footer.icon.aktivitaet")}
+                  </div>
+                </div>
+              </Col>
+            )}
             {props.displayAddAktivitaet &&
               user.rolle === UserType.ORGANISATION && (
                 <Col>
@@ -62,20 +66,8 @@ export const Footer = (props: Props) => {
                 <div className="text-white">{t("footer.icon.map")}</div>
               </div>
             </Col>
-            {user.rolle === UserType.FREIWILLIGE && (
-              <Col className="text-center">
-                <div>
-                  <CiGlobe
-                    className="text-white custom-icon"
-                    onClick={() => navigate("/organisation")}
-                  />
-                  <div className="text-white">
-                    {t("footer.icon.organisation")}
-                  </div>
-                </div>
-              </Col>
-            )}
-            {user.rolle === UserType.ORGANISATION && (
+            {(user.rolle === UserType.ORGANISATION ||
+              user.rolle === UserType.ADMIN) && (
               <Col className="text-center">
                 <div>
                   <IoPeopleOutline
@@ -84,6 +76,20 @@ export const Footer = (props: Props) => {
                   />
                   <div className="text-white">
                     {t("footer.icon.freiwillige")}
+                  </div>
+                </div>
+              </Col>
+            )}
+            {(user.rolle === UserType.FREIWILLIGE ||
+              user.rolle === UserType.ADMIN) && (
+              <Col className="text-center">
+                <div>
+                  <CiGlobe
+                    className="text-white custom-icon"
+                    onClick={() => navigate("/organisation")}
+                  />
+                  <div className="text-white">
+                    {t("footer.icon.organisation")}
                   </div>
                 </div>
               </Col>

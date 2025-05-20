@@ -168,6 +168,10 @@ export default function Profil() {
     return initialValues!.rolle === UserType.ORGANISATION;
   };
 
+  const isAdmin = (): boolean => {
+    return initialValues!.rolle === UserType.ADMIN;
+  };
+
   return (
     <>
       <Header title={t("profil.overview.title")} />
@@ -349,310 +353,322 @@ export default function Profil() {
                         </Form.Group>
                       </>
                     )}
-                    <Form.Group className="mb-3">
-                      <Form.Label>
-                        {isOrganisation() && t("profil.beschreibung")}
-                        {isFreiwillige() && t("profil.beschreibung.user")}
-                      </Form.Label>
-                      <Form.Control
-                        id="beschreibung"
-                        name="beschreibung"
-                        as="textarea"
-                        rows={3}
-                        disabled={!edit}
-                        value={values.beschreibung}
-                        onChange={handleChange}
-                      />
-                    </Form.Group>
-                    <h5 style={{ marginTop: 40 }}>
-                      {isFreiwillige() && t("profil.verfuegbar.ort.title")}
-                      {isOrganisation() &&
-                        t("profil.organisationdaten.addresse.title")}
-                    </h5>
-                    {edit && (
-                      <div className="mb-3 mt-4">
-                        <Form.Group className="d-flex align-items-center">
-                          <Form.Check
-                            id="manual"
-                            type="radio"
-                            label={t("aktivitaeten.detail.adress.manual")}
-                            name="addressInputMethod"
-                            value={AdressInputEnum.Manual}
-                            checked={
-                              values.addresseInput === AdressInputEnum.Manual
-                            }
-                            onChange={(e) =>
-                              setFieldValue(
-                                "addresseInput",
-                                e.target.value as AdressInputEnum
-                              )
-                            }
-                            className="me-3"
-                          />
-                          <Form.Check
-                            id="map"
-                            type="radio"
-                            label={t("aktivitaeten.detail.adress.map")}
-                            name="addressInputMethod"
-                            value={AdressInputEnum.Map}
-                            checked={
-                              values.addresseInput === AdressInputEnum.Map
-                            }
-                            onChange={(e) =>
-                              setFieldValue(
-                                "addresseInput",
-                                e.target.value as AdressInputEnum
-                              )
-                            }
-                          />
-                        </Form.Group>
-                      </div>
-                    )}
-                    {values.addresseInput === AdressInputEnum.Manual && (
+                    {!isAdmin() && (
                       <>
-                        <Row>
-                          <Col sm={9}>
-                            <Form.Group className="mb-3">
-                              <Form.Label>
-                                {t("aktivitaeten.detail.adress.strasse")}
-                              </Form.Label>
-                              <Form.Control
-                                id="strasse"
-                                name="strasse"
-                                type="text"
-                                disabled={!edit}
-                                value={values.strasse}
-                                onChange={handleChange}
-                              />
-                            </Form.Group>
-                          </Col>
-                          <Col>
-                            <Form.Group className="mb-3">
-                              <Form.Label>
-                                {t("aktivitaeten.detail.adress.hausnummer")}
-                              </Form.Label>
-                              <Form.Control
-                                id="hausnummer"
-                                name="hausnummer"
-                                disabled={!edit}
-                                type="text"
-                                value={values.hausnummer}
-                                onChange={handleChange}
-                              />
-                            </Form.Group>
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col sm={4}>
-                            <Form.Group
-                              className="mb-3"
-                              style={{ flex: 1, marginRight: "10px" }}
-                            >
-                              <Form.Label>
-                                {t("aktivitaeten.detail.adress.plz")}
-                              </Form.Label>
-                              <Form.Control
-                                id="plz"
-                                name="plz"
-                                disabled={!edit}
-                                type="text"
-                                value={values.plz}
-                                onChange={handleChange}
-                              />
-                            </Form.Group>
-                          </Col>
-                          <Col>
-                            <Form.Group className="mb-3" style={{ flex: 1 }}>
-                              <Form.Label>
-                                {t("aktivitaeten.detail.adress.ort")}
-                              </Form.Label>
-                              <Form.Control
-                                id="ort"
-                                name="ort"
-                                disabled={!edit}
-                                type="text"
-                                value={values.ort}
-                                onChange={handleChange}
-                              />
-                            </Form.Group>
-                          </Col>
-                        </Row>
                         <Form.Group className="mb-3">
                           <Form.Label>
-                            {t("aktivitaeten.detail.koordinaten")}
+                            {isOrganisation() && t("profil.beschreibung")}
+                            {isFreiwillige() && t("profil.beschreibung.user")}
                           </Form.Label>
-                          <Row>
-                            <Col sm={6}>
-                              <Form.Control
-                                id="latitude"
-                                name="latitude"
-                                type="number"
-                                disabled
-                                value={latitude}
-                                onChange={handleChange}
-                              />
-                            </Col>
-                            <Col sm={6}>
-                              <Form.Control
-                                id="longitude"
-                                name="longitude"
-                                type="number"
-                                disabled
-                                value={longitude}
-                                onChange={handleChange}
-                              />
-                            </Col>
-                          </Row>
+                          <Form.Control
+                            id="beschreibung"
+                            name="beschreibung"
+                            as="textarea"
+                            rows={3}
+                            disabled={!edit}
+                            value={values.beschreibung}
+                            onChange={handleChange}
+                          />
                         </Form.Group>
+                        <h5 style={{ marginTop: 40 }}>
+                          {isFreiwillige() && t("profil.verfuegbar.ort.title")}
+                          {isOrganisation() &&
+                            t("profil.organisationdaten.addresse.title")}
+                        </h5>
                         {edit && (
-                          <Row>
-                            <Col style={{ textAlign: "right" }}>
-                              <Button
-                                variant="primary"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  getCoordinates(
-                                    values.strasse!,
-                                    values.hausnummer!,
-                                    values.plz!,
-                                    values.ort!
-                                  );
-                                }}
-                              >
-                                {t("button.coordinates")}
-                              </Button>
-                              <br />
-                              <br />
-                            </Col>
-                          </Row>
-                        )}
-                      </>
-                    )}
-                    {edit && values.addresseInput === AdressInputEnum.Map && (
-                      <MapComponent
-                        MapClickHandler={MapClickHandler}
-                        address={address}
-                        position={position}
-                        radius={
-                          isFreiwillige() && values.einheit === "KM"
-                            ? values.radius! * 1000
-                            : values.radius
-                        }
-                      />
-                    )}
-                    {isFreiwillige() && (
-                      <>
-                        {edit && (
-                          <Row>
-                            <Col sm={9}>
-                              <Form.Label>
-                                {t("profil.verfuegbar.umkreis")}
-                                {values.radius}{" "}
-                                {values.einheit === "KM" ? "km" : "m"}
-                              </Form.Label>
-                              <Form.Range
-                                id="radius"
-                                name="radius"
-                                min={0}
-                                max={values.einheit === "KM" ? 25 : 25000}
-                                value={values.radius}
-                                onChange={handleChange}
+                          <div className="mb-3 mt-4">
+                            <Form.Group className="d-flex align-items-center">
+                              <Form.Check
+                                id="manual"
+                                type="radio"
+                                label={t("aktivitaeten.detail.adress.manual")}
+                                name="addressInputMethod"
+                                value={AdressInputEnum.Manual}
+                                checked={
+                                  values.addresseInput ===
+                                  AdressInputEnum.Manual
+                                }
+                                onChange={(e) =>
+                                  setFieldValue(
+                                    "addresseInput",
+                                    e.target.value as AdressInputEnum
+                                  )
+                                }
+                                className="me-3"
                               />
-                            </Col>
-                            <Col>
-                              <Form.Group className="mb-3">
-                                <Form.Label>
-                                  {t("profil.verfuegbar.einheit")}
-                                </Form.Label>
-                                <Form.Select
-                                  id="einheit"
-                                  name="einheit"
-                                  value={values.einheit}
-                                  onChange={(e) => {
-                                    e.preventDefault();
-                                    setFieldValue("einheit", e.target.value);
-                                    setFieldValue("radius", 0);
-                                  }}
+                              <Form.Check
+                                id="map"
+                                type="radio"
+                                label={t("aktivitaeten.detail.adress.map")}
+                                name="addressInputMethod"
+                                value={AdressInputEnum.Map}
+                                checked={
+                                  values.addresseInput === AdressInputEnum.Map
+                                }
+                                onChange={(e) =>
+                                  setFieldValue(
+                                    "addresseInput",
+                                    e.target.value as AdressInputEnum
+                                  )
+                                }
+                              />
+                            </Form.Group>
+                          </div>
+                        )}
+                        {values.addresseInput === AdressInputEnum.Manual && (
+                          <>
+                            <Row>
+                              <Col sm={9}>
+                                <Form.Group className="mb-3">
+                                  <Form.Label>
+                                    {t("aktivitaeten.detail.adress.strasse")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="strasse"
+                                    name="strasse"
+                                    type="text"
+                                    disabled={!edit}
+                                    value={values.strasse}
+                                    onChange={handleChange}
+                                  />
+                                </Form.Group>
+                              </Col>
+                              <Col>
+                                <Form.Group className="mb-3">
+                                  <Form.Label>
+                                    {t("aktivitaeten.detail.adress.hausnummer")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="hausnummer"
+                                    name="hausnummer"
+                                    disabled={!edit}
+                                    type="text"
+                                    value={values.hausnummer}
+                                    onChange={handleChange}
+                                  />
+                                </Form.Group>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col sm={4}>
+                                <Form.Group
+                                  className="mb-3"
+                                  style={{ flex: 1, marginRight: "10px" }}
                                 >
-                                  {einheitOptions.map((option) => (
-                                    <option
-                                      key={option.value}
-                                      value={option.value}
-                                    >
-                                      {option.label}
-                                    </option>
-                                  ))}
-                                </Form.Select>
-                              </Form.Group>
-                            </Col>
-                          </Row>
+                                  <Form.Label>
+                                    {t("aktivitaeten.detail.adress.plz")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="plz"
+                                    name="plz"
+                                    disabled={!edit}
+                                    type="text"
+                                    value={values.plz}
+                                    onChange={handleChange}
+                                  />
+                                </Form.Group>
+                              </Col>
+                              <Col>
+                                <Form.Group
+                                  className="mb-3"
+                                  style={{ flex: 1 }}
+                                >
+                                  <Form.Label>
+                                    {t("aktivitaeten.detail.adress.ort")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="ort"
+                                    name="ort"
+                                    disabled={!edit}
+                                    type="text"
+                                    value={values.ort}
+                                    onChange={handleChange}
+                                  />
+                                </Form.Group>
+                              </Col>
+                            </Row>
+                            <Form.Group className="mb-3">
+                              <Form.Label>
+                                {t("aktivitaeten.detail.koordinaten")}
+                              </Form.Label>
+                              <Row>
+                                <Col sm={6}>
+                                  <Form.Control
+                                    id="latitude"
+                                    name="latitude"
+                                    type="number"
+                                    disabled
+                                    value={latitude}
+                                    onChange={handleChange}
+                                  />
+                                </Col>
+                                <Col sm={6}>
+                                  <Form.Control
+                                    id="longitude"
+                                    name="longitude"
+                                    type="number"
+                                    disabled
+                                    value={longitude}
+                                    onChange={handleChange}
+                                  />
+                                </Col>
+                              </Row>
+                            </Form.Group>
+                            {edit && (
+                              <Row>
+                                <Col style={{ textAlign: "right" }}>
+                                  <Button
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      getCoordinates(
+                                        values.strasse!,
+                                        values.hausnummer!,
+                                        values.plz!,
+                                        values.ort!
+                                      );
+                                    }}
+                                  >
+                                    {t("button.coordinates")}
+                                  </Button>
+                                  <br />
+                                  <br />
+                                </Col>
+                              </Row>
+                            )}
+                          </>
                         )}
-                        <Row style={{ marginTop: 40 }}>
-                          <h5>{t("profil.verfuegbar.title")}</h5>
-                          <Col>
-                            <Form.Group className="mb-3">
-                              <Form.Label>
-                                {t("profil.verfuegbar.von")}
-                              </Form.Label>
-                              <Form.Control
-                                type="date"
-                                id="verfuegbarVonDatum"
-                                name="verfuegbarVonDatum"
-                                disabled={!edit}
-                                value={values.verfuegbarVonDatum}
-                                onChange={handleChange}
-                              />
-                            </Form.Group>
-                          </Col>
-                          <Col>
-                            <Form.Group className="mb-3">
-                              <Form.Label>
-                                {t("profil.verfuegbar.bis")}
-                              </Form.Label>
-                              <Form.Control
-                                id="verfuegbarBisDatum"
-                                name="verfuegbarBisDatum"
-                                disabled={!edit}
-                                type="date"
-                                value={values.verfuegbarBisDatum}
-                                onChange={handleChange}
-                              />
-                            </Form.Group>
-                          </Col>
-                        </Row>
-                        <Row>
-                          <Col>
-                            <Form.Group className="mb-3">
-                              <Form.Label>
-                                {t("profil.verfuegbar.von")}
-                              </Form.Label>
-                              <Form.Control
-                                id="verfuegbarVonZeit"
-                                name="verfuegbarVonZeit"
-                                disabled={!edit}
-                                type="time"
-                                value={values.verfuegbarVonZeit}
-                                onChange={handleChange}
-                              />
-                            </Form.Group>
-                          </Col>
-                          <Col>
-                            <Form.Group className="mb-3">
-                              <Form.Label>
-                                {t("profil.verfuegbar.bis")}
-                              </Form.Label>
-                              <Form.Control
-                                id="verfuegbarBisZeit"
-                                name="verfuegbarBisZeit"
-                                disabled={!edit}
-                                type="time"
-                                value={values.verfuegbarBisZeit}
-                                onChange={handleChange}
-                              />
-                            </Form.Group>
-                          </Col>
-                        </Row>
+                        {edit &&
+                          values.addresseInput === AdressInputEnum.Map && (
+                            <MapComponent
+                              MapClickHandler={MapClickHandler}
+                              address={address}
+                              position={position}
+                              radius={
+                                isFreiwillige() && values.einheit === "KM"
+                                  ? values.radius! * 1000
+                                  : values.radius
+                              }
+                            />
+                          )}
+                        {isFreiwillige() && (
+                          <>
+                            {edit && (
+                              <Row>
+                                <Col sm={9}>
+                                  <Form.Label>
+                                    {t("profil.verfuegbar.umkreis")}
+                                    {values.radius}{" "}
+                                    {values.einheit === "KM" ? "km" : "m"}
+                                  </Form.Label>
+                                  <Form.Range
+                                    id="radius"
+                                    name="radius"
+                                    min={0}
+                                    max={values.einheit === "KM" ? 25 : 25000}
+                                    value={values.radius}
+                                    onChange={handleChange}
+                                  />
+                                </Col>
+                                <Col>
+                                  <Form.Group className="mb-3">
+                                    <Form.Label>
+                                      {t("profil.verfuegbar.einheit")}
+                                    </Form.Label>
+                                    <Form.Select
+                                      id="einheit"
+                                      name="einheit"
+                                      value={values.einheit}
+                                      onChange={(e) => {
+                                        e.preventDefault();
+                                        setFieldValue(
+                                          "einheit",
+                                          e.target.value
+                                        );
+                                        setFieldValue("radius", 0);
+                                      }}
+                                    >
+                                      {einheitOptions.map((option) => (
+                                        <option
+                                          key={option.value}
+                                          value={option.value}
+                                        >
+                                          {option.label}
+                                        </option>
+                                      ))}
+                                    </Form.Select>
+                                  </Form.Group>
+                                </Col>
+                              </Row>
+                            )}
+                            <Row style={{ marginTop: 40 }}>
+                              <h5>{t("profil.verfuegbar.title")}</h5>
+                              <Col>
+                                <Form.Group className="mb-3">
+                                  <Form.Label>
+                                    {t("profil.verfuegbar.von")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    type="date"
+                                    id="verfuegbarVonDatum"
+                                    name="verfuegbarVonDatum"
+                                    disabled={!edit}
+                                    value={values.verfuegbarVonDatum}
+                                    onChange={handleChange}
+                                  />
+                                </Form.Group>
+                              </Col>
+                              <Col>
+                                <Form.Group className="mb-3">
+                                  <Form.Label>
+                                    {t("profil.verfuegbar.bis")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="verfuegbarBisDatum"
+                                    name="verfuegbarBisDatum"
+                                    disabled={!edit}
+                                    type="date"
+                                    value={values.verfuegbarBisDatum}
+                                    onChange={handleChange}
+                                  />
+                                </Form.Group>
+                              </Col>
+                            </Row>
+                            <Row>
+                              <Col>
+                                <Form.Group className="mb-3">
+                                  <Form.Label>
+                                    {t("profil.verfuegbar.von")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="verfuegbarVonZeit"
+                                    name="verfuegbarVonZeit"
+                                    disabled={!edit}
+                                    type="time"
+                                    value={values.verfuegbarVonZeit}
+                                    onChange={handleChange}
+                                  />
+                                </Form.Group>
+                              </Col>
+                              <Col>
+                                <Form.Group className="mb-3">
+                                  <Form.Label>
+                                    {t("profil.verfuegbar.bis")}
+                                  </Form.Label>
+                                  <Form.Control
+                                    id="verfuegbarBisZeit"
+                                    name="verfuegbarBisZeit"
+                                    disabled={!edit}
+                                    type="time"
+                                    value={values.verfuegbarBisZeit}
+                                    onChange={handleChange}
+                                  />
+                                </Form.Group>
+                              </Col>
+                            </Row>
+                          </>
+                        )}
                       </>
                     )}
                     {edit && (

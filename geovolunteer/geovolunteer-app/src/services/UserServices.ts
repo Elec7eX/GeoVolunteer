@@ -16,7 +16,7 @@ const create = (data: UserModel) => {
 };
 
 const getAll = () => {
-  return http.get<Array<UserModel>>("/benutzer");
+  return http.get<Array<UserModel>>("/benutzer"); 
 };
 
 const getFreiwillige = () => {

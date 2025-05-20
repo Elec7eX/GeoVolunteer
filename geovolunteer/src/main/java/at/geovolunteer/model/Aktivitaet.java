@@ -162,7 +162,7 @@ public class Aktivitaet extends AbstractAktivitaet {
 
 	public void removeTeilnehmer(Benutzer teilnehmer) {
 		if (this.teilnehmer.contains(teilnehmer)) {
-			this.teilnehmer.remove(teilnehmer);
+			this.teilnehmer.remove(teilnehmer); 
 			teilnehmer.getTeilnahmen().remove(this);
 		}
 	}

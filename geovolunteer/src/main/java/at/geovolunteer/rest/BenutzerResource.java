@@ -109,7 +109,7 @@ public class BenutzerResource {
 		}
 	}
 
-	@DeleteMapping("/remove/{id}")
+	@DeleteMapping("/remove/{id}") 
 	public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") long id) {
 		try {
 			// service.deleteById(id);

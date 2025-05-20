@@ -1,5 +1,11 @@
 import { AdressInputEnum } from "../enums/Enums"
 
+export enum UserType {
+    ADMIN = "Admin",
+    ORGANISATION = "Organisation",
+    FREIWILLIGE = "Freiwillige",
+  }
+
 export interface UserModel {
     id?: number,
     rolle?: string,
@@ -32,7 +38,7 @@ export interface UserModel {
 export interface RessourceModel {
     name: string,
     beschreibung: string,
-    addresseInput: AdressInputEnum,
+    addresseInput: AdressInputEnum, 
     strasse: string,
     hausnummer: string,
     plz: string,
