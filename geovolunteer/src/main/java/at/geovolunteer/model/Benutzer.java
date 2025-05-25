@@ -2,6 +2,7 @@ package at.geovolunteer.model;
 
 import java.util.Calendar;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import jakarta.persistence.Entity;
@@ -15,6 +16,7 @@ import jakarta.persistence.TemporalType;
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(value = { "addresseInput" })
 @Entity(name = "benutzer")
 public class Benutzer {
 
@@ -24,6 +26,8 @@ public class Benutzer {
 
 	@Enumerated(EnumType.STRING)
 	private Rolle rolle;
+
+	private boolean active;
 
 	private String login;
 	private String password;
@@ -234,6 +238,14 @@ public class Benutzer {
 
 	public void setVerfuegbarBisZeit(Calendar verfuegbarBisZeit) {
 		this.verfuegbarBisZeit = verfuegbarBisZeit;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 }

@@ -1,11 +1,12 @@
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Form as FormikForm, Formik, FormikHelpers } from "formik";
 import { useTranslation } from "react-i18next";
 import { Registration } from "./Registration";
 import userService from "../services/UserServices";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export type LoginType = {
   login?: string;
@@ -22,6 +23,7 @@ export function Login() {
   const { _login }: any = useAuth();
   const [initialValues, setInitialValues] = useState<LoginType>();
   const [isRegistrationPage, setIsRegistrationPage] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     setInitialValues({
@@ -90,20 +92,26 @@ export function Login() {
                     <Form.Text className="text-muted"></Form.Text>
                   </Form.Group>
                   <Form.Group className="mb-3">
-                    <Form.Label>{t("label.login.passwort")}</Form.Label>
-                    <Form.Control
-                      id="password"
-                      name="password"
-                      placeholder={t("placeholder.login.passwort")}
-                      type="password"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className={
-                        errors.password && touched.password
-                          ? "text-input error"
-                          : "text-input"
-                      }
-                    />
+                    <InputGroup>
+                      <Form.Control
+                        id="password"
+                        name="password"
+                        placeholder={t("placeholder.login.passwort")}
+                        type={showPassword ? "text" : "password"}
+                        onChange={handleChange}
+                        className={
+                          errors.password && touched.password
+                            ? "text-input error"
+                            : "text-input"
+                        }
+                      />
+                      <Button
+                        variant="secondary"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </Button>
+                    </InputGroup>
                     <Form.Text className="text-muted"></Form.Text>
                     {errors.password && touched.password && (
                       <div className="input-feedback">{errors.password}</div>

@@ -12,6 +12,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
+import userService from "../../services/UserServices";
 
 type Props = {
   title: string;
@@ -27,7 +28,7 @@ export const Header = (props: Props) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    _logout();
+    userService.logout().then(() => _logout());
   };
 
   return (
@@ -35,6 +36,9 @@ export const Header = (props: Props) => {
       <div className="header">
         <Container>
           <Row>
+            <Col md={{ span: 8, offset: 2 }}>
+              <div className="header-title">{props.title}</div>
+            </Col>
             <Col md={2}>
               <Navbar>
                 <Navbar.Collapse>
@@ -42,7 +46,11 @@ export const Header = (props: Props) => {
                     <NavDropdown
                       style={{ zIndex: 1050 }}
                       title={<CgProfile className="custom-icon" size={27} />}
+                      align="end"
                     >
+                      <NavDropdown.Item onClick={() => navigate("/profil")}>
+                        {t("button.profile")}
+                      </NavDropdown.Item>
                       <NavDropdown.Divider />
                       <NavDropdown.Item onClick={handleLogout}>
                         {t("button.logout")}
@@ -51,9 +59,6 @@ export const Header = (props: Props) => {
                   </Nav>
                 </Navbar.Collapse>
               </Navbar>
-            </Col>
-            <Col md={{ span: 6, offset: 1 }}>
-              <div className="header-title">{props.title}</div>
             </Col>
           </Row>
           {props.breadcrumb && (

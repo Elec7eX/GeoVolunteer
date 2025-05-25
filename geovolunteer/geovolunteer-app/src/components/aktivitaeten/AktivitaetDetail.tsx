@@ -325,6 +325,8 @@ export default function AktivitaetDetail() {
                             <Form.Control
                               id="beschreibung"
                               name="beschreibung"
+                              as="textarea"
+                              rows={3}
                               className={
                                 errors.beschreibung && touched.beschreibung
                                   ? "text-input error"
@@ -706,7 +708,7 @@ export default function AktivitaetDetail() {
                             <Form.Control
                               id="email"
                               name="email"
-                              type="text"
+                              type="email"
                               value={values.email}
                               onChange={handleChange}
                               onBlur={handleBlur}

@@ -36,6 +36,16 @@ public class BenutzerResource {
 		}
 	}
 
+	@PostMapping("/logout")
+	public ResponseEntity<Benutzer> logout() {
+		Benutzer benutzer = service.logout();
+		if (benutzer != null) {
+			return ResponseEntity.ok(benutzer);
+		} else {
+			return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
+		}
+	}
+
 	@PostMapping("/create")
 	public ResponseEntity<?> create(@RequestBody Benutzer user) {
 		try {
@@ -60,27 +70,25 @@ public class BenutzerResource {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Benutzer> getBenutzerById(@PathVariable("id") long id) {
-		Optional<Benutzer> tutorialData = service.findById(id);
+		Optional<Benutzer> benutzer = service.findById(id);
 
-		if (tutorialData.isPresent()) {
-			return new ResponseEntity<>(tutorialData.get(), HttpStatus.OK);
+		if (benutzer.isPresent()) {
+			return new ResponseEntity<>(benutzer.get(), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@PutMapping("/update/{id}")
-	public ResponseEntity<Benutzer> updateTutorial(@PathVariable("id") long id, @RequestBody Benutzer user) {
-		Optional<Benutzer> tutorialData = service.findById(id);
-
-		if (tutorialData.isPresent()) {
-			Benutzer _user = tutorialData.get();
-			_user.setVorname(user.getVorname());
-			_user.setNachname(user.getNachname());
-			_user.setGeburtsDatum(user.getGeburtsDatum());
-			return new ResponseEntity<>(service.save(_user), HttpStatus.OK);
-		} else {
+	public ResponseEntity<Benutzer> update(@PathVariable("id") long id, @RequestBody Benutzer user) {
+		try {
+			Benutzer entity = service.update(user);
+			if (entity != null) {
+				return ResponseEntity.ok(entity);
+			}
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

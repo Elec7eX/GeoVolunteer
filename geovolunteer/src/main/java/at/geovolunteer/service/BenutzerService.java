@@ -20,7 +20,10 @@ public class BenutzerService {
 	public Benutzer authenticate(LoginType loginRequest) {
 		Optional<Benutzer> entity = benutzerRepository.findByLogin(loginRequest.getLogin()).stream().findFirst();
 		if (entity.isPresent() && passwordMatches(loginRequest.getPassword(), entity.get().getPassword())) {
-			return entity.get();
+			Benutzer benutzer = entity.get();
+			benutzer.setActive(true);
+			benutzerRepository.saveAndFlush(benutzer);
+			return benutzer;
 		}
 		return null;
 	}
@@ -35,6 +38,46 @@ public class BenutzerService {
 		return entity;
 	}
 
+	public Benutzer logout() {
+		Optional<Benutzer> benutzer = findAll().stream().filter(e -> e.isActive()).findAny();
+		if (benutzer.isPresent()) {
+			Benutzer entity = benutzer.get();
+			entity.setActive(false);
+			benutzerRepository.saveAndFlush(entity);
+			return entity;
+		}
+		return null;
+	}
+
+	public Benutzer update(Benutzer user) {
+		Optional<Benutzer> benutzer = findById(user.getId());
+		if (benutzer.isPresent()) {
+			Benutzer entity = benutzer.get();
+			entity.setVorname(user.getVorname());
+			entity.setNachname(user.getNachname());
+			entity.setGeburtsDatum(user.getGeburtsDatum());
+			entity.setVerfuegbarVonDatum(user.getVerfuegbarVonDatum());
+			entity.setVerfuegbarBisDatum(user.getVerfuegbarBisDatum());
+			entity.setVerfuegbarVonZeit(user.getVerfuegbarVonZeit());
+			entity.setVerfuegbarBisZeit(user.getVerfuegbarBisZeit());
+			entity.setLogin(user.getLogin());
+			entity.setPassword(user.getPassword());
+			entity.setEmail(user.getEmail());
+			entity.setTelefon(user.getTelefon());
+			entity.setStrasse(user.getStrasse());
+			entity.setHausnummer(user.getHausnummer());
+			entity.setPlz(user.getPlz());
+			entity.setOrt(user.getOrt());
+			entity.setLand(user.getLand());
+			entity.setName(user.getName());
+			entity.setWebseite(user.getWebseite());
+			entity.setBeschreibung(user.getBeschreibung());
+			benutzerRepository.saveAndFlush(entity);
+			return entity;
+		}
+		return null;
+	}
+
 	public List<Benutzer> findByUsername(String login) {
 		List<Benutzer> benutzer = new ArrayList<Benutzer>();
 		benutzerRepository.findByLogin(login).forEach(benutzer::add);
@@ -46,9 +89,9 @@ public class BenutzerService {
 	}
 
 	public List<Benutzer> findAll() {
-		List<Benutzer> tutorials = new ArrayList<Benutzer>();
-		benutzerRepository.findAll().forEach(tutorials::add);
-		return tutorials;
+		List<Benutzer> benutzer = new ArrayList<Benutzer>();
+		benutzerRepository.findAll().forEach(benutzer::add);
+		return benutzer;
 	}
 
 	public <S extends Benutzer> S save(S entity) {

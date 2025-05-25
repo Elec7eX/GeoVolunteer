@@ -4,7 +4,7 @@ export enum AdressInputEnum {
 }
 
 export enum UserType {
-    ADMIN,
-    ORGANISATION,
-    FREIWILLIGE 
+    ADMIN = "ADMIN",
+    ORGANISATION = "ORGANISATION",
+    FREIWILLIGE = "FREIWILLIGE" 
 }

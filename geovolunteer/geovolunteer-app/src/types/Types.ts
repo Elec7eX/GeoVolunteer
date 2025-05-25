@@ -6,9 +6,23 @@ export interface UserModel {
     login: string,
     email?: string,
     password: string,
+    telefon?: string,
+    strasse?: string,
+    hausnummer?: string,
+    addresseInput?: AdressInputEnum,
+    plz?: string,
+    ort?: string,
+    land?: string,
+    name?: string,
+    webseite?: string,
+    beschreibung?: string,
     vorname?: string,
     nachname?: string,
-    geburtsDatum?: string  
+    geburtsDatum?: string,
+    verfuegbarVonDatum?: string,
+    verfuegbarBisDatum?: string,
+    verfuegbarVonZeit?: string,
+    verfuegbarBisZeit?: string 
 }
 
 export interface RessourceModel {
