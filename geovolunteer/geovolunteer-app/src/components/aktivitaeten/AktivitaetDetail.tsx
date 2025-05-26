@@ -667,7 +667,7 @@ export default function AktivitaetDetail() {
                           </Form.Group>
                           <hr />
                           <h5 style={{ marginTop: 30 }}>
-                            Kontakt Informationen
+                            {t("aktivitaeten.detail.kontaktinfo.title")}
                           </h5>
                           <Row>
                             <Col>

@@ -4,6 +4,7 @@ import java.util.Calendar;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,18 +50,23 @@ public class Benutzer {
 	private String vorname;
 	private String nachname;
 	@Temporal(TemporalType.DATE)
+	@JsonSerialize(using = CalendarSerializer.class)
 	@JsonDeserialize(using = CalendarDeserializer.class)
 	private Calendar geburtsDatum;
 	@Temporal(TemporalType.DATE)
+	@JsonSerialize(using = CalendarSerializer.class)
 	@JsonDeserialize(using = CalendarDeserializer.class)
 	private Calendar verfuegbarVonDatum;
 	@Temporal(TemporalType.DATE)
+	@JsonSerialize(using = CalendarSerializer.class)
 	@JsonDeserialize(using = CalendarDeserializer.class)
 	private Calendar verfuegbarBisDatum;
 	@Temporal(TemporalType.TIME)
+	@JsonSerialize(using = CalendarTimeSerializer.class)
 	@JsonDeserialize(using = CalendarTimeDeserializer.class)
 	private Calendar verfuegbarVonZeit;
 	@Temporal(TemporalType.TIME)
+	@JsonSerialize(using = CalendarTimeSerializer.class)
 	@JsonDeserialize(using = CalendarTimeDeserializer.class)
 	private Calendar verfuegbarBisZeit;
 

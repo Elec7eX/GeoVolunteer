@@ -50,7 +50,7 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/aktivitäten/detail/ressourceDetail"
+              path="/aktivitäten/ressource/detail/:id"
               element={
                 <ProtectedRoute>
                   <RessourceDetailPage />

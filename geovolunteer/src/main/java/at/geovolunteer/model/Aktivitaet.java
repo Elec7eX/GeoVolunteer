@@ -5,6 +5,7 @@ import java.util.Calendar;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -30,18 +31,22 @@ public class Aktivitaet extends AbstractAktivitaet {
 	private String verpflegung;
 
 	@Temporal(TemporalType.DATE)
+	@JsonSerialize(using = CalendarSerializer.class)
 	@JsonDeserialize(using = CalendarDeserializer.class)
 	private Calendar startDatum;
 
 	@Temporal(TemporalType.DATE)
+	@JsonSerialize(using = CalendarSerializer.class)
 	@JsonDeserialize(using = CalendarDeserializer.class)
 	private Calendar endDatum;
 
 	@Temporal(TemporalType.TIME)
+	@JsonSerialize(using = CalendarTimeSerializer.class)
 	@JsonDeserialize(using = CalendarTimeDeserializer.class)
 	private Calendar startZeit;
 
 	@Temporal(TemporalType.TIME)
+	@JsonSerialize(using = CalendarTimeSerializer.class)
 	@JsonDeserialize(using = CalendarTimeDeserializer.class)
 	private Calendar endZeit;
 

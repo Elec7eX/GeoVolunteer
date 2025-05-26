@@ -39,7 +39,7 @@ public class BenutzerService {
 	}
 
 	public Benutzer logout() {
-		Optional<Benutzer> benutzer = findAll().stream().filter(e -> e.isActive()).findAny();
+		Optional<Benutzer> benutzer = findAll().stream().filter(b -> b.isActive()).findAny();
 		if (benutzer.isPresent()) {
 			Benutzer entity = benutzer.get();
 			entity.setActive(false);

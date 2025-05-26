@@ -2,10 +2,11 @@ import { t } from "i18next";
 import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Nav, Row } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { AktivitaetModel } from "../../types/Types";
 import aktivitaetService from "../../services/AktivitaetService";
+import { VerticalDivider } from "../../utils/Utils";
 
 export default function AktivitaetDetailPage() {
   const navigate = useNavigate();
@@ -58,22 +59,92 @@ export default function AktivitaetDetailPage() {
             </Row>
           </Card.Body>
         </Card>
-        <Card style={{ marginTop: 10, height: "100%" }}>
+        <Card style={{ marginTop: 10, height: "auto" }}>
           <Card.Body>
-            <Card.Title>Beschreibung</Card.Title>
-            <Card.Text>Weitere Beschreibung hier</Card.Text>
+            <Card.Title>{t("aktivitaeten.detail.beschreibung")}</Card.Title>
+            <Card.Text>{aktivitaet.beschreibung}</Card.Text>
           </Card.Body>
           <Card.Body>
-            <Card.Title>Örtliche Verfügbarkeit</Card.Title>
-            <Card.Text>Beschreibung hier</Card.Text>
+            <Row>
+              <h5>{t("aktivitaeten.detail.zeit.title")}</h5>
+              <Col md={5}>
+                <div>
+                  {t("aktivitaeten.detail.startDate")}: {aktivitaet.startDatum}
+                  <br />
+                  {t("aktivitaeten.detail.endDate")} : {aktivitaet.endDatum}
+                </div>
+              </Col>
+              <Col md={2}>
+                <VerticalDivider />
+              </Col>
+              <Col>
+                <div>
+                  {t("aktivitaeten.detail.startTime")}: {aktivitaet.startZeit}
+                  <br />
+                  {t("aktivitaeten.detail.endTime")} : {aktivitaet.endZeit}
+                </div>
+              </Col>
+            </Row>
+            <br />
+            <Row>
+              <h5>{t("aktivitaeten.detail.teilnehmerzahl")}</h5>
+              <div>{aktivitaet.teilnehmeranzahl}</div>
+            </Row>
+            <br />
+            <Row>
+              <h5>{t("aktivitaeten.detail.transport")}</h5>
+              <div>{aktivitaet.transport}</div>
+            </Row>
+            <br />
+            <Row>
+              <h5>{t("aktivitaeten.detail.verpflegung")}</h5>
+              <div>{aktivitaet.verpflegung}</div>
+            </Row>
+            <br />
+            <Row>
+              <h5>
+                {t("aktivitaeten.detail.kontaktinfo.title")} &{" "}
+                {t("aktivitaeten.detail.adresse.title")}
+              </h5>
+              <Col md={6}>
+                <div>
+                  {aktivitaet.vorname} {aktivitaet.nachname}
+                </div>
+                <div>{aktivitaet.email}</div>
+                <div>{aktivitaet.telefon}</div>
+              </Col>
+              <Col md={1}>
+                <VerticalDivider height="70px" />
+              </Col>
+              <Col>
+                <div>
+                  {aktivitaet.strasse} {aktivitaet.hausnummer}
+                </div>
+                <div>
+                  {aktivitaet.plz} {aktivitaet.ort}
+                </div>
+                <div>
+                  <Button
+                    variant="link"
+                    onClick={undefined}
+                    style={{ padding: 0 }}
+                  >
+                    Auf der Karte anzeigen
+                  </Button>
+                </div>
+              </Col>
+            </Row>
           </Card.Body>
-          <Card.Body>
-            <Card.Title>Zeitliche Verfügbarkeit</Card.Title>
-            <Card.Text>Beschreibung hier</Card.Text>
-          </Card.Body>
+          <br />
           <Card.Body
-            onClick={() => navigate("/aktivitäten/detail/ressourceDetail")}
+            onClick={() =>
+              navigate(`/aktivitäten/ressource/detail/${aktivitaet.id}`, {
+                state: { aktivitaet },
+              })
+            }
           >
+            <h5>{t("ressourcen.detail.uebersicht")}</h5>
+            <br />
             <Row>
               <Col md={3}>
                 <Card.Img
@@ -83,8 +154,8 @@ export default function AktivitaetDetailPage() {
                 />
               </Col>
               <Col>
-                <Card.Title>Ressource</Card.Title>
-                <Card.Text>Ressource-Beschreibung hier</Card.Text>
+                <Card.Title>{aktivitaet.ressource.name}</Card.Title>
+                <Card.Text>{aktivitaet.ressource.beschreibung}</Card.Text>
               </Col>
             </Row>
           </Card.Body>
