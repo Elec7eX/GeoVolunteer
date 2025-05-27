@@ -68,6 +68,9 @@ public class BenutzerService {
 			entity.setHausnummer(user.getHausnummer());
 			entity.setPlz(user.getPlz());
 			entity.setOrt(user.getOrt());
+			entity.setLatitude(user.getLatitude());
+			entity.setLongitude(user.getLongitude());
+			entity.setRadius(user.getRadius());
 			entity.setLand(user.getLand());
 			entity.setName(user.getName());
 			entity.setWebseite(user.getWebseite());

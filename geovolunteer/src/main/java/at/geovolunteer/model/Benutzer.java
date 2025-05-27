@@ -36,6 +36,9 @@ public class Benutzer {
 	private String telefon;
 	private String strasse;
 	private String hausnummer;
+	private double latitude;
+	private double longitude;
+	private double radius;
 	private String plz;
 	private String ort;
 	private String land;
@@ -252,6 +255,30 @@ public class Benutzer {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	public double getRadius() {
+		return radius;
+	}
+
+	public void setRadius(double radius) {
+		this.radius = radius;
 	}
 
 }

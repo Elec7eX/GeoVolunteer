@@ -70,6 +70,8 @@
   "profil.verfuegbar.zeit": "Verfügbarkeit nach Zeit",
   "profil.verfuegbar.von": "von",
   "profil.verfuegbar.bis": "bis",
+  "profil.verfuegbar.einheit": "Einheit",
+  "profil.verfuegbar.umkreis": "Umkreis von: ",
   "ressourcen.detail.title": "Ressource Detail",
   "ressourcen.detail.uebersicht": "Ressource Übersicht",
   "ressourcen.create.title": "Ressource Erstellen",

@@ -12,18 +12,12 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { AktivitaetModel } from "../../types/Types";
 import { AdressInputEnum } from "../../enums/Enums";
-import {
-  MapContainer,
-  Marker,
-  TileLayer,
-  Popup,
-  useMapEvents,
-} from "react-leaflet";
+import { useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { Icon } from "leaflet";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import aktivitaetService from "../../services/AktivitaetService";
+import MapComponent from "../karte/MapComponent";
 
 interface FormularResult {
   values: AktivitaetModel;
@@ -89,11 +83,6 @@ export default function AktivitaetDetail() {
     };
     setInitialValues(model);
   }, []);
-
-  const customIcon = new Icon({
-    iconUrl: require("../../icons/marker-icon.png"),
-    iconSize: [38, 38],
-  });
 
   const MapClickHandler = () => {
     const { setFieldValue } = useFormikContext();
@@ -520,31 +509,11 @@ export default function AktivitaetDetail() {
                           )}
                           {values.addresseInput === AdressInputEnum.Map && (
                             <>
-                              <Form.Group className="mb-3">
-                                <Form.Text>
-                                  {address && <div>Address: {address}</div>}
-                                </Form.Text>
-                              </Form.Group>
-                              <MapContainer
-                                center={[48.30639, 14.28611]}
-                                zoom={13}
-                                style={{
-                                  height: "512px",
-                                  width: "100%",
-                                  marginBottom: "2rem",
-                                }}
-                              >
-                                <TileLayer
-                                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                />
-                                <MapClickHandler />
-                                {position && (
-                                  <Marker position={position} icon={customIcon}>
-                                    <Popup>{address}</Popup>
-                                  </Marker>
-                                )}
-                              </MapContainer>
+                              <MapComponent
+                                MapClickHandler={MapClickHandler}
+                                address={address}
+                                position={position}
+                              />
                             </>
                           )}
                           <Row>
@@ -988,36 +957,11 @@ export default function AktivitaetDetail() {
                           {values.ressource.addresseInput ===
                             AdressInputEnum.Map && (
                             <>
-                              <Form.Group className="mb-3">
-                                <Form.Text>
-                                  {ressourceAddress && (
-                                    <div>Address: {ressourceAddress}</div>
-                                  )}
-                                </Form.Text>
-                              </Form.Group>
-                              <MapContainer
-                                center={[48.30639, 14.28611]}
-                                zoom={13}
-                                style={{
-                                  height: "512px",
-                                  width: "100%",
-                                  marginBottom: "2rem",
-                                }}
-                              >
-                                <TileLayer
-                                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                />
-                                <MapClickHandlerRessource />
-                                {ressourcePosition && (
-                                  <Marker
-                                    position={ressourcePosition}
-                                    icon={customIcon}
-                                  >
-                                    <Popup>{ressourceAddress}</Popup>
-                                  </Marker>
-                                )}
-                              </MapContainer>
+                              <MapComponent
+                                MapClickHandler={MapClickHandlerRessource}
+                                address={ressourceAddress}
+                                position={ressourcePosition}
+                              />
                             </>
                           )}
                           <Row>

@@ -7,13 +7,7 @@ import { useEffect, useState } from "react";
 import { UserModel } from "../../types/Types";
 import userService from "../../services/UserServices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import {
-  MapContainer,
-  Marker,
-  TileLayer,
-  Popup,
-  useMapEvents,
-} from "react-leaflet";
+import { useMapEvents } from "react-leaflet";
 import { Card, Row, Col, Button, Form, InputGroup } from "react-bootstrap";
 import {
   Form as FormikForm,
@@ -22,7 +16,7 @@ import {
   useFormikContext,
 } from "formik";
 import axios from "axios";
-import { Icon } from "leaflet";
+import MapComponent from "../karte/MapComponent";
 
 interface FormularResult {
   values: UserModel;
@@ -38,6 +32,11 @@ export default function Profil() {
   const [latitude, setLatitude] = useState<number>(0);
   const [longitude, setLongitude] = useState<number>(0);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [radius, setRadius] = useState(0); // Standardradius in m
+  const [einheit, setEinheit] = useState("km");
+  const einheitOption = [{ value: "km" }, { value: "m" }];
+  const radiusInMeter = einheit === "km" ? radius * 1000 : radius;
 
   useEffect(() => {
     if (user.id !== undefined) {
@@ -56,6 +55,9 @@ export default function Profil() {
           plz: benutzer.plz,
           ort: benutzer.ort,
           land: benutzer.land,
+          latitude: benutzer.latitude,
+          longitude: benutzer.longitude,
+          radius: benutzer.radius,
           name: benutzer.name,
           beschreibung: benutzer.beschreibung,
           webseite: benutzer.webseite,
@@ -67,15 +69,9 @@ export default function Profil() {
           verfuegbarVonZeit: benutzer.verfuegbarVonZeit,
           verfuegbarBisZeit: benutzer.verfuegbarBisZeit,
         });
-        console.log(benutzer);
       });
     }
   }, [user.id]);
-
-  const customIcon = new Icon({
-    iconUrl: require("../../icons/marker-icon.png"),
-    iconSize: [38, 38],
-  });
 
   const MapClickHandler = () => {
     const { setFieldValue } = useFormikContext();
@@ -534,39 +530,55 @@ export default function Profil() {
                               >
                                 {t("button.coordinates")}
                               </Button>
+                              <br />
+                              <br />
                             </Col>
                           </Row>
                         )}
                       </>
                     )}
                     {edit && values.addresseInput === AdressInputEnum.Map && (
-                      <>
-                        <Form.Group className="mb-3">
-                          <Form.Text>
-                            {address && <div>Address: {address}</div>}
-                          </Form.Text>
-                        </Form.Group>
-                        <MapContainer
-                          center={[48.30639, 14.28611]}
-                          zoom={13}
-                          style={{
-                            height: "512px",
-                            width: "100%",
-                            marginBottom: "2rem",
-                          }}
-                        >
-                          <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      <MapComponent
+                        MapClickHandler={MapClickHandler}
+                        address={address}
+                        position={position}
+                        radius={radiusInMeter}
+                      />
+                    )}
+                    {edit && (
+                      <Row>
+                        <Col sm={9}>
+                          <Form.Label>
+                            {t("profil.verfuegbar.umkreis")}
+                            {values.radius} {einheit}
+                          </Form.Label>
+                          <Form.Range
+                            id="radius"
+                            name="radius"
+                            min={0}
+                            max={einheit === "km" ? 25 : 25000}
+                            onChange={handleChange}
                           />
-                          <MapClickHandler />
-                          {position && (
-                            <Marker position={position} icon={customIcon}>
-                              <Popup>{address}</Popup>
-                            </Marker>
-                          )}
-                        </MapContainer>
-                      </>
+                        </Col>
+                        <Col>
+                          <Form.Group className="mb-3">
+                            <Form.Label>
+                              {t("profil.verfuegbar.einheit")}
+                            </Form.Label>
+                            <Form.Select
+                              id="einheit"
+                              value={einheit}
+                              onChange={(e) => setEinheit(e.target.value)}
+                            >
+                              {einheitOption.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.value}
+                                </option>
+                              ))}
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
+                      </Row>
                     )}
                     {edit && (
                       <Button
