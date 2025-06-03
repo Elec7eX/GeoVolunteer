@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import at.geovolunteer.model.Benutzer;
+import at.geovolunteer.model.Einheit;
 import at.geovolunteer.model.repo.BenutzerRepository;
 import at.geovolunteer.rest.LoginType;
 
@@ -70,7 +71,8 @@ public class BenutzerService {
 			entity.setOrt(user.getOrt());
 			entity.setLatitude(user.getLatitude());
 			entity.setLongitude(user.getLongitude());
-			entity.setRadius(user.getRadius());
+			entity.setEinheit(user.getEinheit());
+			entity.setRadius(Einheit.KM.equals(user.getEinheit()) ? user.getRadius() * 1000 : user.getRadius());
 			entity.setLand(user.getLand());
 			entity.setName(user.getName());
 			entity.setWebseite(user.getWebseite());

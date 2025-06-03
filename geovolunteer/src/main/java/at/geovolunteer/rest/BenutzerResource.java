@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import at.geovolunteer.model.Benutzer;
+import at.geovolunteer.model.Einheit;
 import at.geovolunteer.service.BenutzerService;
 
 @RestController
@@ -71,8 +72,11 @@ public class BenutzerResource {
 	@GetMapping("/{id}")
 	public ResponseEntity<Benutzer> getBenutzerById(@PathVariable("id") long id) {
 		Optional<Benutzer> benutzer = service.findById(id);
-
 		if (benutzer.isPresent()) {
+			Benutzer benutzerModel = benutzer.get();
+			if (Einheit.KM.equals(benutzerModel.getEinheit())) {
+				benutzerModel.setRadius(benutzerModel.getRadius() / 1000);
+			}
 			return new ResponseEntity<>(benutzer.get(), HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -17,6 +17,7 @@ import {
 } from "formik";
 import axios from "axios";
 import MapComponent from "../karte/MapComponent";
+import { useNavigate } from "react-router-dom";
 
 interface FormularResult {
   values: UserModel;
@@ -24,6 +25,7 @@ interface FormularResult {
 }
 
 export default function Profil() {
+  const navigate = useNavigate();
   const [user] = useLocalStorage("user", null);
   const [initialValues, setInitialValues] = useState<UserModel>();
   const [edit, setEdit] = useState<boolean>(false);
@@ -33,10 +35,10 @@ export default function Profil() {
   const [longitude, setLongitude] = useState<number>(0);
   const [showPassword, setShowPassword] = useState(false);
 
-  const [radius, setRadius] = useState(0); // Standardradius in m
-  const [einheit, setEinheit] = useState("km");
-  const einheitOption = [{ value: "km" }, { value: "m" }];
-  const radiusInMeter = einheit === "km" ? radius * 1000 : radius;
+  const einheitOptions = [
+    { value: "KM", label: "km" },
+    { value: "M", label: "m" },
+  ];
 
   useEffect(() => {
     if (user.id !== undefined) {
@@ -57,6 +59,7 @@ export default function Profil() {
           land: benutzer.land,
           latitude: benutzer.latitude,
           longitude: benutzer.longitude,
+          einheit: benutzer.einheit,
           radius: benutzer.radius,
           name: benutzer.name,
           beschreibung: benutzer.beschreibung,
@@ -69,6 +72,9 @@ export default function Profil() {
           verfuegbarVonZeit: benutzer.verfuegbarVonZeit,
           verfuegbarBisZeit: benutzer.verfuegbarBisZeit,
         });
+        setPosition([benutzer.latitude, benutzer.longitude]);
+        setLatitude(benutzer.latitude!);
+        setLongitude(benutzer.longitude!);
       });
     }
   }, [user.id]);
@@ -142,7 +148,10 @@ export default function Profil() {
 
   const handleSubmit = async (result: FormularResult) => {
     var benutzer: UserModel = result.values;
-    userService.update(benutzer.id, benutzer).then(() => setEdit(false));
+    userService.update(benutzer.id, benutzer).then(() => {
+      setEdit(false);
+      navigate("/");
+    });
   };
 
   return (
@@ -542,7 +551,11 @@ export default function Profil() {
                         MapClickHandler={MapClickHandler}
                         address={address}
                         position={position}
-                        radius={radiusInMeter}
+                        radius={
+                          values.einheit === "KM"
+                            ? values.radius! * 1000
+                            : values.radius
+                        }
                       />
                     )}
                     {edit && (
@@ -550,13 +563,15 @@ export default function Profil() {
                         <Col sm={9}>
                           <Form.Label>
                             {t("profil.verfuegbar.umkreis")}
-                            {values.radius} {einheit}
+                            {values.radius}{" "}
+                            {values.einheit === "KM" ? "km" : "m"}
                           </Form.Label>
                           <Form.Range
                             id="radius"
                             name="radius"
                             min={0}
-                            max={einheit === "km" ? 25 : 25000}
+                            max={values.einheit === "KM" ? 25 : 25000}
+                            value={values.radius}
                             onChange={handleChange}
                           />
                         </Col>
@@ -567,12 +582,17 @@ export default function Profil() {
                             </Form.Label>
                             <Form.Select
                               id="einheit"
-                              value={einheit}
-                              onChange={(e) => setEinheit(e.target.value)}
+                              name="einheit"
+                              value={values.einheit}
+                              onChange={(e) => {
+                                e.preventDefault();
+                                setFieldValue("einheit", e.target.value);
+                                setFieldValue("radius", 0);
+                              }}
                             >
-                              {einheitOption.map((option) => (
+                              {einheitOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
-                                  {option.value}
+                                  {option.label}
                                 </option>
                               ))}
                             </Form.Select>

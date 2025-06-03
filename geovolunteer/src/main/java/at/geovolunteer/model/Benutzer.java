@@ -39,6 +39,8 @@ public class Benutzer {
 	private double latitude;
 	private double longitude;
 	private double radius;
+	@Enumerated(EnumType.STRING)
+	private Einheit einheit;
 	private String plz;
 	private String ort;
 	private String land;
@@ -279,6 +281,14 @@ public class Benutzer {
 
 	public void setRadius(double radius) {
 		this.radius = radius;
+	}
+
+	public Einheit getEinheit() {
+		return einheit;
+	}
+
+	public void setEinheit(Einheit einheit) {
+		this.einheit = einheit;
 	}
 
 }

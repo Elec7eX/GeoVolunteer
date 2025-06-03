@@ -14,6 +14,7 @@ export interface UserModel {
     ort?: string,
     latitude?: number,
     longitude?: number,
+    einheit?: string,
     radius?: number,
     land?: string,
     name?: string,
