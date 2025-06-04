@@ -1,7 +1,9 @@
-* {
-  box-sizing: border-box;
-  margin: 0; /* Setzt den Standard-Margin auf 0 */
-  padding: 0; /* Setzt den Standard-Padding auf 0 */
+body {
+  display: flex;
+  justify-content: center; /* Horizontal zentrieren */
+  align-items: center; /* Vertikal zentrieren */
+  height: 100vh; /* Vollbildhöhe */
+  margin: 0; /* Entferne Standard-Margin */
 }
 
 .app {
@@ -9,8 +11,7 @@
   height: 900px;
   display: flex;
   flex-direction: column;
-  border: 3px solid #ccc; /* Optional: fügt einen Rahmen hinzu, um die Größe sichtbar zu machen */
-  margin-left: 0rem;
+  border: 3px solid #ccc;
 }
 
 .header {
@@ -98,7 +99,7 @@ input.error {
 .header-title {
   text-align: center;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 29px;
   color: white;
   padding: 8px;
 }
