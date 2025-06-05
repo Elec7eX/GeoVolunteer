@@ -83,9 +83,9 @@ input.error {
 }
 
 .custom-addIcon {
-  font-size: 32px;
+  font-size: 35px;
   font-weight: bold;
-  color: black;
+  color: rgb(13, 110, 253);
 }
 
 .custom-addIcon:hover {
@@ -99,7 +99,7 @@ input.error {
 .header-title {
   text-align: center;
   font-weight: bold;
-  font-size: 29px;
+  font-size: 30px;
   color: white;
   padding: 8px;
 }

@@ -2,11 +2,13 @@ import { t } from "i18next";
 import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Button, Card, Col, Nav, Row } from "react-bootstrap";
+import { Card, Col, Row } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { AktivitaetModel } from "../../types/Types";
 import aktivitaetService from "../../services/AktivitaetService";
 import { VerticalDivider } from "../../utils/Utils";
+import MapComponent from "../karte/MapComponent";
+import { PiMapPinArea } from "react-icons/pi";
 
 export default function AktivitaetDetailPage() {
   const navigate = useNavigate();
@@ -16,15 +18,22 @@ export default function AktivitaetDetailPage() {
   const aktivitaetFromState = location.state?.aktivitaet;
 
   const [aktivitaet, setAktivitaet] = useState<AktivitaetModel | null>(null);
+  const [position, setPosition]: any = useState(null);
+  const [isShowMap, setIsShowMap] = useState<boolean>(false);
 
   useEffect(() => {
     if (aktivitaetFromState) {
       setAktivitaet(aktivitaetFromState);
+      setPosition([
+        aktivitaetFromState.latitude,
+        aktivitaetFromState.longitude,
+      ]);
     } else {
       aktivitaetService
         .getById(id!)
         .then((resp) => {
           setAktivitaet(resp.data);
+          setPosition([resp.data.latitude, resp.data.longitude]);
         })
         .catch(() => alert("Fehler beim Laden der Daten"));
     }
@@ -74,7 +83,7 @@ export default function AktivitaetDetailPage() {
                   {t("aktivitaeten.detail.endDate")} : {aktivitaet.endDatum}
                 </div>
               </Col>
-              <Col md={2}>
+              <Col md={1}>
                 <VerticalDivider />
               </Col>
               <Col>
@@ -87,13 +96,25 @@ export default function AktivitaetDetailPage() {
             </Row>
             <br />
             <Row>
-              <h5>{t("aktivitaeten.detail.teilnehmerzahl")}</h5>
-              <div>{aktivitaet.teilnehmeranzahl}</div>
-            </Row>
-            <br />
-            <Row>
-              <h5>{t("aktivitaeten.detail.transport")}</h5>
-              <div>{aktivitaet.transport}</div>
+              <Row>
+                <Col>
+                  <h5>{t("aktivitaeten.detail.transport")}</h5>
+                </Col>
+                <Col>
+                  <h5>{t("aktivitaeten.detail.teilnehmerzahl")}</h5>
+                </Col>
+              </Row>
+              <Row>
+                <Col md={5}>
+                  <div>{aktivitaet.transport}</div>
+                </Col>
+                <Col md={1}>
+                  <VerticalDivider />
+                </Col>
+                <Col>
+                  <div>{aktivitaet.teilnehmeranzahl}</div>
+                </Col>
+              </Row>
             </Row>
             <br />
             <Row>
@@ -124,15 +145,16 @@ export default function AktivitaetDetailPage() {
                   {aktivitaet.plz} {aktivitaet.ort}
                 </div>
                 <div>
-                  <Button
-                    variant="link"
-                    onClick={undefined}
-                    style={{ padding: 0 }}
-                  >
-                    Auf der Karte anzeigen
-                  </Button>
+                  <PiMapPinArea
+                    style={{ marginLeft: 100, color: "#0d6efd" }}
+                    size={30}
+                    onClick={() => setIsShowMap(!isShowMap)}
+                  />
                 </div>
               </Col>
+            </Row>
+            <Row style={{ padding: 10, marginTop: 40 }}>
+              {isShowMap && <MapComponent position={position} zoom={17} />}
             </Row>
           </Card.Body>
           <br />

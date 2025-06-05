@@ -165,10 +165,6 @@ export default function Profil() {
     return initialValues!.rolle === UserType.ORGANISATION;
   };
 
-  const isAdmin = (): boolean => {
-    return initialValues!.rolle === UserType.ADMIN;
-  };
-
   return (
     <>
       <Header title={t("profil.overview.title")} />

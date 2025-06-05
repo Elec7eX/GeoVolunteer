@@ -45,7 +45,7 @@ export const Header = (props: Props) => {
                   <Nav>
                     <NavDropdown
                       style={{ zIndex: 1050 }}
-                      title={<CgProfile className="custom-icon" size={27} />}
+                      title={<CgProfile className="custom-icon" size={32} />}
                       align="end"
                     >
                       <NavDropdown.Item onClick={() => navigate("/profil")}>

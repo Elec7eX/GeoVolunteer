@@ -1,10 +1,11 @@
 import { Col, Container, Row } from "react-bootstrap";
 import { IoHomeOutline } from "react-icons/io5";
 import { BsHeartPulse } from "react-icons/bs";
-import { BsMap } from "react-icons/bs";
+import { GrMapLocation } from "react-icons/gr";
 import { CiGlobe } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
-import { IoAddCircleOutline } from "react-icons/io5";
+import { GrAddCircle } from "react-icons/gr";
+import { t } from "i18next";
 
 type Props = {
   displayAddAktivitaet?: boolean;
@@ -12,37 +13,60 @@ type Props = {
 
 export const Footer = (props: Props) => {
   const navigate = useNavigate();
+
   return (
     <>
-      {props.displayAddAktivitaet && (
-        <div className="footer-add">
-          <IoAddCircleOutline
-            className="mx-5 custom-addIcon"
-            onClick={() => navigate("/aktivitäten/erstellen")}
-          />
-        </div>
-      )}
       <footer className="footer">
         <Container>
-          <Row className="py-2">
-            <Col>
+          <Row className="py-2 justify-content-center">
+            <Col className="text-center">
               <div>
                 <IoHomeOutline
-                  className="text-white mx-5 custom-icon"
+                  className="text-white custom-icon"
                   onClick={() => navigate("/")}
                 />
+                <div className="text-white">{t("footer.icon.uebersicht")}</div>
+              </div>
+            </Col>
+            <Col className="text-center">
+              <div>
                 <BsHeartPulse
-                  className="text-white mx-5 custom-icon"
+                  className="text-white custom-icon"
                   onClick={() => navigate("/aktivitäten")}
                 />
-                <BsMap
-                  className="text-white mx-5 custom-icon"
+                <div className="text-white">{t("footer.icon.aktivitaet")}</div>
+              </div>
+            </Col>
+
+            {props.displayAddAktivitaet && (
+              <Col>
+                <div>
+                  <GrAddCircle
+                    className="text-white custom-icon"
+                    onClick={() => navigate("/aktivitäten/erstellen")}
+                  />
+                  <div className="text-white">{t("footer.icon.neu")}</div>
+                </div>
+              </Col>
+            )}
+            <Col className="text-center">
+              <div>
+                <GrMapLocation
+                  className="text-white custom-icon"
                   onClick={() => navigate("/map")}
                 />
+                <div className="text-white">{t("footer.icon.map")}</div>
+              </div>
+            </Col>
+            <Col className="text-center">
+              <div>
                 <CiGlobe
-                  className="text-white mx-5 custom-icon"
+                  className="text-white custom-icon"
                   onClick={() => navigate("/organisation")}
                 />
+                <div className="text-white">
+                  {t("footer.icon.organisation")}
+                </div>
               </div>
             </Col>
           </Row>
