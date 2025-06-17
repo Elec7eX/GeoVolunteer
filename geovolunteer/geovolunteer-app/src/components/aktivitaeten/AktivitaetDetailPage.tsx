@@ -91,17 +91,10 @@ export default function AktivitaetDetailPage() {
                 {user.rolle === UserType.ORGANISATION && (
                   <Row style={{ textAlign: "end" }}>
                     <Col>
-                      <FiEdit
-                        size={25}
-                        onClick={() =>
-                          navigate(`/aktivitäten/bearbeiten/${aktivitaet.id}`, {
-                            state: { aktivitaet },
-                          })
-                        }
-                      />
+                      <RiDeleteBinLine size={25} />
                     </Col>
                     <Col md="auto">
-                      <RiDeleteBinLine size={25} onClick={handleShow} />
+                      <FiEdit size={25} />
                     </Col>
                   </Row>
                 )}
