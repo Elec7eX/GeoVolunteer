@@ -2,7 +2,9 @@ package at.geovolunteer.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,12 +32,27 @@ public class BenutzerService {
 		return null;
 	}
 
+	public Benutzer getActive() {
+		return findBenutzerByCriteria(b -> b.isActive(), "Kein aktiver Benutzer gefunden!");
+	}
+
+	public Benutzer getOrganisation() {
+		return findBenutzerByCriteria(b -> b.isActive() && Rolle.ORGANISATION.equals(b.getRolle()),
+				"Kein aktiver Organisation gefunden!");
+	}
+
+	private Benutzer findBenutzerByCriteria(Predicate<Benutzer> criteria, String errorMessage) {
+		return findAll().stream().filter(criteria).findFirst()
+				.orElseThrow(() -> new NoSuchElementException(errorMessage));
+	}
+
 	public Benutzer create(Benutzer benutzer) {
 		Benutzer entity = new Benutzer();
 		entity.setRolle(benutzer.getRolle());
 		entity.setLogin(benutzer.getLogin());
 		entity.setEmail(benutzer.getEmail());
 		entity.setPassword(benutzer.getPassword());
+		entity.setActive(true);
 		benutzerRepository.save(entity);
 		return entity;
 	}

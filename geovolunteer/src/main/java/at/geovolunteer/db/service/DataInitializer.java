@@ -1,7 +1,5 @@
 package at.geovolunteer.db.service;
 
-import java.util.Calendar;
-
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -23,25 +21,16 @@ public class DataInitializer implements CommandLineRunner {
 		if (benutzerRepository.count() == 0) {
 			Benutzer benutzer = new Benutzer();
 			benutzer.setRolle(Rolle.FREIWILLIGE);
-			benutzer.setVorname("Murat");
-			benutzer.setNachname("Demir");
-			benutzer.setEmail("murat.demir@hotmail.com");
 			benutzer.setLogin("user");
+			benutzer.setEmail("mde@hotmail.com");
 			benutzer.setPassword("aaa");
-
-			Calendar c = Calendar.getInstance();
-			c.set(1990, 4, 15);
-			benutzer.setGeburtsDatum(c);
 			benutzerRepository.save(benutzer);
 
 			Benutzer benutzer2 = new Benutzer();
 			benutzer2.setRolle(Rolle.ORGANISATION);
-			benutzer2.setVorname("Mustermann");
-			benutzer2.setNachname("Muster");
-			benutzer2.setEmail("mde@hotmail.com");
-			benutzer2.setLogin("murat");
+			benutzer2.setLogin("org");
+			benutzer2.setEmail("org@rotes-kreuz.com");
 			benutzer2.setPassword("aaa");
-			benutzer2.setGeburtsDatum(c);
 			benutzerRepository.save(benutzer2);
 		}
 	}

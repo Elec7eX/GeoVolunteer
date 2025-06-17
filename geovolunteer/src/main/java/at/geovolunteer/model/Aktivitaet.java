@@ -1,9 +1,11 @@
 package at.geovolunteer.model;
 
 import java.util.Calendar;
+import java.util.List;
 
 import org.springframework.lang.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -13,6 +15,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -54,6 +58,16 @@ public class Aktivitaet extends AbstractAktivitaet {
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "ressource_id", unique = true)
 	private Ressource ressource;
+
+	// Der Ersteller der Aktivität (Organisation)
+	@ManyToOne
+	@JoinColumn(name = "organisation_id")
+	private Benutzer organisation;
+
+	// Teilnehmer (Freiwillige)
+	@JsonIgnore
+	@ManyToMany(mappedBy = "teilnahmen")
+	private List<Benutzer> teilnehmer;
 
 	public Long getId() {
 		return id;
@@ -125,6 +139,32 @@ public class Aktivitaet extends AbstractAktivitaet {
 
 	public void setRessource(Ressource ressource) {
 		this.ressource = ressource;
+	}
+
+	public Benutzer getOrganisation() {
+		return organisation;
+	}
+
+	public void setOrganisation(Benutzer organisation) {
+		this.organisation = organisation;
+	}
+
+	public List<Benutzer> getTeilnehmer() {
+		return teilnehmer;
+	}
+
+	public void addTeilnehmer(Benutzer teilnehmer) {
+		if (!this.teilnehmer.contains(teilnehmer)) {
+			this.teilnehmer.add(teilnehmer);
+			teilnehmer.getTeilnahmen().add(this);
+		}
+	}
+
+	public void removeTeilnehmer(Benutzer teilnehmer) {
+		if (this.teilnehmer.contains(teilnehmer)) {
+			this.teilnehmer.remove(teilnehmer);
+			teilnehmer.getTeilnahmen().remove(this);
+		}
 	}
 
 }

@@ -3,8 +3,8 @@ import { AktivitaetModel } from "../types/Types";
 
 const BASE_URL = "/aktivitaet"
 
-const create = (data: AktivitaetModel) => {
-  return http.post<AktivitaetModel>(BASE_URL + "/create", data);
+const update = (data: AktivitaetModel) => {
+  return http.post<AktivitaetModel>(BASE_URL + "/update", data);
 };
 
 const getAll = () => {
@@ -15,10 +15,15 @@ const getById = (id: string) => {
   return http.get<AktivitaetModel>(BASE_URL + `/${id}`);
 }
 
+const deleteById = (id: string) => {
+  return http.delete(`${BASE_URL}/delete/${id}`);
+};
+
 const aktivitaetService = {
-  create,
+  update,
   getAll,
-  getById
+  getById,
+  deleteById
 };
 
 export default aktivitaetService;

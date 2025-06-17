@@ -2,24 +2,30 @@ import { t } from "i18next";
 import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Card, Col, Row } from "react-bootstrap";
+import { Button, Card, Col, Modal, Nav, Row } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { AktivitaetModel } from "../../types/Types";
 import aktivitaetService from "../../services/AktivitaetService";
 import { VerticalDivider } from "../../utils/Utils";
 import MapComponent from "../karte/MapComponent";
 import { PiMapPinArea } from "react-icons/pi";
+import { RiDeleteBinLine } from "react-icons/ri";
+import { FiEdit } from "react-icons/fi";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { UserType } from "../../enums/Enums";
 
 export default function AktivitaetDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
+  const [user] = useLocalStorage("user", null);
 
   const aktivitaetFromState = location.state?.aktivitaet;
 
   const [aktivitaet, setAktivitaet] = useState<AktivitaetModel | null>(null);
   const [position, setPosition]: any = useState(null);
   const [isShowMap, setIsShowMap] = useState<boolean>(false);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     if (aktivitaetFromState) {
@@ -39,6 +45,9 @@ export default function AktivitaetDetailPage() {
     }
   }, [id, aktivitaetFromState]);
 
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
   if (!aktivitaet) return <div>Lädt...</div>;
 
   return (
@@ -52,6 +61,24 @@ export default function AktivitaetDetailPage() {
       />
       <div className="body">
         <Card>
+          <Card.Header>
+            <Nav variant="tabs" defaultActiveKey="#first">
+              <Nav.Item>
+                <Nav.Link href="#first">{t("footer.icon.aktivitaet")}</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link
+                  onClick={() =>
+                    navigate(`/aktivitäten/ressource/detail/${aktivitaet.id}`, {
+                      state: { aktivitaet },
+                    })
+                  }
+                >
+                  {t("ressourcen.card.link")}
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+          </Card.Header>
           <Card.Body>
             <Row>
               <Col md={3}>
@@ -63,7 +90,24 @@ export default function AktivitaetDetailPage() {
               </Col>
               <Col>
                 <Card.Title>{aktivitaet.name}</Card.Title>
-                <Card.Text>Organisationsbeschreibung hier</Card.Text>
+                <Card.Text>{aktivitaet.organisation?.name}</Card.Text>
+                {user.rolle === UserType.ORGANISATION && (
+                  <Row style={{ textAlign: "end" }}>
+                    <Col>
+                      <FiEdit
+                        size={25}
+                        onClick={() =>
+                          navigate(`/aktivitäten/bearbeiten/${aktivitaet.id}`, {
+                            state: { aktivitaet },
+                          })
+                        }
+                      />
+                    </Col>
+                    <Col md="auto">
+                      <RiDeleteBinLine size={25} onClick={handleShow} />
+                    </Col>
+                  </Row>
+                )}
               </Col>
             </Row>
           </Card.Body>
@@ -157,30 +201,34 @@ export default function AktivitaetDetailPage() {
               {isShowMap && <MapComponent position={position} zoom={17} />}
             </Row>
           </Card.Body>
-          <br />
-          <Card.Body
-            onClick={() =>
-              navigate(`/aktivitäten/ressource/detail/${aktivitaet.id}`, {
-                state: { aktivitaet },
-              })
-            }
+          <Modal
+            show={show}
+            onHide={handleClose}
+            backdrop="static"
+            keyboard={false}
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
           >
-            <h5>{t("ressourcen.detail.uebersicht")}</h5>
-            <br />
-            <Row>
-              <Col md={3}>
-                <Card.Img
-                  style={{ width: 75, height: 75 }}
-                  variant="top"
-                  src={require("../../icons/logo192.png")}
-                />
-              </Col>
-              <Col>
-                <Card.Title>{aktivitaet.ressource.name}</Card.Title>
-                <Card.Text>{aktivitaet.ressource.beschreibung}</Card.Text>
-              </Col>
-            </Row>
-          </Card.Body>
+            <Modal.Header closeButton>
+              <Modal.Title>{t("aktivitaeten.remove.title")}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>{t("aktivitaeten.remove.text")}</Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                {t("button.nein")}
+              </Button>
+              <Button
+                variant="primary"
+                onClick={() =>
+                  aktivitaetService
+                    .deleteById(`${aktivitaet.id}`)
+                    .then(() => navigate("/aktivitäten"))
+                }
+              >
+                {t("button.ja")}
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </Card>
       </div>
       <Footer />

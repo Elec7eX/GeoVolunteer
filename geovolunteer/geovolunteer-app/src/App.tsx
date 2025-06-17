@@ -66,6 +66,14 @@ const App: React.FC = () => {
               }
             />
             <Route
+              path="/aktivitäten/bearbeiten/:id"
+              element={
+                <ProtectedRoute>
+                  <AktivitaetDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/map"
               element={
                 <ProtectedRoute>

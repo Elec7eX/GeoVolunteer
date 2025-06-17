@@ -1,7 +1,9 @@
 package at.geovolunteer.model;
 
 import java.util.Calendar;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -12,6 +14,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.Data;
@@ -74,6 +80,16 @@ public class Benutzer {
 	@JsonSerialize(using = CalendarTimeSerializer.class)
 	@JsonDeserialize(using = CalendarTimeDeserializer.class)
 	private Calendar verfuegbarBisZeit;
+
+	// Für Organisationen: Aktivitäten erstellen
+	@JsonIgnore
+	@OneToMany(mappedBy = "organisation")
+	private List<Aktivitaet> erstellteAktivitaeten;
+
+	// Für Freiwillige: Teilnahme an Aktivitäten
+	@ManyToMany
+	@JoinTable(joinColumns = @JoinColumn(name = "benutzer_id"), inverseJoinColumns = @JoinColumn(name = "aktivitaet_id"))
+	private List<Aktivitaet> teilnahmen;
 
 	public Long getId() {
 		return id;
@@ -291,4 +307,39 @@ public class Benutzer {
 		this.einheit = einheit;
 	}
 
+	public List<Aktivitaet> getErstellteAktivitaeten() {
+		return erstellteAktivitaeten;
+	}
+
+	public void addErstellteAktivitaeten(Aktivitaet aktivitaet) {
+		if (!this.erstellteAktivitaeten.contains(aktivitaet)) {
+			this.erstellteAktivitaeten.add(aktivitaet);
+			aktivitaet.setOrganisation(this);
+		}
+	}
+
+	public void removeErstellteAktivitaeten(Aktivitaet aktivitaet) {
+		if (this.erstellteAktivitaeten.contains(aktivitaet)) {
+			this.erstellteAktivitaeten.remove(aktivitaet);
+			aktivitaet.setOrganisation(null);
+		}
+	}
+
+	public List<Aktivitaet> getTeilnahmen() {
+		return teilnahmen;
+	}
+
+	public void addTeilnahmen(Aktivitaet aktivitaet) {
+		if (!this.teilnahmen.contains(aktivitaet)) {
+			this.teilnahmen.add(aktivitaet);
+			aktivitaet.getTeilnehmer().add(this);
+		}
+	}
+
+	public void removeTeilnahmen(Aktivitaet aktivitaet) {
+		if (this.teilnahmen.contains(aktivitaet)) {
+			this.teilnahmen.remove(aktivitaet);
+			aktivitaet.getTeilnehmer().remove(this);
+		}
+	}
 }

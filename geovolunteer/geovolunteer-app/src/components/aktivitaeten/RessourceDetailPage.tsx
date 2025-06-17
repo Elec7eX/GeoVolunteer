@@ -1,8 +1,8 @@
 import { t } from "i18next";
 import { Header } from "../header/Header";
-import { Card, Row, Col } from "react-bootstrap";
+import { Card, Row, Col, Nav } from "react-bootstrap";
 import { Footer } from "../footer/Footer";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel, RessourceModel } from "../../types/Types";
@@ -12,6 +12,7 @@ import { PiMapPinArea } from "react-icons/pi";
 
 export default function RessourceDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const location = useLocation();
   const aktivitaetFromState = location.state?.aktivitaet;
 
@@ -47,7 +48,7 @@ export default function RessourceDetailPage() {
   return (
     <>
       <Header
-        title={t("ressourcen.detail.title")}
+        title={t("ressourcen.detail.uebersicht")}
         breadcrumb={{
           title: t("aktivitaeten.detail.title"),
           navigate: `/aktivitäten/detail/${aktivitaet.id}`,
@@ -55,6 +56,22 @@ export default function RessourceDetailPage() {
       />
       <div className="body">
         <Card>
+          <Card.Header>
+            <Nav variant="tabs" defaultActiveKey="#first">
+              <Nav.Item>
+                <Nav.Link
+                  onClick={() =>
+                    navigate(`/aktivitäten/detail/${aktivitaet.id}`)
+                  }
+                >
+                  {t("footer.icon.aktivitaet")}
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link href="#first">{t("ressourcen.card.link")}</Nav.Link>
+              </Nav.Item>
+            </Nav>
+          </Card.Header>
           <Card.Body>
             <Row>
               <Col md={3}>
@@ -66,7 +83,7 @@ export default function RessourceDetailPage() {
               </Col>
               <Col>
                 <Card.Title>{ressource.name}</Card.Title>
-                <Card.Text>Organisationsbeschreibung hier</Card.Text>
+                <Card.Text>{aktivitaet.organisation?.name}</Card.Text>
               </Col>
             </Row>
           </Card.Body>

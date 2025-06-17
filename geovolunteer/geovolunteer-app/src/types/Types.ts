@@ -70,5 +70,6 @@ export interface AktivitaetModel {
     startDatum: string,
     endDatum: string,
     startZeit: string,
-    endZeit: string
+    endZeit: string,
+    organisation?: UserModel
 }

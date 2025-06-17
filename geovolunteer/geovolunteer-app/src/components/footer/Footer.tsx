@@ -6,6 +6,8 @@ import { CiGlobe } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 import { GrAddCircle } from "react-icons/gr";
 import { t } from "i18next";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { UserType } from "../../enums/Enums";
 
 type Props = {
   displayAddAktivitaet?: boolean;
@@ -13,6 +15,7 @@ type Props = {
 
 export const Footer = (props: Props) => {
   const navigate = useNavigate();
+  const [user] = useLocalStorage("user", null);
 
   return (
     <>
@@ -38,17 +41,18 @@ export const Footer = (props: Props) => {
               </div>
             </Col>
 
-            {props.displayAddAktivitaet && (
-              <Col>
-                <div>
-                  <GrAddCircle
-                    className="text-white custom-icon"
-                    onClick={() => navigate("/aktivitäten/erstellen")}
-                  />
-                  <div className="text-white">{t("footer.icon.neu")}</div>
-                </div>
-              </Col>
-            )}
+            {props.displayAddAktivitaet &&
+              user.rolle === UserType.ORGANISATION && (
+                <Col>
+                  <div>
+                    <GrAddCircle
+                      className="text-white custom-icon"
+                      onClick={() => navigate("/aktivitäten/erstellen")}
+                    />
+                    <div className="text-white">{t("footer.icon.neu")}</div>
+                  </div>
+                </Col>
+              )}
             <Col className="text-center">
               <div>
                 <GrMapLocation

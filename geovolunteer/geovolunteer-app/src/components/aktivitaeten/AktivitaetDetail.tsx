@@ -14,7 +14,7 @@ import { AktivitaetModel } from "../../types/Types";
 import { AdressInputEnum } from "../../enums/Enums";
 import { useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import aktivitaetService from "../../services/AktivitaetService";
 import MapComponent from "../karte/MapComponent";
@@ -27,6 +27,8 @@ interface FormularResult {
 export default function AktivitaetDetail() {
   const navigate = useNavigate();
   const formRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const aktivitaetFromState = location.state?.aktivitaet;
   const [currentPage, setCurrentPage] = useState<number>(0);
 
   const [initialValues, setInitialValues] = useState<AktivitaetModel>();
@@ -41,24 +43,63 @@ export default function AktivitaetDetail() {
   const [ressourceLongitude, setRessourceLongitude] = useState<number>(0);
 
   useEffect(() => {
-    const model: AktivitaetModel = {
-      name: "",
-      beschreibung: "",
-      addresseInput: AdressInputEnum.Manual,
-      strasse: "",
-      hausnummer: "",
-      plz: "",
-      ort: "",
-      latitude: 0,
-      longitude: 0,
-      teilnehmeranzahl: 0,
-      transport: "",
-      verpflegung: "",
-      vorname: "",
-      nachname: "",
-      email: "",
-      telefon: "",
-      ressource: {
+    if (aktivitaetFromState) {
+      setInitialValues({
+        id: aktivitaetFromState.id,
+        name: aktivitaetFromState.name,
+        beschreibung: aktivitaetFromState.beschreibung,
+        addresseInput: AdressInputEnum.Manual,
+        strasse: aktivitaetFromState.strasse,
+        hausnummer: aktivitaetFromState.hausnummer,
+        plz: aktivitaetFromState.plz,
+        ort: aktivitaetFromState.ort,
+        latitude: aktivitaetFromState.latitude,
+        longitude: aktivitaetFromState.longitude,
+        startDatum: aktivitaetFromState.startDatum,
+        endDatum: aktivitaetFromState.endDatum,
+        startZeit: aktivitaetFromState.startZeit,
+        endZeit: aktivitaetFromState.endZeit,
+        teilnehmeranzahl: aktivitaetFromState.teilnehmeranzahl,
+        transport: aktivitaetFromState.transport,
+        verpflegung: aktivitaetFromState.verpflegung,
+        vorname: aktivitaetFromState.vorname,
+        nachname: aktivitaetFromState.nachname,
+        email: aktivitaetFromState.email,
+        telefon: aktivitaetFromState.telefon,
+        ressource: {
+          name: aktivitaetFromState.ressource.name,
+          beschreibung: aktivitaetFromState.ressource.beschreibung,
+          addresseInput: AdressInputEnum.Manual,
+          strasse: aktivitaetFromState.ressource.strasse,
+          hausnummer: aktivitaetFromState.ressource.hausnummer,
+          plz: aktivitaetFromState.ressource.plz,
+          ort: aktivitaetFromState.ressource.ort,
+          latitude: aktivitaetFromState.ressource.latitude,
+          longitude: aktivitaetFromState.ressource.longitude,
+          materialien: aktivitaetFromState.ressource.materialien,
+          sicherheitsanforderungen:
+            aktivitaetFromState.ressource.sicherheitsanforderungen,
+          anmerkung: aktivitaetFromState.ressource.anmerkung,
+          vorname: aktivitaetFromState.ressource.vorname,
+          nachname: aktivitaetFromState.ressource.nachname,
+          email: aktivitaetFromState.ressource.email,
+          telefon: aktivitaetFromState.ressource.telefon,
+        },
+      });
+      setPosition([
+        aktivitaetFromState.latitude,
+        aktivitaetFromState.longitude,
+      ]);
+      setLatitude(aktivitaetFromState.latitude);
+      setLongitude(aktivitaetFromState.longitude);
+      setRessourcePosition([
+        aktivitaetFromState.ressource.latitude,
+        aktivitaetFromState.ressource.longitude,
+      ]);
+      setRessourceLatitude(aktivitaetFromState.ressource.latitude);
+      setRessourceLongitude(aktivitaetFromState.ressource.longitude);
+    } else {
+      const model: AktivitaetModel = {
         name: "",
         beschreibung: "",
         addresseInput: AdressInputEnum.Manual,
@@ -68,21 +109,39 @@ export default function AktivitaetDetail() {
         ort: "",
         latitude: 0,
         longitude: 0,
-        materialien: "",
-        sicherheitsanforderungen: "",
-        anmerkung: "",
+        teilnehmeranzahl: 0,
+        transport: "",
+        verpflegung: "",
         vorname: "",
         nachname: "",
         email: "",
         telefon: "",
-      },
-      startDatum: "",
-      endDatum: "",
-      startZeit: "",
-      endZeit: "",
-    };
-    setInitialValues(model);
-  }, []);
+        ressource: {
+          name: "",
+          beschreibung: "",
+          addresseInput: AdressInputEnum.Manual,
+          strasse: "",
+          hausnummer: "",
+          plz: "",
+          ort: "",
+          latitude: 0,
+          longitude: 0,
+          materialien: "",
+          sicherheitsanforderungen: "",
+          anmerkung: "",
+          vorname: "",
+          nachname: "",
+          email: "",
+          telefon: "",
+        },
+        startDatum: "",
+        endDatum: "",
+        startZeit: "",
+        endZeit: "",
+      };
+      setInitialValues(model);
+    }
+  }, [aktivitaetFromState]);
 
   const MapClickHandler = () => {
     const { setFieldValue } = useFormikContext();
@@ -244,7 +303,7 @@ export default function AktivitaetDetail() {
     result.values.longitude = longitude;
     result.values.ressource.latitude = ressourceLatitude;
     result.values.ressource.longitude = ressourceLongitude;
-    await aktivitaetService.create(result.values).then((response) => {
+    await aktivitaetService.update(result.values).then((response) => {
       // 201 = CREATED
       if (response.status === 201) {
         console.log(response.statusText);
@@ -262,7 +321,11 @@ export default function AktivitaetDetail() {
           <Header
             title={
               currentPage === 0
-                ? t("aktivitaeten.create.title")
+                ? aktivitaetFromState
+                  ? t("aktivitaeten.edit.title")
+                  : t("aktivitaeten.create.title")
+                : aktivitaetFromState
+                ? t("ressourcen.edit.title")
                 : t("ressourcen.create.title")
             }
           />

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,18 +49,26 @@ public class AktivitaetRessource {
 		}
 	}
 
-	@PostMapping("/create")
-	public ResponseEntity<?> create(@RequestBody Aktivitaet request) {
-		System.out.println(request);
-		Aktivitaet entity = service.create(request);
+	@PostMapping("/update")
+	public ResponseEntity<Aktivitaet> update(@RequestBody Aktivitaet model) {
+		Aktivitaet entity = service.update(model);
 		if (entity.getId() == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ungültige Aktivität");
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		if (entity.getRessource() == null || entity.getRessource().getId() == null) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-					.body("Ungültige Ressource für Aktivität-ID: " + entity.getId());
+			return new ResponseEntity<Aktivitaet>(HttpStatus.UNAUTHORIZED);
 		}
 		return new ResponseEntity<>(entity, HttpStatus.CREATED);
+	}
+
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<HttpStatus> delete(@PathVariable("id") long id) {
+		try {
+			service.delete(id);
+			return new ResponseEntity<>(HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 }
