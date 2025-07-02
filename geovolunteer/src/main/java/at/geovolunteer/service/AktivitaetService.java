@@ -50,7 +50,7 @@ public class AktivitaetService {
 			}
 			repository.deleteById(id);
 		} else {
-			throw new Exception("Aktivität nicht gefunden. ID: " + id);
+			throw new Exception("Aktivität nicht gefunden - ID: " + id);
 		}
 	}
 
