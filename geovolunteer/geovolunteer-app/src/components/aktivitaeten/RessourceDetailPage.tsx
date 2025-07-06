@@ -9,6 +9,7 @@ import { AktivitaetModel, RessourceModel } from "../../types/Types";
 import { VerticalDivider } from "../../utils/Utils";
 import MapComponent from "../karte/MapComponent";
 import { PiMapPinArea } from "react-icons/pi";
+import { BsHeartPulse } from "react-icons/bs";
 
 export default function RessourceDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -75,11 +76,7 @@ export default function RessourceDetailPage() {
           <Card.Body>
             <Row>
               <Col md={3}>
-                <Card.Img
-                  style={{ width: 75, height: 75 }}
-                  variant="top"
-                  src={require("../../icons/logo192.png")}
-                />
+                <BsHeartPulse size={75} style={{ marginLeft: 15 }} />
               </Col>
               <Col>
                 <Card.Title>{ressource.name}</Card.Title>

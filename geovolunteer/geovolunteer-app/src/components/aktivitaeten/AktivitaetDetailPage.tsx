@@ -13,6 +13,7 @@ import { RiDeleteBinLine } from "react-icons/ri";
 import { FiEdit } from "react-icons/fi";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
+import { BsHeartPulse } from "react-icons/bs";
 
 export default function AktivitaetDetailPage() {
   const navigate = useNavigate();
@@ -82,11 +83,7 @@ export default function AktivitaetDetailPage() {
           <Card.Body>
             <Row>
               <Col md={3}>
-                <Card.Img
-                  style={{ width: 75, height: 75 }}
-                  variant="top"
-                  src={require("../../icons/logo192.png")}
-                />
+                <BsHeartPulse size={75} style={{ marginLeft: 15 }} />
               </Col>
               <Col>
                 <Card.Title>{aktivitaet.name}</Card.Title>

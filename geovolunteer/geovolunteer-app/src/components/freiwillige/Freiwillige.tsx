@@ -13,8 +13,9 @@ export default function Freiwillige() {
   const [user, setUser] = useState<UserModel[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
   const navigateToDetail = (user: UserModel) => {
-    return navigate(`/aktivitäten/detail/${user.id}`, {
+    return navigate(`/freiwillige/detail/${user.id}`, {
       state: { user },
     });
   };
