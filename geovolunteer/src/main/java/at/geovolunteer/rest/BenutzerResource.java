@@ -69,6 +69,19 @@ public class BenutzerResource {
 		}
 	}
 
+	@GetMapping(value = "/freiwillige", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Benutzer>> getFreiwillige() {
+		try {
+			List<Benutzer> freiwillige = service.getFreiwillige();
+			if (freiwillige.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(freiwillige, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Benutzer> getBenutzerById(@PathVariable("id") long id) {
 		Optional<Benutzer> benutzer = service.findById(id);

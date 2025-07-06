@@ -19,6 +19,10 @@ const getAll = () => {
   return http.get<Array<UserModel>>("/benutzer");
 };
 
+const getFreiwillige = () => {
+  return http.get<Array<UserModel>>(BASE_URL + "/freiwillige");
+}
+
 const get = (id: any) => {
   return http.get<UserModel>(BASE_URL + `/${id}`);
 };
@@ -43,6 +47,7 @@ const userService = {
   login,
   logout,
   getAll,
+  getFreiwillige,
   get,
   create,
   update,

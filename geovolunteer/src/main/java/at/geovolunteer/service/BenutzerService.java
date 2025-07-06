@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,11 @@ public class BenutzerService {
 	public Benutzer getOrganisation() {
 		return findBenutzerByCriteria(b -> b.isActive() && Rolle.ORGANISATION.equals(b.getRolle()),
 				"Kein aktiver Organisation gefunden!");
+	}
+
+	public List<Benutzer> getFreiwillige() {
+		return findAll().stream().filter(b -> Rolle.FREIWILLIGE.equals(b.getRolle()))
+				.filter(b -> b.getVorname() != null && b.getNachname() != null).collect(Collectors.toList());
 	}
 
 	private Benutzer findBenutzerByCriteria(Predicate<Benutzer> criteria, String errorMessage) {

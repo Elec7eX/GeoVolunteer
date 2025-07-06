@@ -190,7 +190,7 @@ export default function AktivitaetDetailPage() {
                 </div>
                 <div>
                   <PiMapPinArea
-                    style={{ marginLeft: 100, color: "#0d6efd" }}
+                    style={{ marginLeft: 100, color: "#00e7ff" }}
                     size={30}
                     onClick={() => setIsShowMap(!isShowMap)}
                   />

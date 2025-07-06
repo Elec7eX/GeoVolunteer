@@ -54,12 +54,15 @@ export default function AktivitaetenOverview() {
             aktivitaeten.map((aktivitaet) => (
               <Card
                 key={aktivitaet.id}
+                className="custom-card"
                 onClick={() => navigateToDetail(aktivitaet)}
                 style={{ marginBottom: 10 }}
               >
-                <CardHeader>
-                  <BsHeartPulse style={{ marginRight: 5 }} />
-                  {aktivitaet.name}
+                <CardHeader className="custom-cardheader">
+                  <BsHeartPulse size={30} style={{ marginRight: 15 }} />
+                  <div className="custom-cardheader_text">
+                    {aktivitaet.name}
+                  </div>
                 </CardHeader>
                 <CardBody>
                   <Card.Text>{aktivitaet.beschreibung}</Card.Text>

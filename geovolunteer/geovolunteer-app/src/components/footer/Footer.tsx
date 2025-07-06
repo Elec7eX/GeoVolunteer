@@ -2,6 +2,7 @@ import { Col, Container, Row } from "react-bootstrap";
 import { IoHomeOutline } from "react-icons/io5";
 import { BsHeartPulse } from "react-icons/bs";
 import { GrMapLocation } from "react-icons/gr";
+import { IoPeopleOutline } from "react-icons/io5";
 import { CiGlobe } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
 import { GrAddCircle } from "react-icons/gr";
@@ -40,7 +41,6 @@ export const Footer = (props: Props) => {
                 <div className="text-white">{t("footer.icon.aktivitaet")}</div>
               </div>
             </Col>
-
             {props.displayAddAktivitaet &&
               user.rolle === UserType.ORGANISATION && (
                 <Col>
@@ -62,17 +62,32 @@ export const Footer = (props: Props) => {
                 <div className="text-white">{t("footer.icon.map")}</div>
               </div>
             </Col>
-            <Col className="text-center">
-              <div>
-                <CiGlobe
-                  className="text-white custom-icon"
-                  onClick={() => navigate("/organisation")}
-                />
-                <div className="text-white">
-                  {t("footer.icon.organisation")}
+            {user.rolle === UserType.FREIWILLIGE && (
+              <Col className="text-center">
+                <div>
+                  <CiGlobe
+                    className="text-white custom-icon"
+                    onClick={() => navigate("/organisation")}
+                  />
+                  <div className="text-white">
+                    {t("footer.icon.organisation")}
+                  </div>
                 </div>
-              </div>
-            </Col>
+              </Col>
+            )}
+            {user.rolle === UserType.ORGANISATION && (
+              <Col className="text-center">
+                <div>
+                  <IoPeopleOutline
+                    className="text-white custom-icon"
+                    onClick={() => navigate("/freiwillige")}
+                  />
+                  <div className="text-white">
+                    {t("footer.icon.freiwillige")}
+                  </div>
+                </div>
+              </Col>
+            )}
           </Row>
         </Container>
       </footer>
