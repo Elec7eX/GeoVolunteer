@@ -54,17 +54,23 @@ export default function Freiwillige() {
                 key={user.id}
                 className="custom-card"
                 onClick={() => navigateToDetail(user)}
+                style={{ marginBottom: 10 }}
               >
                 <CardHeader className="custom-cardheader">
-                  <IoPersonOutline size={30} style={{ marginRight: 15 }} />
+                  <IoPersonOutline size={27} style={{ marginRight: 15 }} />
                   <div className="custom-cardheader_text">
                     {user.vorname} {user.nachname}
                   </div>
                 </CardHeader>
                 <CardBody>
                   <Card.Text>
-                    {user.strasse} {user.hausnummer}, {user.plz} {user.ort}
-                    <br />
+                    {user.strasse} {user.hausnummer}
+                    {user.plz && user.ort && (
+                      <>
+                        , {user.plz} {user.ort}
+                        <br />
+                      </>
+                    )}
                     {user.email}
                   </Card.Text>
                 </CardBody>

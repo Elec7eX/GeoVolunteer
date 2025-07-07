@@ -54,6 +54,10 @@ public class BenutzerService {
 
 	public Benutzer create(Benutzer benutzer) {
 		Benutzer entity = new Benutzer();
+		if (Rolle.FREIWILLIGE.equals(benutzer.getRolle())) {
+			entity.setVorname(benutzer.getVorname());
+			entity.setNachname(benutzer.getNachname());
+		}
 		entity.setRolle(benutzer.getRolle());
 		entity.setLogin(benutzer.getLogin());
 		entity.setEmail(benutzer.getEmail());

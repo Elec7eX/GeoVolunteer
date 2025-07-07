@@ -99,7 +99,10 @@ export default function Profil() {
             setFieldValue("strasse", data.address.road);
             setFieldValue("hausnummer", data.address.house_number);
             setFieldValue("plz", data.address.postcode);
-            setFieldValue("ort", data.address.city);
+            setFieldValue(
+              "ort",
+              data.address.city ? data.address.city : data.address.town
+            );
             setLatitude(data.lat);
             setLongitude(data.lon);
           }

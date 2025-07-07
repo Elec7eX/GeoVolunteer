@@ -6,6 +6,7 @@ import { Form as FormikForm, Formik, FormikHelpers } from "formik";
 import { useTranslation } from "react-i18next";
 import { UserModel } from "../types/Types";
 import userService from "../services/UserServices";
+import { UserType } from "../enums/Enums";
 
 interface Props {
   handleBack: () => void;
@@ -63,18 +64,75 @@ export function Registration(props: Props) {
           enableReinitialize
           validationSchema={validationLogin}
         >
-          {({ errors, touched, handleChange, handleBlur, isSubmitting }) => (
+          {({
+            values,
+            errors,
+            touched,
+            handleChange,
+            handleBlur,
+            isSubmitting,
+          }) => (
             <FormikForm className="rounded p-4">
-              <Form.Group className="mb-3">
-                <Form.Label>{t("label.login.rolle")}</Form.Label>
-                <Form.Select id="rolle" name="rolle" onChange={handleChange}>
-                  {rollenOptionen.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </Form.Select>
-              </Form.Group>
+              <Row>
+                <Col md={values.rolle === UserType.FREIWILLIGE ? 6 : 12}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>{t("label.login.rolle")}</Form.Label>
+                    <Form.Select
+                      id="rolle"
+                      name="rolle"
+                      onChange={handleChange}
+                    >
+                      {rollenOptionen.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+                </Col>
+              </Row>
+              {values.rolle === UserType.FREIWILLIGE && (
+                <Row>
+                  <Col>
+                    <Form.Group className="mb-3">
+                      <Form.Label>{t("profil.vorname")}</Form.Label>
+                      <Form.Control
+                        id="vorname"
+                        name="vorname"
+                        placeholder={t("placeholder.login.login")}
+                        type="text"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className={
+                          errors.vorname && touched.vorname
+                            ? "text-input error"
+                            : "text-input"
+                        }
+                      />
+                      <Form.Text className="text-muted"></Form.Text>
+                    </Form.Group>
+                  </Col>
+                  <Col>
+                    <Form.Group className="mb-3">
+                      <Form.Label>{t("profil.nachname")}</Form.Label>
+                      <Form.Control
+                        id="nachname"
+                        name="nachname"
+                        placeholder={t("placeholder.login.login")}
+                        type="text"
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        className={
+                          errors.nachname && touched.nachname
+                            ? "text-input error"
+                            : "text-input"
+                        }
+                      />
+                      <Form.Text className="text-muted"></Form.Text>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              )}
               <Form.Group className="mb-3">
                 <Form.Label>{t("label.login.login")}</Form.Label>
                 <Form.Control
