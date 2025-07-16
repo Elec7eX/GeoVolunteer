@@ -347,20 +347,23 @@ export default function Profil() {
                             onChange={handleChange}
                           />
                         </Form.Group>
-                        <Form.Group className="mb-3">
-                          <Form.Label>{t("profil.beschreibung")}</Form.Label>
-                          <Form.Control
-                            id="beschreibung"
-                            name="beschreibung"
-                            as="textarea"
-                            rows={3}
-                            disabled={!edit}
-                            value={values.beschreibung}
-                            onChange={handleChange}
-                          />
-                        </Form.Group>
                       </>
                     )}
+                    <Form.Group className="mb-3">
+                      <Form.Label>
+                        {isOrganisation() && t("profil.beschreibung")}
+                        {isFreiwillige() && t("profil.beschreibung.user")}
+                      </Form.Label>
+                      <Form.Control
+                        id="beschreibung"
+                        name="beschreibung"
+                        as="textarea"
+                        rows={3}
+                        disabled={!edit}
+                        value={values.beschreibung}
+                        onChange={handleChange}
+                      />
+                    </Form.Group>
                     <h5 style={{ marginTop: 40 }}>
                       {isFreiwillige() && t("profil.verfuegbar.ort.title")}
                       {isOrganisation() &&

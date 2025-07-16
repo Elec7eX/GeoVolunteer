@@ -81,8 +81,8 @@ public class BenutzerService {
 	public Benutzer update(Benutzer user) {
 		Optional<Benutzer> benutzer = findById(user.getId());
 		Benutzer entity = benutzer.isPresent() ? benutzer.get() : null;
-		if (entity != null && entity.isActive()) {
 
+		if (entity != null && entity.isActive()) {
 			entity.setLogin(user.getLogin());
 			entity.setPassword(user.getPassword());
 			entity.setEmail(user.getEmail());
@@ -110,6 +110,7 @@ public class BenutzerService {
 		entity.setLatitude(user.getLatitude());
 		entity.setLongitude(user.getLongitude());
 		entity.setLand(user.getLand());
+		entity.setBeschreibung(user.getBeschreibung());
 		if (Rolle.FREIWILLIGE.equals(rolle)) {
 			updateFreiwillige(entity, user);
 		} else if (Rolle.ORGANISATION.equals(rolle)) {
@@ -132,7 +133,6 @@ public class BenutzerService {
 	private void updateOrganisation(Benutzer entity, Benutzer user) {
 		entity.setName(user.getName());
 		entity.setWebseite(user.getWebseite());
-		entity.setBeschreibung(user.getBeschreibung());
 	}
 
 	public List<Benutzer> findByUsername(String login) {

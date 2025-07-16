@@ -42,6 +42,7 @@ public class Benutzer {
 	private String telefon;
 	private String strasse;
 	private String hausnummer;
+	private String beschreibung;
 	private double latitude;
 	private double longitude;
 	private double radius;
@@ -55,7 +56,6 @@ public class Benutzer {
 	// Organisation
 	private String name;
 	private String webseite;
-	private String beschreibung;
 
 	// Freiwillige
 	private String vorname;
