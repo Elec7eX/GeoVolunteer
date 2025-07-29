@@ -57,15 +57,18 @@ export const Footer = (props: Props) => {
                   </div>
                 </Col>
               )}
-            <Col className="text-center">
-              <div>
-                <GrMapLocation
-                  className="text-white custom-icon"
-                  onClick={() => navigate("/map")}
-                />
-                <div className="text-white">{t("footer.icon.map")}</div>
-              </div>
-            </Col>
+            {(user.rolle === UserType.ORGANISATION ||
+              user.rolle === UserType.FREIWILLIGE) && (
+              <Col className="text-center">
+                <div>
+                  <GrMapLocation
+                    className="text-white custom-icon"
+                    onClick={() => navigate("/map")}
+                  />
+                  <div className="text-white">{t("footer.icon.map")}</div>
+                </div>
+              </Col>
+            )}
             {(user.rolle === UserType.ORGANISATION ||
               user.rolle === UserType.ADMIN) && (
               <Col className="text-center">

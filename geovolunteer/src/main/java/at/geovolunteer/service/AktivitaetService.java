@@ -3,6 +3,7 @@ package at.geovolunteer.service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,14 +31,19 @@ public class AktivitaetService {
 		return repository.save(entity);
 	}
 
-	public List<Aktivitaet> getAll() {
+	public List<Aktivitaet> getErstellteAktivitaeten() {
 		return benutzerService.getActive().getErstellteAktivitaeten();
+	}
+
+	public List<Aktivitaet> geAktivitaeten() {
+		return benutzerService.getOrganisationen().stream().flatMap(e -> e.getErstellteAktivitaeten().stream())
+				.collect(Collectors.toList());
 	}
 
 	public Optional<Aktivitaet> getById(Long id) {
 		if (id == null) {
 			return Optional.empty();
-		} 
+		}
 		return repository.findById(id);
 	}
 

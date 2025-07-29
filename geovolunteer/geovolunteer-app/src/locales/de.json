@@ -1,6 +1,7 @@
 {
   "aktivitaeten.overview.title": "Aktivitäten",
   "aktivitaeten.overview.created.title": "Meine erstellten Aktivitäten",
+  "aktivitaeten.overview.all.title": "Aktivitäten",
   "aktivitaeten.overview.done.title": "Meine abgeschlossenen Aktivitäten",
   "aktivitaeten.detail.title": "Aktivitäten Übersicht",
   "aktivitaeten.create.title": "Aktivität erstellen",
@@ -61,6 +62,8 @@
   "label.login.passwort": "Passwort",
   "map.overview.title": "Karte",
   "organisation.overview.title": "Organisation",
+  "organisation.detail.title": "Organisation Übersicht",
+  "organisation.detail.kontakt": "Kontakt",
   "placeholder.login.login": "Login eingeben",
   "placeholder.login.email": "Email eingeben",
   "placeholder.login.passwort": "Passwort eingeben",

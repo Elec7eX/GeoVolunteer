@@ -16,6 +16,7 @@ import AktivitaetDetail from "./components/aktivitaeten/AktivitaetDetail";
 import Profil from "./components/profil/Profil";
 import Freiwillige from "./components/freiwillige/Freiwillige";
 import FreiwilligeDetailPage from "./components/freiwillige/FreiwilligeDetailPage";
+import OrganisationDetailPage from "./components/organisation/OrganisationDetailPage";
 
 const App: React.FC = () => {
   console.log(i18n);
@@ -88,6 +89,14 @@ const App: React.FC = () => {
               element={
                 <ProtectedRoute>
                   <Organisaiton />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/organisation/detail/:id"
+              element={
+                <ProtectedRoute>
+                  <OrganisationDetailPage />
                 </ProtectedRoute>
               }
             />

@@ -1,31 +1,57 @@
 import { t } from "i18next";
 import { Header } from "../header/Header";
 import { Footer } from "../footer/Footer";
-import { Alert, Card, CardBody, CardHeader, Spinner } from "react-bootstrap";
+import {
+  Alert,
+  Card,
+  CardBody,
+  CardHeader,
+  Col,
+  Row,
+  Spinner,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { BsHeartPulse } from "react-icons/bs";
 import { useEffect, useState } from "react";
 import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel } from "../../types/Types";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { UserType } from "../../enums/Enums";
 
 export default function AktivitaetenOverview() {
   const navigate = useNavigate();
+  const [user] = useLocalStorage("user", null);
+
   const [aktivitaeten, setAktivitaeten] = useState<AktivitaetModel[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    aktivitaetService
-      .getAll()
-      .then((response) => {
-        setAktivitaeten(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Fehler beim Laden der Daten:", error);
-        setError("Fehler beim Laden der Daten");
-        setLoading(false);
-      });
+    if (user.rolle === UserType.FREIWILLIGE) {
+      aktivitaetService
+        .getAll()
+        .then((response) => {
+          setAktivitaeten(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Fehler beim Laden der Daten:", error);
+          setError("Fehler beim Laden der Daten");
+          setLoading(false);
+        });
+    } else if (user.rolle === UserType.ORGANISATION) {
+      aktivitaetService
+        .getErstellteAktivitaeten()
+        .then((response) => {
+          setAktivitaeten(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Fehler beim Laden der Daten:", error);
+          setError("Fehler beim Laden der Daten");
+          setLoading(false);
+        });
+    }
   }, []);
 
   if (loading) {
@@ -47,7 +73,9 @@ export default function AktivitaetenOverview() {
       <Header title={t("aktivitaeten.overview.title")} />
       <div className="body">
         <h5 style={{ marginTop: 30 }}>
-          {t("aktivitaeten.overview.created.title")}
+          {user.rolle === UserType.ORGANISATION
+            ? t("aktivitaeten.overview.created.title")
+            : t("aktivitaeten.overview.all.title")}
         </h5>
         <div>
           {aktivitaeten.length > 0 &&
@@ -58,12 +86,29 @@ export default function AktivitaetenOverview() {
                 onClick={() => navigateToDetail(aktivitaet)}
                 style={{ marginBottom: 10 }}
               >
-                <CardHeader className="custom-cardheader">
-                  <BsHeartPulse size={30} style={{ marginRight: 15 }} />
-                  <div className="custom-cardheader_text">
-                    {aktivitaet.name}
-                  </div>
-                </CardHeader>
+                {user.rolle === UserType.ORGANISATION && (
+                  <CardHeader className="custom-cardheader">
+                    <BsHeartPulse size={30} style={{ marginRight: 15 }} />
+                    <div className="custom-cardheader_text">
+                      {aktivitaet.name}
+                    </div>
+                  </CardHeader>
+                )}
+                {user.rolle === UserType.FREIWILLIGE && (
+                  <CardHeader className="custom-cardheader">
+                    <Col sm={1}>
+                      <BsHeartPulse size={30} style={{ marginRight: 15 }} />
+                    </Col>
+                    <Col>
+                      <div>{aktivitaet.organisation!.name}</div>
+                      {user.rolle === UserType.FREIWILLIGE && (
+                        <div className="custom-cardheader_text">
+                          {aktivitaet.name}
+                        </div>
+                      )}
+                    </Col>
+                  </CardHeader>
+                )}
                 <CardBody>
                   <Card.Text>{aktivitaet.beschreibung}</Card.Text>
                 </CardBody>

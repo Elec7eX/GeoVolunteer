@@ -47,6 +47,10 @@ public class BenutzerService {
 				.filter(b -> b.getVorname() != null && b.getNachname() != null).collect(Collectors.toList());
 	}
 
+	public List<Benutzer> getOrganisationen() {
+		return findAll().stream().filter(b -> Rolle.ORGANISATION.equals(b.getRolle())).collect(Collectors.toList());
+	}
+
 	private Benutzer findBenutzerByCriteria(Predicate<Benutzer> criteria, String errorMessage) {
 		return findAll().stream().filter(criteria).findFirst()
 				.orElseThrow(() -> new NoSuchElementException(errorMessage));

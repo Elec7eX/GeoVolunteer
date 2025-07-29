@@ -7,6 +7,10 @@ const update = (data: AktivitaetModel) => {
   return http.post<AktivitaetModel>(BASE_URL + "/update", data);
 };
 
+const getErstellteAktivitaeten = () => {
+  return http.get<Array<AktivitaetModel>>(BASE_URL + "/erstellteAktivitaeten");
+};
+
 const getAll = () => {
   return http.get<Array<AktivitaetModel>>(BASE_URL + "/aktivitaeten");
 };
@@ -21,6 +25,7 @@ const deleteById = (id: string) => {
 
 const aktivitaetService = {
   update,
+  getErstellteAktivitaeten,
   getAll,
   getById,
   deleteById

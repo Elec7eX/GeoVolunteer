@@ -26,10 +26,23 @@ public class AktivitaetRessource {
 	@Autowired
 	private AktivitaetService service;
 
-	@GetMapping(value = "/aktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Aktivitaet>> getAllAktivitaeten() {
+	@GetMapping(value = "/erstellteAktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Aktivitaet>> getErstellteAktivitaeten() {
 		try {
-			List<Aktivitaet> list = service.getAll();
+			List<Aktivitaet> list = service.getErstellteAktivitaeten();
+			if (CollectionUtils.isEmpty(list)) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(list, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/aktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Aktivitaet>> getAktivitaten() {
+		try {
+			List<Aktivitaet> list = service.geAktivitaeten();
 			if (CollectionUtils.isEmpty(list)) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			}

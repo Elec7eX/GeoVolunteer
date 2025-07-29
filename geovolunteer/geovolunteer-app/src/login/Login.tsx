@@ -35,9 +35,14 @@ export function Login() {
   const handleSubmit = async (result: FormularResult) => {
     const { login, password } = result.values;
     if (login !== undefined && password !== undefined) {
-      await userService.login({ login, password }).then((response) => {
-        _login(response.data);
-      });
+      await userService
+        .login({ login, password })
+        .then((response) => {
+          _login(response.data);
+        })
+        .catch((error) => {
+          alert("Benutzer existiert nicht!");
+        });
     }
   };
 
@@ -79,7 +84,7 @@ export function Login() {
                     <Form.Control
                       id="login"
                       name="login"
-                      placeholder={t("placeholder.login.login")} 
+                      placeholder={t("placeholder.login.login")}
                       type="text"
                       onChange={handleChange}
                       onBlur={handleBlur}

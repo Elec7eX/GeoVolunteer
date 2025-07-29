@@ -82,6 +82,19 @@ public class BenutzerResource {
 		}
 	}
 
+	@GetMapping(value = "/organisation", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Benutzer>> getOrganisationen() {
+		try {
+			List<Benutzer> organisationen = service.getOrganisationen();
+			if (organisationen.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(organisationen, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Benutzer> getBenutzerById(@PathVariable("id") long id) {
 		Optional<Benutzer> benutzer = service.findById(id);
@@ -109,7 +122,7 @@ public class BenutzerResource {
 		}
 	}
 
-	@DeleteMapping("/remove/{id}") 
+	@DeleteMapping("/remove/{id}")
 	public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") long id) {
 		try {
 			// service.deleteById(id);
