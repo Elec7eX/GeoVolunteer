@@ -12,7 +12,7 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { BsHeartPulse } from "react-icons/bs";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel } from "../../types/Types";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
@@ -22,37 +22,41 @@ export default function AktivitaetenOverview() {
   const navigate = useNavigate();
   const [user] = useLocalStorage("user", null);
 
+  const initialized = useRef(false);
   const [aktivitaeten, setAktivitaeten] = useState<AktivitaetModel[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user.rolle === UserType.FREIWILLIGE) {
-      aktivitaetService
-        .getAll()
-        .then((response) => {
-          setAktivitaeten(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Fehler beim Laden der Daten:", error);
-          setError("Fehler beim Laden der Daten");
-          setLoading(false);
-        });
-    } else if (user.rolle === UserType.ORGANISATION) {
-      aktivitaetService
-        .getErstellteAktivitaeten()
-        .then((response) => {
-          setAktivitaeten(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Fehler beim Laden der Daten:", error);
-          setError("Fehler beim Laden der Daten");
-          setLoading(false);
-        });
+    if (!initialized.current) {
+      initialized.current = true;
+      if (user.rolle === UserType.FREIWILLIGE) {
+        aktivitaetService
+          .getAll()
+          .then((response) => {
+            setAktivitaeten(response.data);
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error("Fehler beim Laden der Daten:", error);
+            setError("Fehler beim Laden der Daten");
+            setLoading(false);
+          });
+      } else if (user.rolle === UserType.ORGANISATION) {
+        aktivitaetService
+          .getErstellteAktivitaeten()
+          .then((response) => {
+            setAktivitaeten(response.data);
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error("Fehler beim Laden der Daten:", error);
+            setError("Fehler beim Laden der Daten");
+            setLoading(false);
+          });
+      }
     }
-  }, []);
+  }, [user.rolle]);
 
   if (loading) {
     return <Spinner animation="border" />;
