@@ -32,6 +32,8 @@
   "aktivitaeten.detail.zeit.title": "Zeitliche Verfügbarkeit",
   "aktivitaeten.detail.adresse.title": "Adresse",
   "aktivitaeten.detail.kontaktinfo.title": "Kontakt Informationen",
+  "aktivitaeten.detail.button.teilnehmen": "Teilnehmen",
+  "aktivitaeten.detail.button.nichtTeilnehmen": "Nicht mehr teilnehmen",
   "button.login": "Login",
   "button.anmelden": "Neu Anmelden",
   "button.registrieren": "Registrieren",

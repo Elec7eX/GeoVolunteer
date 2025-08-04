@@ -21,7 +21,7 @@ export default function AktivitaetDetailPage() {
   const location = useLocation();
   const [user] = useLocalStorage("user", null);
 
-  const aktivitaetFromState = location.state?.aktivitaet;
+  const { aktivitaetFromState, isTeilnehmer } = location.state;
 
   const [aktivitaet, setAktivitaet] = useState<AktivitaetModel | null>(null);
   const [position, setPosition]: any = useState(null);
@@ -100,19 +100,20 @@ export default function AktivitaetDetailPage() {
                 )}
               </Col>
             </Row>
-
-            {/* Button am unteren rechten Rand */}
-            <Button
-              style={{
-                position: "absolute",
-                bottom: "10px", // Abstand vom unteren Rand
-                right: "10px", // Abstand vom rechten Rand
-                zIndex: 1, // Damit der Button über der Linie ist
-              }}
-              className="btn btn-primary" // Nutzen Sie Bootstrap oder Ihre eigene Klassen für den Button
-            >
-              Teilnehmen
-            </Button>
+            {!isTeilnehmer && (
+              <Button className="custom-button_teilnehmen">
+                <div className="text-white">
+                  {t("aktivitaeten.detail.button.teilnehmen")}
+                </div>
+              </Button>
+            )}
+            {isTeilnehmer && (
+              <Button className="custom-button_nichtTeilnehmen">
+                <div className="text-white">
+                  {t("aktivitaeten.detail.button.nichtTeilnehmen")}
+                </div>
+              </Button>
+            )}
           </Card.Body>
         </Card>
         <Card style={{ marginTop: 10, height: "auto" }}>

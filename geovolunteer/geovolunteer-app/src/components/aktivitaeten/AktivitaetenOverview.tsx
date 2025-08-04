@@ -16,6 +16,7 @@ import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel } from "../../types/Types";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
+import { VerticalDivider } from "../../utils/Utils";
 
 export default function AktivitaetenOverview() {
   const navigate = useNavigate();
@@ -65,9 +66,12 @@ export default function AktivitaetenOverview() {
     return <Alert variant="danger">{error}</Alert>;
   }
 
-  const navigateToDetail = (aktivitaet: AktivitaetModel) => {
+  const navigateToDetail = (
+    aktivitaet: AktivitaetModel,
+    isTeilnehmer: boolean
+  ) => {
     return navigate(`/aktivitäten/detail/${aktivitaet.id}`, {
-      state: { aktivitaet },
+      state: { aktivitaet, isTeilnehmer },
     });
   };
 
@@ -76,8 +80,49 @@ export default function AktivitaetenOverview() {
       <Header title={t("aktivitaeten.overview.title")} />
       <div className="body">
         {user.rolle === UserType.FREIWILLIGE && (
-          <h5>{t("aktivitaeten.overview.registered.title")}</h5>
+          <>
+            <h5>{t("aktivitaeten.overview.registered.title")}</h5>
+            <div>
+              {aktivitaeten.length > 0 &&
+                aktivitaeten.map((aktivitaet) => (
+                  <Card
+                    key={aktivitaet.id}
+                    className="custom-card"
+                    onClick={() => navigateToDetail(aktivitaet, true)}
+                    style={{ marginBottom: 10 }}
+                  >
+                    {user.rolle === UserType.ORGANISATION && (
+                      <CardHeader className="custom-cardheader">
+                        <BsHeartPulse size={30} style={{ marginRight: 15 }} />
+                        <div className="custom-cardheader_text">
+                          {aktivitaet.name}
+                        </div>
+                      </CardHeader>
+                    )}
+                    {user.rolle === UserType.FREIWILLIGE && (
+                      <CardHeader className="custom-cardheader">
+                        <Col sm={1}>
+                          <BsHeartPulse size={30} style={{ marginRight: 15 }} />
+                        </Col>
+                        <Col>
+                          <div>{aktivitaet.organisation!.name}</div>
+                          {user.rolle === UserType.FREIWILLIGE && (
+                            <div className="custom-cardheader_text">
+                              {aktivitaet.name}
+                            </div>
+                          )}
+                        </Col>
+                      </CardHeader>
+                    )}
+                    <CardBody>
+                      <Card.Text>{aktivitaet.beschreibung}</Card.Text>
+                    </CardBody>
+                  </Card>
+                ))}
+            </div>
+          </>
         )}
+        <hr style={{ marginTop: 30 }} />
         <h5 style={{ marginTop: 30 }}>
           {user.rolle === UserType.ORGANISATION
             ? t("aktivitaeten.overview.created.title")
@@ -89,7 +134,7 @@ export default function AktivitaetenOverview() {
               <Card
                 key={aktivitaet.id}
                 className="custom-card"
-                onClick={() => navigateToDetail(aktivitaet)}
+                onClick={() => navigateToDetail(aktivitaet, false)}
                 style={{ marginBottom: 10 }}
               >
                 {user.rolle === UserType.ORGANISATION && (
