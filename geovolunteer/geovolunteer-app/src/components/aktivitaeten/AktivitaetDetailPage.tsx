@@ -80,7 +80,7 @@ export default function AktivitaetDetailPage() {
               </Nav.Item>
             </Nav>
           </Card.Header>
-          <Card.Body>
+          <Card.Body style={{ position: "relative" }}>
             <Row>
               <Col md={3}>
                 <BsHeartPulse size={75} style={{ marginLeft: 15 }} />
@@ -100,6 +100,19 @@ export default function AktivitaetDetailPage() {
                 )}
               </Col>
             </Row>
+
+            {/* Button am unteren rechten Rand */}
+            <Button
+              style={{
+                position: "absolute",
+                bottom: "10px", // Abstand vom unteren Rand
+                right: "10px", // Abstand vom rechten Rand
+                zIndex: 1, // Damit der Button über der Linie ist
+              }}
+              className="btn btn-primary" // Nutzen Sie Bootstrap oder Ihre eigene Klassen für den Button
+            >
+              Teilnehmen
+            </Button>
           </Card.Body>
         </Card>
         <Card style={{ marginTop: 10, height: "auto" }}>

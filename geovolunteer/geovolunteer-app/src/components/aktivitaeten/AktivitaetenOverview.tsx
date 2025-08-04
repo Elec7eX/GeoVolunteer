@@ -7,7 +7,6 @@ import {
   CardBody,
   CardHeader,
   Col,
-  Row,
   Spinner,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -76,6 +75,9 @@ export default function AktivitaetenOverview() {
     <>
       <Header title={t("aktivitaeten.overview.title")} />
       <div className="body">
+        {user.rolle === UserType.FREIWILLIGE && (
+          <h5>{t("aktivitaeten.overview.registered.title")}</h5>
+        )}
         <h5 style={{ marginTop: 30 }}>
           {user.rolle === UserType.ORGANISATION
             ? t("aktivitaeten.overview.created.title")
@@ -119,30 +121,34 @@ export default function AktivitaetenOverview() {
               </Card>
             ))}
         </div>
-        <hr style={{ marginTop: 30 }} />
-        <h5 style={{ marginTop: 30 }}>
-          {t("aktivitaeten.overview.done.title")}
-        </h5>
-        <div>
-          <Card onClick={() => navigateToDetail}>
-            <CardHeader>
-              <BsHeartPulse style={{ marginRight: 5 }} />
-              Aktivitäts-Titel
-            </CardHeader>
-            <CardBody>
-              <Card.Text>Aktivitäts-Detail</Card.Text>
-            </CardBody>
-          </Card>
-          <Card style={{ marginTop: 10 }}>
-            <CardHeader>
-              <BsHeartPulse style={{ marginRight: 5 }} />
-              Second Card
-            </CardHeader>
-            <CardBody>
-              <Card.Text>Second Card Body</Card.Text>
-            </CardBody>
-          </Card>
-        </div>
+        {user.rolle === UserType.ORGANISATION && (
+          <>
+            <hr style={{ marginTop: 30 }} />
+            <h5 style={{ marginTop: 30 }}>
+              {t("aktivitaeten.overview.done.title")}
+            </h5>
+            <div>
+              <Card onClick={() => navigateToDetail}>
+                <CardHeader>
+                  <BsHeartPulse style={{ marginRight: 5 }} />
+                  Aktivitäts-Titel
+                </CardHeader>
+                <CardBody>
+                  <Card.Text>Aktivitäts-Detail</Card.Text>
+                </CardBody>
+              </Card>
+              <Card style={{ marginTop: 10 }}>
+                <CardHeader>
+                  <BsHeartPulse style={{ marginRight: 5 }} />
+                  Second Card
+                </CardHeader>
+                <CardBody>
+                  <Card.Text>Second Card Body</Card.Text>
+                </CardBody>
+              </Card>
+            </div>
+          </>
+        )}
       </div>
       <Footer displayAddAktivitaet />
     </>

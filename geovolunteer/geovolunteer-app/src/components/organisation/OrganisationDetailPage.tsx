@@ -2,7 +2,7 @@ import { t } from "i18next";
 import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
 import { Card, Col, Row } from "react-bootstrap";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { UserModel, UserType } from "../../types/Types";
 import { VerticalDivider } from "../../utils/Utils";
@@ -15,6 +15,7 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 export default function OrganisationDetailPage() {
   const location = useLocation();
   const [user] = useLocalStorage("user", null);
+  const navigate = useNavigate();
 
   const organisationFromState = location.state?.user;
   const [organisation, setOrganisation] = useState<UserModel | null>();
