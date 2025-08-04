@@ -13,6 +13,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { IoIosArrowBack } from "react-icons/io";
 import userService from "../../services/UserServices";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { UserType } from "../../enums/Enums";
 
 type Props = {
   title: string;
@@ -26,6 +28,7 @@ export const Header = (props: Props) => {
   const { _logout }: any = useAuth();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [user] = useLocalStorage("user", null);
 
   const handleLogout = () => {
     userService.logout().then(() => _logout());
@@ -48,6 +51,17 @@ export const Header = (props: Props) => {
                       title={<CgProfile className="custom-icon" size={32} />}
                       align="end"
                     >
+                      <NavDropdown.Item disabled>
+                        <div style={{ fontStyle: "italic", marginBottom: 10 }}>
+                          {user.rolle === UserType.ADMIN && user.login}
+                          {user.rolle === UserType.ORGANISATION && user.name}
+                          {user.rolle === UserType.FREIWILLIGE && (
+                            <>
+                              {user.vorname} {user.nachname}
+                            </>
+                          )}
+                        </div>
+                      </NavDropdown.Item>
                       <NavDropdown.Item onClick={() => navigate("/profil")}>
                         {t("button.profile")}
                       </NavDropdown.Item>
