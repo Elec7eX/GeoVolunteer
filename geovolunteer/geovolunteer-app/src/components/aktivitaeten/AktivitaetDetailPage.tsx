@@ -101,14 +101,28 @@ export default function AktivitaetDetailPage() {
               </Col>
             </Row>
             {!isTeilnehmer && (
-              <Button className="custom-button_teilnehmen">
+              <Button
+                className="btn custom-button_teilnehmen"
+                onClick={() =>
+                  aktivitaetService
+                    .addTeilnehmer(id!)
+                    .then(() => navigate("/aktivitäten"))
+                }
+              >
                 <div className="text-white">
                   {t("aktivitaeten.detail.button.teilnehmen")}
                 </div>
               </Button>
             )}
             {isTeilnehmer && (
-              <Button className="custom-button_nichtTeilnehmen">
+              <Button
+                className="btn custom-button_nichtTeilnehmen"
+                onClick={() =>
+                  aktivitaetService
+                    .removeTeilnehmer(id!)
+                    .then(() => navigate("/aktivitäten"))
+                }
+              >
                 <div className="text-white">
                   {t("aktivitaeten.detail.button.nichtTeilnehmen")}
                 </div>

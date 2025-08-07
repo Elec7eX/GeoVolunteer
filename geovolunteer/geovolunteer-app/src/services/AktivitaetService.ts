@@ -23,12 +23,22 @@ const deleteById = (id: string) => {
   return http.delete(`${BASE_URL}/delete/${id}`);
 };
 
+const addTeilnehmer = (id: string) => {
+  return http.get<AktivitaetModel>(BASE_URL + `addTeilnehmer/${id}`);
+}
+
+const removeTeilnehmer = (id: string) => {
+  return http.get<AktivitaetModel>(BASE_URL + `removeTeilnehmer/${id}`);
+}
+
 const aktivitaetService = {
   update,
   getErstellteAktivitaeten,
   getAll,
   getById,
-  deleteById
+  deleteById,
+  addTeilnehmer,
+  removeTeilnehmer
 };
 
 export default aktivitaetService;

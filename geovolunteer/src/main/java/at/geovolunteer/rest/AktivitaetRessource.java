@@ -62,6 +62,22 @@ public class AktivitaetRessource {
 		}
 	}
 
+	@PostMapping("/addTeilnehmer")
+	public ResponseEntity<Aktivitaet> addTeilnehmer(@RequestBody Long id) {
+		if (service.addTeilnehmer(id)) {
+			return new ResponseEntity<>(HttpStatus.ACCEPTED);
+		}
+		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+	}
+
+	@PostMapping("/removeTeilnehmer")
+	public ResponseEntity<Aktivitaet> removeTeilnehmer(@RequestBody Long id) {
+		if (service.removeTeilnehmer(id)) {
+			return new ResponseEntity<>(HttpStatus.ACCEPTED);
+		}
+		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+	}
+
 	@PostMapping("/update")
 	public ResponseEntity<Aktivitaet> update(@RequestBody Aktivitaet model) {
 		Aktivitaet entity = service.update(model);

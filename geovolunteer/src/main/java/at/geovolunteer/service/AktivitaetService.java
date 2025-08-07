@@ -12,6 +12,7 @@ import at.geovolunteer.model.AbstractAktivitaet;
 import at.geovolunteer.model.Aktivitaet;
 import at.geovolunteer.model.Benutzer;
 import at.geovolunteer.model.Ressource;
+import at.geovolunteer.model.Rolle;
 import at.geovolunteer.model.repo.AktivitaetRepository;
 
 @Service
@@ -58,6 +59,40 @@ public class AktivitaetService {
 		} else {
 			throw new Exception("Aktivität nicht gefunden - ID: " + id);
 		}
+	}
+
+	public boolean addTeilnehmer(Long id) {
+		Benutzer benutzer = benutzerService.getActive();
+		Optional<Aktivitaet> aktivitaet = getById(id);
+
+		if (Rolle.FREIWILLIGE.equals(benutzer.getRolle()) && aktivitaet.isPresent()) {
+			Aktivitaet entity = aktivitaet.get();
+			boolean isTeilnehmer = !aktivitaet.get().getTeilnehmer().stream()
+					.anyMatch(b -> b.getId() == benutzer.getId());
+			if (!isTeilnehmer) {
+				entity.addTeilnehmer(benutzer);
+				repository.saveAndFlush(entity);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean removeTeilnehmer(Long id) {
+		Benutzer benutzer = benutzerService.getActive();
+		Optional<Aktivitaet> aktivitaet = getById(id);
+
+		if (Rolle.FREIWILLIGE.equals(benutzer.getRolle()) && aktivitaet.isPresent()) {
+			Aktivitaet entity = aktivitaet.get();
+			boolean isTeilnehmer = !aktivitaet.get().getTeilnehmer().stream()
+					.anyMatch(b -> b.getId() == benutzer.getId());
+			if (isTeilnehmer) {
+				entity.removeTeilnehmer(benutzer);
+				repository.saveAndFlush(entity);
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private Aktivitaet getOrCreate(Aktivitaet model) {
