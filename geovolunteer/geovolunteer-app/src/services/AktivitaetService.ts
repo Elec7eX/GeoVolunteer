@@ -15,6 +15,10 @@ const getAll = () => {
   return http.get<Array<AktivitaetModel>>(BASE_URL + "/aktivitaeten");
 };
 
+const getAngemeldete = () => {
+  return http.get<Array<AktivitaetModel>>(BASE_URL + "/angemeldete/aktivitaeten");
+};
+
 const getById = (id: string) => {
   return http.get<AktivitaetModel>(BASE_URL + `/${id}`);
 }
@@ -24,17 +28,18 @@ const deleteById = (id: string) => {
 };
 
 const addTeilnehmer = (id: string) => {
-  return http.get<AktivitaetModel>(BASE_URL + `addTeilnehmer/${id}`);
+  return http.put<AktivitaetModel>(BASE_URL + `/addTeilnehmer/${id}`);
 }
 
 const removeTeilnehmer = (id: string) => {
-  return http.get<AktivitaetModel>(BASE_URL + `removeTeilnehmer/${id}`);
+  return http.put<AktivitaetModel>(BASE_URL + `/removeTeilnehmer/${id}`);
 }
 
 const aktivitaetService = {
   update,
   getErstellteAktivitaeten,
   getAll,
+  getAngemeldete,
   getById,
   deleteById,
   addTeilnehmer,

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +31,19 @@ public class AktivitaetRessource {
 	public ResponseEntity<List<Aktivitaet>> getErstellteAktivitaeten() {
 		try {
 			List<Aktivitaet> list = service.getErstellteAktivitaeten();
+			if (CollectionUtils.isEmpty(list)) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(list, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/angemeldete/aktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Aktivitaet>> getAngemeldeteAktivitaten() {
+		try {
+			List<Aktivitaet> list = service.geAngemeldeteAktivitaeten();
 			if (CollectionUtils.isEmpty(list)) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			}
@@ -62,16 +76,16 @@ public class AktivitaetRessource {
 		}
 	}
 
-	@PostMapping("/addTeilnehmer")
-	public ResponseEntity<Aktivitaet> addTeilnehmer(@RequestBody Long id) {
+	@PutMapping("/addTeilnehmer/{id}")
+	public ResponseEntity<Aktivitaet> addTeilnehmer(@PathVariable("id") long id) {
 		if (service.addTeilnehmer(id)) {
 			return new ResponseEntity<>(HttpStatus.ACCEPTED);
 		}
 		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 	}
 
-	@PostMapping("/removeTeilnehmer")
-	public ResponseEntity<Aktivitaet> removeTeilnehmer(@RequestBody Long id) {
+	@PutMapping("/removeTeilnehmer/{id}")
+	public ResponseEntity<Aktivitaet> removeTeilnehmer(@PathVariable("id") long id) {
 		if (service.removeTeilnehmer(id)) {
 			return new ResponseEntity<>(HttpStatus.ACCEPTED);
 		}

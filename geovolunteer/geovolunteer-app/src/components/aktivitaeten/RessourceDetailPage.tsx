@@ -53,6 +53,7 @@ export default function RessourceDetailPage() {
         breadcrumb={{
           title: t("aktivitaeten.detail.title"),
           navigate: `/aktivitäten/detail/${aktivitaet.id}`,
+          aktivitaetState: aktivitaet,
         }}
       />
       <div className="body">
@@ -62,7 +63,9 @@ export default function RessourceDetailPage() {
               <Nav.Item>
                 <Nav.Link
                   onClick={() =>
-                    navigate(`/aktivitäten/detail/${aktivitaet.id}`)
+                    navigate(`/aktivitäten/detail/${aktivitaet.id}`, {
+                      state: { aktivitaet },
+                    })
                   }
                 >
                   {t("footer.icon.aktivitaet")}

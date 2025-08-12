@@ -15,12 +15,14 @@ import { IoIosArrowBack } from "react-icons/io";
 import userService from "../../services/UserServices";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
+import { AktivitaetModel } from "../../types/Types";
 
 type Props = {
   title: string;
   breadcrumb?: {
     title: string;
     navigate: string;
+    aktivitaetState?: AktivitaetModel;
   };
 };
 
@@ -77,7 +79,15 @@ export const Header = (props: Props) => {
           </Row>
           {props.breadcrumb && (
             <Row>
-              <Breadcrumb onClick={() => navigate(props.breadcrumb!.navigate)}>
+              <Breadcrumb
+                onClick={() =>
+                  props.breadcrumb?.aktivitaetState !== undefined
+                    ? navigate(props.breadcrumb.navigate!, {
+                        state: props.breadcrumb.aktivitaetState,
+                      })
+                    : navigate(props.breadcrumb!.navigate!)
+                }
+              >
                 <IoIosArrowBack
                   style={{ width: 27, height: 27, color: "white" }}
                 />

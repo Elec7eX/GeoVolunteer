@@ -174,7 +174,10 @@ export default function AktivitaetDetailPage() {
                   <VerticalDivider />
                 </Col>
                 <Col>
-                  <div>{aktivitaet.teilnehmeranzahl}</div>
+                  <div>
+                    {aktivitaet.teilnehmer?.length}/
+                    {aktivitaet.teilnehmeranzahl}
+                  </div>
                 </Col>
               </Row>
             </Row>

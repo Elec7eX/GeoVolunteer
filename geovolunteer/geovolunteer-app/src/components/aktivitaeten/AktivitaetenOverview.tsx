@@ -16,7 +16,6 @@ import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel } from "../../types/Types";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
-import { VerticalDivider } from "../../utils/Utils";
 
 export default function AktivitaetenOverview() {
   const navigate = useNavigate();
@@ -24,6 +23,9 @@ export default function AktivitaetenOverview() {
 
   const initialized = useRef(false);
   const [aktivitaeten, setAktivitaeten] = useState<AktivitaetModel[]>([]);
+  const [angemeldeteAktivitaeten, setAngemeldeteAktivitaeten] = useState<
+    AktivitaetModel[]
+  >([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +33,17 @@ export default function AktivitaetenOverview() {
     if (!initialized.current) {
       initialized.current = true;
       if (user.rolle === UserType.FREIWILLIGE) {
+        aktivitaetService
+          .getAngemeldete()
+          .then((response) => {
+            setAngemeldeteAktivitaeten(response.data);
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.error("Fehler beim Laden der Daten:", error);
+            setError("Fehler beim Laden der Daten");
+            setLoading(false);
+          });
         aktivitaetService
           .getAll()
           .then((response) => {
@@ -81,48 +94,51 @@ export default function AktivitaetenOverview() {
       <div className="body">
         {user.rolle === UserType.FREIWILLIGE && (
           <>
-            <h5>{t("aktivitaeten.overview.registered.title")}</h5>
             <div>
-              {aktivitaeten.length > 0 &&
-                aktivitaeten.map((aktivitaet) => (
-                  <Card
-                    key={aktivitaet.id}
-                    className="custom-card"
-                    onClick={() => navigateToDetail(aktivitaet, true)}
-                    style={{ marginBottom: 10 }}
-                  >
-                    {user.rolle === UserType.ORGANISATION && (
-                      <CardHeader className="custom-cardheader">
-                        <BsHeartPulse size={30} style={{ marginRight: 15 }} />
-                        <div className="custom-cardheader_text">
-                          {aktivitaet.name}
-                        </div>
-                      </CardHeader>
-                    )}
-                    {user.rolle === UserType.FREIWILLIGE && (
-                      <CardHeader className="custom-cardheader">
-                        <Col sm={1}>
-                          <BsHeartPulse size={30} style={{ marginRight: 15 }} />
-                        </Col>
-                        <Col>
-                          <div>{aktivitaet.organisation!.name}</div>
-                          {user.rolle === UserType.FREIWILLIGE && (
-                            <div className="custom-cardheader_text">
-                              {aktivitaet.name}
-                            </div>
-                          )}
-                        </Col>
-                      </CardHeader>
-                    )}
-                    <CardBody>
-                      <Card.Text>{aktivitaet.beschreibung}</Card.Text>
-                    </CardBody>
-                  </Card>
+              <>
+                {console.log(
+                  "angemeldeteAktivitaeten:",
+                  angemeldeteAktivitaeten
+                )}
+              </>
+              {angemeldeteAktivitaeten.length > 0 &&
+                angemeldeteAktivitaeten.map((aktivitaet) => (
+                  <>
+                    <h5>{t("aktivitaeten.overview.registered.title")}</h5>
+                    <Card
+                      key={aktivitaet.id}
+                      className="custom-card"
+                      onClick={() => navigateToDetail(aktivitaet, true)}
+                      style={{ marginBottom: 10 }}
+                    >
+                      {user.rolle === UserType.FREIWILLIGE && (
+                        <CardHeader className="custom-cardheader">
+                          <Col sm={1}>
+                            <BsHeartPulse
+                              size={30}
+                              style={{ marginRight: 15 }}
+                            />
+                          </Col>
+                          <Col>
+                            <div>{aktivitaet.organisation!.name}</div>
+                            {user.rolle === UserType.FREIWILLIGE && (
+                              <div className="custom-cardheader_text">
+                                {aktivitaet.name}
+                              </div>
+                            )}
+                          </Col>
+                        </CardHeader>
+                      )}
+                      <CardBody>
+                        <Card.Text>{aktivitaet.beschreibung}</Card.Text>
+                      </CardBody>
+                    </Card>
+                    <hr style={{ marginTop: 30 }} />
+                  </>
                 ))}
             </div>
           </>
         )}
-        <hr style={{ marginTop: 30 }} />
         <h5 style={{ marginTop: 30 }}>
           {user.rolle === UserType.ORGANISATION
             ? t("aktivitaeten.overview.created.title")

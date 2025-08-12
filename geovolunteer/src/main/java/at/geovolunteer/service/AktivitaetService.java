@@ -38,7 +38,13 @@ public class AktivitaetService {
 
 	public List<Aktivitaet> geAktivitaeten() {
 		return benutzerService.getOrganisationen().stream().flatMap(e -> e.getErstellteAktivitaeten().stream())
+				.filter(e -> e.getTeilnehmer().size() <= e.getTeilnehmeranzahl()).filter(e -> e.getTeilnehmer().stream()
+						.noneMatch(b -> b.getId() == benutzerService.getActive().getId()))
 				.collect(Collectors.toList());
+	}
+
+	public List<Aktivitaet> geAngemeldeteAktivitaeten() {
+		return benutzerService.getActive().getTeilnahmen();
 	}
 
 	public Optional<Aktivitaet> getById(Long id) {
@@ -67,9 +73,9 @@ public class AktivitaetService {
 
 		if (Rolle.FREIWILLIGE.equals(benutzer.getRolle()) && aktivitaet.isPresent()) {
 			Aktivitaet entity = aktivitaet.get();
-			boolean isTeilnehmer = !aktivitaet.get().getTeilnehmer().stream()
-					.anyMatch(b -> b.getId() == benutzer.getId());
-			if (!isTeilnehmer) {
+			boolean isNotTeilnehmer = aktivitaet.get().getTeilnehmer().stream()
+					.noneMatch(b -> b.getId() == benutzer.getId());
+			if (isNotTeilnehmer) {
 				entity.addTeilnehmer(benutzer);
 				repository.saveAndFlush(entity);
 				return true;
@@ -85,7 +91,7 @@ public class AktivitaetService {
 		if (Rolle.FREIWILLIGE.equals(benutzer.getRolle()) && aktivitaet.isPresent()) {
 			Aktivitaet entity = aktivitaet.get();
 			boolean isTeilnehmer = !aktivitaet.get().getTeilnehmer().stream()
-					.anyMatch(b -> b.getId() == benutzer.getId());
+					.noneMatch(b -> b.getId() == benutzer.getId());
 			if (isTeilnehmer) {
 				entity.removeTeilnehmer(benutzer);
 				repository.saveAndFlush(entity);
