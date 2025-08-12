@@ -94,13 +94,7 @@ export default function AktivitaetenOverview() {
       <div className="body">
         {user.rolle === UserType.FREIWILLIGE && (
           <>
-            <div>
-              <>
-                {console.log(
-                  "angemeldeteAktivitaeten:",
-                  angemeldeteAktivitaeten
-                )}
-              </>
+            <div style={{ marginTop: 30 }}>
               {angemeldeteAktivitaeten.length > 0 &&
                 angemeldeteAktivitaeten.map((aktivitaet) => (
                   <>
