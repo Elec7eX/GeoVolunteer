@@ -22,6 +22,9 @@ public class BenutzerService {
 	@Autowired
 	private BenutzerRepository benutzerRepository;
 
+	@Autowired
+	private AktivitaetService aktivitaetService;
+
 	public Benutzer authenticate(LoginType loginRequest) {
 		Optional<Benutzer> entity = benutzerRepository.findByLogin(loginRequest.getLogin()).stream().findFirst();
 		if (entity.isPresent() && passwordMatches(loginRequest.getPassword(), entity.get().getPassword())) {
@@ -161,6 +164,38 @@ public class BenutzerService {
 
 	public Optional<Benutzer> findById(Long id) {
 		return Optional.of(benutzerRepository.findById(id).orElseThrow());
+	}
+
+	public boolean delete(Long id) {
+		Optional<Benutzer> entity = findById(id);
+		if (entity.isPresent()) {
+			Benutzer benutzer = entity.get();
+			if (!benutzer.isActive()) {
+				if (Rolle.FREIWILLIGE.equals(benutzer.getRolle())) {
+					benutzer.getTeilnahmen().clear();
+					benutzerRepository.save(benutzer);
+					benutzerRepository.delete(benutzer);
+					return true;
+				} else if (Rolle.ORGANISATION.equals(benutzer.getRolle())) {
+					benutzer.getErstellteAktivitaeten().stream().forEach(a -> a.getTeilnehmer().clear());
+					benutzerRepository.save(benutzer);
+					List<Long> ids = benutzer.getErstellteAktivitaeten().stream().map(a -> a.getId())
+							.collect(Collectors.toList());
+					ids.forEach(e -> {
+						try {
+							aktivitaetService.delete(e);
+						} catch (Exception e1) {
+							System.err.println("Error for aktivität delete");
+							e1.printStackTrace();
+						}
+					});
+					benutzerRepository.save(benutzer);
+					benutzerRepository.delete(benutzer);
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

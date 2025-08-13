@@ -11,6 +11,7 @@ import MapComponent from "../karte/MapComponent";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CiGlobe } from "react-icons/ci";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import userService from "../../services/UserServices";
 
 export default function OrganisationDetailPage() {
   const location = useLocation();
@@ -53,11 +54,17 @@ export default function OrganisationDetailPage() {
               <Col>
                 <Card.Title>{organisation.name}</Card.Title>
                 <Card.Text>{organisation.webseite}</Card.Text>
-                <>{console.log(user.rolle)}</>
                 {user.rolle === UserType.ADMIN && (
                   <Row style={{ textAlign: "end" }}>
                     <Col>
-                      <RiDeleteBinLine size={25} />
+                      <RiDeleteBinLine
+                        size={25}
+                        onClick={() =>
+                          userService
+                            .remove(organisation.id)
+                            .then(() => navigate("/freiwillige"))
+                        }
+                      />
                     </Col>
                   </Row>
                 )}

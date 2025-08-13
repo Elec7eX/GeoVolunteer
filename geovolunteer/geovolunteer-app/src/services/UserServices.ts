@@ -36,7 +36,7 @@ const update = (id: any, data: UserModel) => {
 };
 
 const remove = (id: any) => {
-  return http.delete<any>(`/users/${id}`);
+  return http.delete<any>(BASE_URL + `/delete/${id}`);
 };
 
 const removeAll = () => {

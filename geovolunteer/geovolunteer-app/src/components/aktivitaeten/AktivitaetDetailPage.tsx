@@ -100,7 +100,7 @@ export default function AktivitaetDetailPage() {
                 )}
               </Col>
             </Row>
-            {!isTeilnehmer && (
+            {!isTeilnehmer && user.rolle === UserType.FREIWILLIGE && (
               <Button
                 className="btn custom-button_teilnehmen"
                 onClick={() =>
@@ -114,7 +114,7 @@ export default function AktivitaetDetailPage() {
                 </div>
               </Button>
             )}
-            {isTeilnehmer && (
+            {isTeilnehmer && user.rolle === UserType.FREIWILLIGE && (
               <Button
                 className="btn custom-button_nichtTeilnehmen"
                 onClick={() =>

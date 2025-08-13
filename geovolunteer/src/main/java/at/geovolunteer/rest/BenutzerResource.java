@@ -122,24 +122,15 @@ public class BenutzerResource {
 		}
 	}
 
-	@DeleteMapping("/remove/{id}")
-	public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") long id) {
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<HttpStatus> delete(@PathVariable("id") long id) {
 		try {
-			// service.deleteById(id);
+			if (service.delete(id)) {
+				return new ResponseEntity<>(HttpStatus.OK);
+			}
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-	}
-
-	@DeleteMapping("/deleteAll")
-	public ResponseEntity<HttpStatus> deleteAllTutorials() {
-		try {
-			// service.deleteAll();
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-
 	}
 }

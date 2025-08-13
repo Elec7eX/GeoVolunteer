@@ -1,9 +1,9 @@
 import { AdressInputEnum } from "../enums/Enums"
 
 export enum UserType {
-    ADMIN = "Admin",
-    ORGANISATION = "Organisation",
-    FREIWILLIGE = "Freiwillige",
+    ADMIN = "ADMIN",
+    ORGANISATION = "ORGANISATION",
+    FREIWILLIGE = "FREIWILLIGE",
   }
 
 export interface UserModel {
