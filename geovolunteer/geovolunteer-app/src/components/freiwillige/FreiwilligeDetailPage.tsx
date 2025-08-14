@@ -17,7 +17,6 @@ export default function FreiwilligeDetailPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const freiwilligeFromState = location.state?.user;
-  
 
   const [user] = useLocalStorage("user", null);
 

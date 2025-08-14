@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import at.geovolunteer.model.Aktivitaet;
 import at.geovolunteer.model.Benutzer;
 import at.geovolunteer.model.Einheit;
 import at.geovolunteer.model.Rolle;
+import at.geovolunteer.model.repo.AktivitaetRepository;
 import at.geovolunteer.model.repo.BenutzerRepository;
 import at.geovolunteer.rest.LoginType;
 
@@ -21,6 +23,9 @@ public class BenutzerService {
 
 	@Autowired
 	private BenutzerRepository benutzerRepository;
+
+	@Autowired
+	private AktivitaetRepository aktivitaetRepository;
 
 	@Autowired
 	private AktivitaetService aktivitaetService;
@@ -177,7 +182,13 @@ public class BenutzerService {
 					benutzerRepository.delete(benutzer);
 					return true;
 				} else if (Rolle.ORGANISATION.equals(benutzer.getRolle())) {
-					benutzer.getErstellteAktivitaeten().stream().forEach(a -> a.getTeilnehmer().clear());
+					for (Aktivitaet a : benutzer.getErstellteAktivitaeten()) {
+						for (Benutzer teilnehmer : a.getTeilnehmer()) {
+							teilnehmer.getTeilnahmen().remove(a);
+						}
+						a.getTeilnehmer().clear();
+						aktivitaetRepository.save(a);
+					}
 					benutzerRepository.save(benutzer);
 					List<Long> ids = benutzer.getErstellteAktivitaeten().stream().map(a -> a.getId())
 							.collect(Collectors.toList());

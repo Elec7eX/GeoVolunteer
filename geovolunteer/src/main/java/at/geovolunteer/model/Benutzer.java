@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import jakarta.persistence.Entity; 
+import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -31,7 +31,7 @@ public class Benutzer {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Enumerated(EnumType.STRING) 
+	@Enumerated(EnumType.STRING)
 	private Rolle rolle;
 
 	private boolean active;
@@ -341,5 +341,14 @@ public class Benutzer {
 			this.teilnahmen.remove(aktivitaet);
 			aktivitaet.getTeilnehmer().remove(this);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "[id='" + getId().toString() + "'; " + "rolle='" + getRolle() + "'"
+				+ (Rolle.FREIWILLIGE.equals(getRolle())
+						? "vorname='" + getVorname() + "'; nachname='" + getNachname() + "'"
+						: "name='" + getName() + "'")
+				+ "]";
 	}
 }

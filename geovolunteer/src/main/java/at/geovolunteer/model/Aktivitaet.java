@@ -167,4 +167,9 @@ public class Aktivitaet extends AbstractAktivitaet {
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "[id='" + getId().toString() + "'; " + "name='" + getName() + "'" + "]";
+	}
+
 }
