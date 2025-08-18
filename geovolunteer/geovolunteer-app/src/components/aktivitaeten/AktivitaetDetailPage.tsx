@@ -47,7 +47,6 @@ export default function AktivitaetDetailPage() {
   }, [id, aktivitaetFromState]);
 
   const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
 
   if (!aktivitaet) return <div>Lädt...</div>;
 
