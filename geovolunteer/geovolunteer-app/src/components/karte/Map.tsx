@@ -16,7 +16,7 @@ import { UserType } from "../../enums/Enums";
 import userService from "../../services/UserServices";
 import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel } from "../../types/Types";
-import { ButtonGroup, Dropdown, DropdownButton } from "react-bootstrap";
+import { ButtonGroup, DropdownButton, Form } from "react-bootstrap";
 import { FaFilter } from "react-icons/fa";
 
 type MarkerType = {
@@ -27,6 +27,11 @@ type MarkerType = {
 export default function Map() {
   const [user] = useLocalStorage("user", null);
   const initialized = useRef(false);
+
+  const [filter, setFilter] = useState({
+    organisation: true,
+    aktivitaeten: true,
+  });
 
   const [organistaion, setOrganisation] = useState<MarkerType>();
   const [erstellteAktivitaeten, setErstellteAktivitaeten] = useState<
@@ -64,7 +69,7 @@ export default function Map() {
 
   const aktivitaetIcon = new Icon({
     iconUrl: require("../../icons/aktivitaet-icon.png"),
-    iconSize: [45, 45],
+    iconSize: [44, 44],
   });
 
   return (
@@ -76,6 +81,7 @@ export default function Map() {
           zoom={13}
           scrollWheelZoom={true}
           zoomControl={false}
+          doubleClickZoom={false}
           style={{ height: "739px", width: "100%" }}
         >
           <TileLayer
@@ -85,7 +91,7 @@ export default function Map() {
           <ZoomControl position="topright" />
           {UserType.ORGANISATION === user.rolle && (
             <>
-              {organistaion !== undefined && (
+              {filter.organisation && organistaion !== undefined && (
                 <Marker
                   key={user.id}
                   position={organistaion.geocode}
@@ -94,25 +100,26 @@ export default function Map() {
                   <Popup>{organistaion.popUp}</Popup>
                 </Marker>
               )}
-              {erstellteAktivitaeten.map((marker, index) => (
-                <Marker
-                  key={index}
-                  position={marker.geocode}
-                  icon={aktivitaetIcon}
-                >
-                  <Popup>{marker.popUp}</Popup>
-                </Marker>
-              ))}
+              {filter.aktivitaeten &&
+                erstellteAktivitaeten.map((marker, index) => (
+                  <Marker
+                    key={index}
+                    position={marker.geocode}
+                    icon={aktivitaetIcon}
+                  >
+                    <Popup>{marker.popUp}</Popup>
+                  </Marker>
+                ))}
             </>
           )}
           <DropdownButton
             as={ButtonGroup}
-            drop={"end"}
+            drop="end"
             variant="light"
             title={<FaFilter color="black" />}
             style={{
               position: "absolute",
-              top: "10px", // Positionierung des Buttons unterhalb der Zoom-Steuerung
+              top: "10px",
               left: "10px",
               zIndex: 1000,
               border: "2px solid rgba(0,0,0,0.2)",
@@ -120,11 +127,33 @@ export default function Map() {
               backgroundColor: "#fff",
             }}
           >
-            <Dropdown.Item eventKey="1">Action</Dropdown.Item>
-            <Dropdown.Item eventKey="2">Another action</Dropdown.Item>
-            <Dropdown.Item eventKey="3">Something else here</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item eventKey="4">Separated link</Dropdown.Item>
+            <div style={{ padding: "10px", minWidth: "180px" }}>
+              <Form.Check
+                type="checkbox"
+                id="organisation"
+                label={t("map.filter.organisation.own")}
+                checked={filter.organisation}
+                onChange={() =>
+                  setFilter((prev) => ({
+                    ...prev,
+                    organisation: !prev.organisation,
+                  }))
+                }
+                style={{ marginBottom: "10px" }}
+              />
+              <Form.Check
+                type="checkbox"
+                id="aktivitaeten"
+                label={t("map.filter.organisation.own.aktivitaeten")}
+                checked={filter.aktivitaeten}
+                onChange={() =>
+                  setFilter((prev) => ({
+                    ...prev,
+                    aktivitaeten: !prev.aktivitaeten,
+                  }))
+                }
+              />
+            </div>
           </DropdownButton>
         </MapContainer>
       </div>

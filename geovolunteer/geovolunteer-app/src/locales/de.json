@@ -64,6 +64,8 @@
   "label.login.login": "Login",
   "label.login.passwort": "Passwort",
   "map.overview.title": "Karte",
+  "map.filter.organisation.own": "Meine Organisation",
+  "map.filter.organisation.own.aktivitaeten": "Meine Aktivitäten",
   "organisation.overview.title": "Organisation",
   "organisation.detail.title": "Organisation Übersicht",
   "organisation.detail.kontakt": "Kontakt",
