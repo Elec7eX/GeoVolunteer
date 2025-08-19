@@ -192,3 +192,31 @@ input.error {
   border: 2px solid;
   background-color: rgb(255, 0, 0);
 }
+
+.dropdown-submenu {
+  position: relative;
+}
+
+.submenu-toggle {
+  cursor: pointer;
+  padding: 5px 10px;
+  font-weight: 500;
+}
+
+.dropdown-menu-sub {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-left: 5px;
+  background-color: white;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 5px;
+  padding: 10px;
+  z-index: 1050;
+  min-width: 180px;
+}
+
+.dropdown-submenu:hover .dropdown-menu-sub {
+  display: block;
+}
