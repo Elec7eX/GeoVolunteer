@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.lang.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -65,7 +65,7 @@ public class Aktivitaet extends AbstractAktivitaet {
 	private Benutzer organisation;
 
 	// Teilnehmer (Freiwillige)
-	@JsonIgnore
+	@JsonManagedReference
 	@ManyToMany(mappedBy = "teilnahmen")
 	private List<Benutzer> teilnehmer;
 

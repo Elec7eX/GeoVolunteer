@@ -3,6 +3,7 @@ package at.geovolunteer.model;
 import java.util.Calendar;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -88,6 +89,7 @@ public class Benutzer {
 
 	// Für Freiwillige: Teilnahme an Aktivitäten
 	@ManyToMany
+	@JsonBackReference
 	@JoinTable(joinColumns = @JoinColumn(name = "benutzer_id"), inverseJoinColumns = @JoinColumn(name = "aktivitaet_id"))
 	private List<Aktivitaet> teilnahmen;
 

@@ -99,34 +99,39 @@ export default function AktivitaetDetailPage() {
                 )}
               </Col>
             </Row>
-            {!isTeilnehmer && user.rolle === UserType.FREIWILLIGE && (
-              <Button
-                className="btn custom-button_teilnehmen"
-                onClick={() =>
-                  aktivitaetService
-                    .addTeilnehmer(id!)
-                    .then(() => navigate("/aktivitäten"))
-                }
-              >
-                <div className="text-white">
-                  {t("aktivitaeten.detail.button.teilnehmen")}
-                </div>
-              </Button>
-            )}
-            {isTeilnehmer && user.rolle === UserType.FREIWILLIGE && (
-              <Button
-                className="btn custom-button_nichtTeilnehmen"
-                onClick={() =>
-                  aktivitaetService
-                    .removeTeilnehmer(id!)
-                    .then(() => navigate("/aktivitäten"))
-                }
-              >
-                <div className="text-white">
-                  {t("aktivitaeten.detail.button.nichtTeilnehmen")}
-                </div>
-              </Button>
-            )}
+            {aktivitaet.teilnehmer &&
+              aktivitaet.teilnehmer.length < aktivitaet.teilnehmeranzahl && (
+                <>
+                  {!isTeilnehmer && user.rolle === UserType.FREIWILLIGE && (
+                    <Button
+                      className="btn custom-button_teilnehmen"
+                      onClick={() =>
+                        aktivitaetService
+                          .addTeilnehmer(id!)
+                          .then(() => navigate("/aktivitäten"))
+                      }
+                    >
+                      <div className="text-white">
+                        {t("aktivitaeten.detail.button.teilnehmen")}
+                      </div>
+                    </Button>
+                  )}
+                  {isTeilnehmer && user.rolle === UserType.FREIWILLIGE && (
+                    <Button
+                      className="btn custom-button_nichtTeilnehmen"
+                      onClick={() =>
+                        aktivitaetService
+                          .removeTeilnehmer(id!)
+                          .then(() => navigate("/aktivitäten"))
+                      }
+                    >
+                      <div className="text-white">
+                        {t("aktivitaeten.detail.button.nichtTeilnehmen")}
+                      </div>
+                    </Button>
+                  )}
+                </>
+              )}
           </Card.Body>
         </Card>
         <Card style={{ marginTop: 10, height: "auto" }}>
@@ -174,7 +179,9 @@ export default function AktivitaetDetailPage() {
                 </Col>
                 <Col>
                   <div>
-                    {aktivitaet.teilnehmer?.length}/
+                    {aktivitaet.teilnehmer !== undefined && (
+                      <>{aktivitaet.teilnehmer.length}/</>
+                    )}
                     {aktivitaet.teilnehmeranzahl}
                   </div>
                 </Col>

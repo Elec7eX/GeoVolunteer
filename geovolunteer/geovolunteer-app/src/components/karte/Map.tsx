@@ -18,13 +18,23 @@ import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel } from "../../types/Types";
 import {
   ButtonGroup,
+  Dropdown,
   DropdownButton,
   DropdownDivider,
   Form,
 } from "react-bootstrap";
 import { FaFilter } from "react-icons/fa";
 
+interface DynamicFilterItem {
+  id: string;
+  label: string;
+  checked: boolean;
+}
+
+type FilterState = DynamicFilterItem[];
+
 interface FilterType {
+  showSubmenu: boolean;
   meineOrganisation: boolean;
   meineAktivitaeten: boolean;
   meineFreiwilligen: boolean;
@@ -43,9 +53,10 @@ export default function Map() {
   const initialized = useRef(false);
 
   const [filter, setFilter] = useState<FilterType>({
+    showSubmenu: false,
     meineOrganisation: true,
     meineAktivitaeten: true,
-    meineFreiwilligen: true,
+    meineFreiwilligen: false,
     alleOrganisationen: false,
     alleAktivitaeten: false,
     alleFreiwilligen: false,
@@ -106,6 +117,16 @@ export default function Map() {
   }, [user.id, user.rolle]);
 
   const updateFilter = (filterName: keyof FilterType) => {
+    if (meineFreiwilligen.length < 1) {
+      console.log("hi");
+    }
+    setFilter((prev) => ({
+      ...prev,
+      [filterName]: !prev[filterName],
+    }));
+  };
+
+  const updateSubmenu = (filterName: keyof FilterType) => {
     setFilter((prev) => ({
       ...prev,
       [filterName]: !prev[filterName],
@@ -121,162 +142,6 @@ export default function Map() {
     iconUrl: require("../../icons/aktivitaet-icon.png"),
     iconSize: [44, 44],
   });
-
-  const MapDropdown = ({
-    filter,
-    toggleFilter,
-  }: {
-    filter: FilterType;
-    toggleFilter: (filterName: keyof FilterType) => void;
-  }) => {
-    const [submenuOpen, setSubmenuOpen] = useState(false);
-
-    return (
-      <DropdownButton
-        as={ButtonGroup}
-        drop="end"
-        variant="light"
-        title={<FaFilter color="black" />}
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          position: "absolute",
-          top: "10px",
-          left: "10px",
-          zIndex: 1000,
-          border: "2px solid rgba(0,0,0,0.2)",
-          borderRadius: "5px",
-          backgroundColor: "#fff",
-        }}
-      >
-        <div style={{ padding: "10px", minWidth: "200px" }}>
-          <div style={{ marginBottom: "10px" }}>
-            <h6
-              style={{
-                marginBottom: "5px",
-                fontSize: "14px",
-                fontWeight: "bold",
-              }}
-            >
-              {t("map.filter.organisation.eigene.title")}
-            </h6>
-            <Form.Check
-              type="checkbox"
-              id="meineOrganisation"
-              label={t("map.filter.organisation.eigene")}
-              checked={filter.meineOrganisation}
-              onChange={() => toggleFilter("meineOrganisation")}
-              onClick={(e) => e.stopPropagation()}
-              style={{ marginBottom: "5px" }}
-            />
-            <Form.Check
-              type="checkbox"
-              id="meineAktivitaeten"
-              label={t("map.filter.organisation.eigene.aktivitaeten")}
-              checked={filter.meineAktivitaeten}
-              onClick={(e) => e.stopPropagation()}
-              onChange={() => toggleFilter("meineAktivitaeten")}
-            />
-            <Form.Check
-              type="checkbox"
-              id="meineFreiwilligen"
-              label={t("map.filter.organisation.eigene.freiwilligen")}
-              checked={filter.meineFreiwilligen}
-              onClick={(e) => e.stopPropagation()}
-              onChange={() => toggleFilter("meineFreiwilligen")}
-            />
-            {/* Untermenü */}
-            <div style={{ position: "relative" }}>
-              <div
-                className="dropdown-item"
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  padding: "6px 12px",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSubmenuOpen((prev) => !prev);
-                }}
-              >
-                <div className="submenu-toggle">Weitere Filter →</div>
-                {submenuOpen && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: "100%",
-                      marginLeft: "5px",
-                      backgroundColor: "#fff",
-                      border: "1px solid rgba(0,0,0,0.15)",
-                      borderRadius: "5px",
-                      padding: "10px",
-                      minWidth: "180px",
-                      zIndex: 2000,
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Form.Check
-                      type="checkbox"
-                      id="extraFilter1"
-                      onClick={(e) => e.stopPropagation()}
-                      label="Extra Filter 1"
-                      style={{ marginBottom: "5px" }}
-                    />
-                    <Form.Check
-                      type="checkbox"
-                      id="extraFilter2"
-                      onClick={(e) => e.stopPropagation()}
-                      label="Extra Filter 2"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-            <DropdownDivider />
-            <div>
-              <h6
-                style={{
-                  marginBottom: "5px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                }}
-              >
-                {t("map.filter.organisation.alle.title")}
-              </h6>
-              <Form.Check
-                type="checkbox"
-                id="alleFreiwilligen"
-                label={t("map.filter.organisation.alle.freiwillige")}
-                checked={filter.alleFreiwilligen}
-                onChange={() => toggleFilter("alleFreiwilligen")}
-                onClick={(e) => e.stopPropagation()}
-                style={{ marginBottom: "5px" }}
-              />
-              <Form.Check
-                type="checkbox"
-                id="alleOrganisationen"
-                label={t("map.filter.organisation.alle.organisationen")}
-                checked={filter.alleOrganisationen}
-                onChange={() => toggleFilter("alleOrganisationen")}
-                onClick={(e) => e.stopPropagation()}
-                style={{ marginBottom: "5px" }}
-              />
-              <Form.Check
-                type="checkbox"
-                id="alleAktivitaeten"
-                label={t("map.filter.organisation.alle.aktivitaeten")}
-                checked={filter.alleAktivitaeten}
-                onChange={() => toggleFilter("alleAktivitaeten")}
-                onClick={(e) => e.stopPropagation()}
-              />
-            </div>
-          </div>
-        </div>
-      </DropdownButton>
-    );
-  };
 
   return (
     <>
@@ -318,31 +183,16 @@ export default function Map() {
                 ))}
             </>
           )}
-          <MapDropdown filter={filter} toggleFilter={updateFilter} />
-          {/*<DropdownButton
+          <DropdownButton
+            className="map-dropdown"
             as={ButtonGroup}
             drop="end"
             variant="light"
             title={<FaFilter color="black" />}
-            style={{
-              position: "absolute",
-              top: "10px",
-              left: "10px",
-              zIndex: 1000,
-              border: "2px solid rgba(0,0,0,0.2)",
-              borderRadius: "5px",
-              backgroundColor: "#fff",
-            }}
           >
             <div style={{ padding: "10px", minWidth: "200px" }}>
               <div style={{ marginBottom: "10px" }}>
-                <h6
-                  style={{
-                    marginBottom: "5px",
-                    fontSize: "14px",
-                    fontWeight: "bold",
-                  }}
-                >
+                <h6 className="map-dropdown_title">
                   {t("map.filter.organisation.eigene.title")}
                 </h6>
                 <Form.Check
@@ -353,21 +203,39 @@ export default function Map() {
                   onChange={() => updateFilter("meineOrganisation")}
                   style={{ marginBottom: "5px" }}
                 />
-                <Form.Check
-                  type="checkbox"
-                  id="meineAktivitaeten"
-                  label={t("map.filter.organisation.eigene.aktivitaeten")}
-                  checked={filter.meineAktivitaeten}
-                  onChange={() => updateFilter("meineAktivitaeten")}
-                />
-                <Form.Check
-                  type="checkbox"
-                  id="meineFreiwilligen"
-                  label={t("map.filter.organisation.eigene.freiwilligen")}
-                  checked={filter.meineFreiwilligen}
-                  onChange={() => updateFilter("meineFreiwilligen")}
-                />
+                <Dropdown.Item
+                  as="div"
+                  className="map-dropdown_item"
+                  onMouseEnter={() => updateSubmenu("showSubmenu")}
+                  onMouseLeave={() => updateSubmenu("showSubmenu")}
+                >
+                  <div style={{ paddingLeft: "8px" }}>
+                    {t("map.filter.organisation.submenu.arrow")}
+                  </div>
+                  {filter.showSubmenu && (
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      className="submenu"
+                    >
+                      <Form.Check
+                        type="checkbox"
+                        id="meineAktivitaeten"
+                        label={t("map.filter.organisation.eigene.aktivitaeten")}
+                        checked={filter.meineAktivitaeten}
+                        onChange={() => updateFilter("meineAktivitaeten")}
+                      />
+                      <Form.Check
+                        type="checkbox"
+                        id="meineFreiwilligen"
+                        label={t("map.filter.organisation.eigene.freiwilligen")}
+                        checked={filter.meineFreiwilligen}
+                        onChange={() => updateFilter("meineFreiwilligen")}
+                      />
+                    </div>
+                  )}
+                </Dropdown.Item>
               </div>
+
               <DropdownDivider />
               <div>
                 <h6
@@ -379,14 +247,6 @@ export default function Map() {
                 >
                   {t("map.filter.organisation.alle.title")}
                 </h6>
-                <Form.Check
-                  type="checkbox"
-                  id="alleFreiwilligen"
-                  label={t("map.filter.organisation.alle.freiwillige")}
-                  checked={filter.alleFreiwilligen}
-                  onChange={() => updateFilter("alleFreiwilligen")}
-                  style={{ marginBottom: "5px" }}
-                />
                 <Form.Check
                   type="checkbox"
                   id="alleOrganisationen"
@@ -402,9 +262,17 @@ export default function Map() {
                   checked={filter.alleAktivitaeten}
                   onChange={() => updateFilter("alleAktivitaeten")}
                 />
+                <Form.Check
+                  type="checkbox"
+                  id="alleFreiwilligen"
+                  label={t("map.filter.organisation.alle.freiwillige")}
+                  checked={filter.alleFreiwilligen}
+                  onChange={() => updateFilter("alleFreiwilligen")}
+                  style={{ marginBottom: "5px" }}
+                />
               </div>
             </div>
-          </DropdownButton>*/}
+          </DropdownButton>
         </MapContainer>
       </div>
       <Footer />
