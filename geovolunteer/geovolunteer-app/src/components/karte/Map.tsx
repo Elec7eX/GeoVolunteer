@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { UserType } from "../../enums/Enums";
 import userService from "../../services/UserServices";
 import aktivitaetService from "../../services/AktivitaetService";
-import { AktivitaetModel } from "../../types/Types";
+import { AktivitaetModel, UserModel } from "../../types/Types";
 import {
   ButtonGroup,
   Dropdown,
@@ -24,14 +24,6 @@ import {
   Form,
 } from "react-bootstrap";
 import { FaFilter } from "react-icons/fa";
-
-interface DynamicFilterItem {
-  id: string;
-  label: string;
-  checked: boolean;
-}
-
-type FilterState = DynamicFilterItem[];
 
 interface FilterType {
   showSubmenu: boolean;
@@ -66,6 +58,12 @@ export default function Map() {
   const [meineAktivitaeten, setMeineAktivitaeten] = useState<MarkerType[]>([]);
   const [meineFreiwilligen, setMeineFreiwilligen] = useState<MarkerType[]>([]);
 
+  const [alleOrganistaionen, setAlleOrganisationen] = useState<MarkerType[]>(
+    []
+  );
+  const [alleAktivitaeten, setAlleAktivitaeten] = useState<MarkerType[]>([]);
+  const [alleFreiwilligen, setAlleFreiwilligen] = useState<MarkerType[]>([]);
+
   useEffect(() => {
     if (!initialized.current) {
       if (UserType.ORGANISATION === user.rolle) {
@@ -90,6 +88,19 @@ export default function Map() {
                       })
                     );
                     setMeineAktivitaeten(markerArray);
+
+                    const teilnehmerData: UserModel[] = res.data.flatMap(
+                      (aktivitaet: AktivitaetModel) => aktivitaet.teilnehmer!
+                    );
+                    if (teilnehmerData.length > 0) {
+                      const teilnehmer: MarkerType[] = teilnehmerData.map(
+                        (t: UserModel) => ({
+                          geocode: [t.latitude!, t.longitude!],
+                          popUp: t.vorname! + " " + t.nachname!,
+                        })
+                      );
+                      setMeineFreiwilligen(teilnehmer);
+                    }
                   } else {
                     console.log(
                       "'Meine Aktivitäten konnte nicht geladen werden: Status - " +
@@ -117,8 +128,42 @@ export default function Map() {
   }, [user.id, user.rolle]);
 
   const updateFilter = (filterName: keyof FilterType) => {
-    if (meineFreiwilligen.length < 1) {
-      console.log("hi");
+    if (filterName === "alleOrganisationen" && alleOrganistaionen.length < 1) {
+      userService.getOrganisationen().then((resp) => {
+        if (resp.status === 200) {
+          const markerArray: MarkerType[] = resp.data.map((org: UserModel) => ({
+            geocode: [org.latitude!, org.longitude!],
+            popUp: org.name!,
+          }));
+          setAlleOrganisationen(markerArray);
+        }
+      });
+    }
+    if (filterName === "alleAktivitaeten" && alleAktivitaeten.length < 1) {
+      aktivitaetService.getAll().then((resp) => {
+        if (resp.status === 200) {
+          const markerArray: MarkerType[] = resp.data.map(
+            (aktivitaet: AktivitaetModel) => ({
+              geocode: [aktivitaet.latitude, aktivitaet.longitude],
+              popUp: aktivitaet.name,
+            })
+          );
+          setAlleAktivitaeten(markerArray);
+        }
+      });
+    }
+    if (filterName === "alleFreiwilligen" && alleFreiwilligen.length < 1) {
+      userService.getFreiwillige().then((resp) => {
+        if (resp.status === 200) {
+          const markerArray: MarkerType[] = resp.data.map(
+            (freiwillige: UserModel) => ({
+              geocode: [freiwillige.latitude!, freiwillige.longitude!],
+              popUp: freiwillige.vorname! + " " + freiwillige.nachname,
+            })
+          );
+          setAlleFreiwilligen(markerArray);
+        }
+      });
     }
     setFilter((prev) => ({
       ...prev,
@@ -134,12 +179,17 @@ export default function Map() {
   };
 
   const customIcon = new Icon({
-    iconUrl: require("../../icons/marker-icon.png"),
-    iconSize: [38, 38],
+    iconUrl: require("../../icons/organisation-icon.png"),
+    iconSize: [44, 44],
   });
 
   const aktivitaetIcon = new Icon({
     iconUrl: require("../../icons/aktivitaet-icon.png"),
+    iconSize: [44, 44],
+  });
+
+  const freiwilligeIcon = new Icon({
+    iconUrl: require("../../icons/freiwillige-icon.png"),
     iconSize: [44, 44],
   });
 
@@ -177,6 +227,46 @@ export default function Map() {
                     key={index}
                     position={marker.geocode}
                     icon={aktivitaetIcon}
+                  >
+                    <Popup>{marker.popUp}</Popup>
+                  </Marker>
+                ))}
+              {filter.meineFreiwilligen &&
+                meineFreiwilligen.map((marker, index) => (
+                  <Marker
+                    key={index}
+                    position={marker.geocode}
+                    icon={freiwilligeIcon}
+                  >
+                    <Popup>{marker.popUp}</Popup>
+                  </Marker>
+                ))}
+              {filter.alleOrganisationen &&
+                alleOrganistaionen.map((marker, index) => (
+                  <Marker
+                    key={index}
+                    position={marker.geocode}
+                    icon={customIcon}
+                  >
+                    <Popup>{marker.popUp}</Popup>
+                  </Marker>
+                ))}
+              {filter.alleAktivitaeten &&
+                alleAktivitaeten.map((marker, index) => (
+                  <Marker
+                    key={index}
+                    position={marker.geocode}
+                    icon={aktivitaetIcon}
+                  >
+                    <Popup>{marker.popUp}</Popup>
+                  </Marker>
+                ))}
+              {filter.alleFreiwilligen &&
+                alleFreiwilligen.map((marker, index) => (
+                  <Marker
+                    key={index}
+                    position={marker.geocode}
+                    icon={freiwilligeIcon}
                   >
                     <Popup>{marker.popUp}</Popup>
                   </Marker>
