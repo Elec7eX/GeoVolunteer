@@ -1,3 +1,5 @@
+import "leaflet-draw/dist/leaflet.draw.css";
+import "leaflet/dist/leaflet.css";
 import { t } from "i18next";
 import { Header } from "../header/Header";
 import { Footer } from "../footer/Footer";
@@ -5,6 +7,7 @@ import {
   MapContainer,
   Marker,
   TileLayer,
+  FeatureGroup,
   Popup,
   ZoomControl,
 } from "react-leaflet";
@@ -24,6 +27,7 @@ import {
   Form,
 } from "react-bootstrap";
 import { FaFilter } from "react-icons/fa";
+import { EditControl } from "react-leaflet-draw";
 
 interface FilterType {
   showSubmenu: boolean;
@@ -43,6 +47,8 @@ type MarkerType = {
 export default function Map() {
   const [user] = useLocalStorage("user", null);
   const initialized = useRef(false);
+
+  const drawnItemsRef = useRef(null);
 
   const [filter, setFilter] = useState<FilterType>({
     showSubmenu: false,
@@ -193,6 +199,23 @@ export default function Map() {
     iconSize: [100, 100],
   });
 
+  const onCreated = (e: any) => {
+    const layer = e.layer;
+    console.log("Shape created:", layer.toGeoJSON());
+  };
+
+  const onEdited = (e: any) => {
+    e.layers.eachLayer((layer: any) => {
+      console.log("Shape edited:", layer.toGeoJSON());
+    });
+  };
+
+  const onDeleted = (e: any) => {
+    e.layers.eachLayer((layer: any) => {
+      console.log("Shape deleted:", layer.toGeoJSON());
+    });
+  };
+
   return (
     <>
       <Header title={t("map.overview.title")} />
@@ -210,6 +233,21 @@ export default function Map() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           <ZoomControl position="topright" />
+          <FeatureGroup ref={drawnItemsRef}>
+            <EditControl
+              position="topright"
+              onCreated={onCreated}
+              onEdited={onEdited}
+              onDeleted={onDeleted}
+              draw={{
+                rectangle: true,
+                polygon: true,
+                circle: true,
+                marker: true,
+                polyline: true,
+              }}
+            />
+          </FeatureGroup>
           {UserType.ORGANISATION === user.rolle && (
             <>
               {filter.meineOrganisation && meineOrganistaion !== undefined && (
