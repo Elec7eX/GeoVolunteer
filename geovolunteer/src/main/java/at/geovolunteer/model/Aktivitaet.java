@@ -3,6 +3,7 @@ package at.geovolunteer.model;
 import java.util.Calendar;
 import java.util.List;
 
+import org.locationtech.jts.geom.Geometry;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -15,6 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -33,6 +35,9 @@ public class Aktivitaet extends AbstractAktivitaet {
 	private int teilnehmeranzahl;
 	private String transport;
 	private String verpflegung;
+
+	@Lob
+	private Geometry shape;
 
 	@Temporal(TemporalType.DATE)
 	@JsonSerialize(using = CalendarSerializer.class)
@@ -151,6 +156,14 @@ public class Aktivitaet extends AbstractAktivitaet {
 
 	public List<Benutzer> getTeilnehmer() {
 		return teilnehmer;
+	}
+
+	public Geometry getShape() {
+		return shape;
+	}
+
+	public void setShape(Geometry shape) {
+		this.shape = shape;
 	}
 
 	public void addTeilnehmer(Benutzer teilnehmer) {

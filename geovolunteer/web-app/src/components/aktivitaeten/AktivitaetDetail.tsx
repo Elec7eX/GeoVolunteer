@@ -53,8 +53,7 @@ export default function AktivitaetDetail() {
         hausnummer: aktivitaetFromState.hausnummer,
         plz: aktivitaetFromState.plz,
         ort: aktivitaetFromState.ort,
-        latitude: aktivitaetFromState.latitude,
-        longitude: aktivitaetFromState.longitude,
+        shape: aktivitaetFromState.shape,
         startDatum: aktivitaetFromState.startDatum,
         endDatum: aktivitaetFromState.endDatum,
         startZeit: aktivitaetFromState.startZeit,
@@ -107,8 +106,7 @@ export default function AktivitaetDetail() {
         hausnummer: "",
         plz: "",
         ort: "",
-        latitude: 0,
-        longitude: 0,
+        shape: null,
         teilnehmeranzahl: 0,
         transport: "",
         verpflegung: "",
@@ -299,8 +297,7 @@ export default function AktivitaetDetail() {
   }
 
   const handleSubmit = async (result: FormularResult) => {
-    result.values.latitude = latitude;
-    result.values.longitude = longitude;
+    // result.values.shape = shape;
     result.values.ressource.latitude = ressourceLatitude;
     result.values.ressource.longitude = ressourceLongitude;
     await aktivitaetService.update(result.values).then((response) => {
@@ -572,11 +569,7 @@ export default function AktivitaetDetail() {
                           )}
                           {values.addresseInput === AdressInputEnum.Map && (
                             <>
-                              <MapComponent
-                                MapClickHandler={MapClickHandler}
-                                address={address}
-                                position={position}
-                              />
+                              <MapComponent position={position} />
                             </>
                           )}
                           <Row>

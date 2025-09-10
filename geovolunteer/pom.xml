@@ -77,6 +77,20 @@
 		    <groupId>com.fasterxml.jackson.datatype</groupId>
 		    <artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
+		<dependency>
+	        <groupId>org.locationtech.jts</groupId>
+	        <artifactId>jts-core</artifactId>
+	        <version>1.19.0</version>
+	    </dependency>
+	    <dependency>
+	        <groupId>com.fasterxml.jackson.core</groupId>
+	        <artifactId>jackson-databind</artifactId>
+	    </dependency>
+	    <dependency>
+	        <groupId>com.bedatadriven</groupId>
+	        <artifactId>jackson-datatype-jts</artifactId>
+	        <version>2.4</version>
+	    </dependency>
 	</dependencies>
 
 	<build>

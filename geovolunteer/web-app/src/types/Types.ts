@@ -4,7 +4,19 @@ export enum UserType {
     ADMIN = "ADMIN",
     ORGANISATION = "ORGANISATION",
     FREIWILLIGE = "FREIWILLIGE",
-  }
+}
+
+export type GeoJsonPoint = {
+  type: "Point";
+  coordinates: [number, number];
+};
+
+export type GeoJsonPolygon = {
+  type: "Polygon";
+  coordinates: [ [ [number, number] ] ];
+};
+
+export type GeoJsonGeometry = GeoJsonPoint | GeoJsonPolygon | null;
 
 export interface UserModel {
     id?: number,
@@ -63,8 +75,7 @@ export interface AktivitaetModel {
     hausnummer: string,
     plz: string,
     ort: string
-    latitude: number,
-    longitude: number,
+    shape: GeoJsonGeometry;
     teilnehmeranzahl: number,
     transport: string,
     verpflegung: string,

@@ -40,7 +40,7 @@ interface FilterType {
 }
 
 type MarkerType = {
-  geocode: [number, number];
+  geocode?: [number, number];
   popUp: string;
 };
 
@@ -89,7 +89,7 @@ export default function Map() {
                   if (res.status === 200) {
                     const markerArray: MarkerType[] = res.data.map(
                       (aktivitaet: AktivitaetModel) => ({
-                        geocode: [aktivitaet.latitude, aktivitaet.longitude],
+                        //geocode: [aktivitaet.latitude, aktivitaet.longitude],
                         popUp: aktivitaet.name,
                       })
                     );
@@ -150,7 +150,7 @@ export default function Map() {
         if (resp.status === 200) {
           const markerArray: MarkerType[] = resp.data.map(
             (aktivitaet: AktivitaetModel) => ({
-              geocode: [aktivitaet.latitude, aktivitaet.longitude],
+              //geocode: [aktivitaet.latitude, aktivitaet.longitude],
               popUp: aktivitaet.name,
             })
           );
@@ -253,7 +253,7 @@ export default function Map() {
               {filter.meineOrganisation && meineOrganistaion !== undefined && (
                 <Marker
                   key={user.id}
-                  position={meineOrganistaion.geocode}
+                  position={meineOrganistaion.geocode!}
                   icon={customIcon}
                 >
                   <Popup>{meineOrganistaion.popUp}</Popup>
@@ -263,7 +263,7 @@ export default function Map() {
                 meineAktivitaeten.map((marker, index) => (
                   <Marker
                     key={index}
-                    position={marker.geocode}
+                    position={marker.geocode!}
                     icon={aktivitaetIcon}
                   >
                     <Popup>{marker.popUp}</Popup>
@@ -273,7 +273,7 @@ export default function Map() {
                 meineFreiwilligen.map((marker, index) => (
                   <Marker
                     key={index}
-                    position={marker.geocode}
+                    position={marker.geocode!}
                     icon={freiwilligeIcon}
                   >
                     <Popup>{marker.popUp}</Popup>
@@ -283,7 +283,7 @@ export default function Map() {
                 alleOrganistaionen.map((marker, index) => (
                   <Marker
                     key={index}
-                    position={marker.geocode}
+                    position={marker.geocode!}
                     icon={customIcon}
                   >
                     <Popup>{marker.popUp}</Popup>
@@ -293,7 +293,7 @@ export default function Map() {
                 alleAktivitaeten.map((marker, index) => (
                   <Marker
                     key={index}
-                    position={marker.geocode}
+                    position={marker.geocode!}
                     icon={aktivitaetIcon}
                   >
                     <Popup>{marker.popUp}</Popup>
@@ -303,7 +303,7 @@ export default function Map() {
                 alleFreiwilligen.map((marker, index) => (
                   <Marker
                     key={index}
-                    position={marker.geocode}
+                    position={marker.geocode!}
                     icon={freiwilligeIcon}
                   >
                     <Popup>{marker.popUp}</Popup>
