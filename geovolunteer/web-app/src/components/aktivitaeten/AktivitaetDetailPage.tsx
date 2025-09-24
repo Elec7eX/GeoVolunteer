@@ -40,7 +40,6 @@ export default function AktivitaetDetailPage() {
         .getById(id!)
         .then((resp) => {
           setAktivitaet(resp.data);
-          setPosition([resp.data.latitude, resp.data.longitude]);
         })
         .catch(() => alert("Fehler beim Laden der Daten"));
     }

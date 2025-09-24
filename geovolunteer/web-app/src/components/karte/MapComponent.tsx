@@ -1,12 +1,5 @@
-import React, { useEffect } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  Circle,
-  useMap,
-} from "react-leaflet";
+import React from "react";
+import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import { Form } from "react-bootstrap";
 import { Icon } from "leaflet";
 

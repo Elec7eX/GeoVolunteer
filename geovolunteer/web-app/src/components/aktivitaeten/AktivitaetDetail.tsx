@@ -10,7 +10,7 @@ import {
   useFormikContext,
 } from "formik";
 import { useEffect, useRef, useState } from "react";
-import { AktivitaetModel } from "../../types/Types";
+import { AktivitaetModel, GeoJsonGeometry } from "../../types/Types";
 import { AdressInputEnum } from "../../enums/Enums";
 import { useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -18,6 +18,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import aktivitaetService from "../../services/AktivitaetService";
 import MapComponent from "../karte/MapComponent";
+import MapComponentAktivitaet from "../karte/MapComponentAktivitaet";
 
 interface FormularResult {
   values: AktivitaetModel;
@@ -36,6 +37,7 @@ export default function AktivitaetDetail() {
   const [address, setAddress] = useState("");
   const [latitude, setLatitude] = useState<number>(0);
   const [longitude, setLongitude] = useState<number>(0);
+  const [geoJson, setGeoJson] = useState<GeoJsonGeometry>();
 
   const [ressourcePosition, setRessourcePosition]: any = useState(null);
   const [ressourceAddress, setRessourceAddress] = useState("");
@@ -85,6 +87,7 @@ export default function AktivitaetDetail() {
           telefon: aktivitaetFromState.ressource.telefon,
         },
       });
+      setGeoJson(aktivitaetFromState.shape);
       setPosition([
         aktivitaetFromState.latitude,
         aktivitaetFromState.longitude,
@@ -569,7 +572,14 @@ export default function AktivitaetDetail() {
                           )}
                           {values.addresseInput === AdressInputEnum.Map && (
                             <>
-                              <MapComponent position={position} />
+                              {/*<MapComponent position={position} />*/}
+                              <MapComponentAktivitaet
+                                drawShape={true}
+                                onShapeChange={(geoJson) => {
+                                  setGeoJson(geoJson);
+                                  console.log(geoJson);
+                                }}
+                              />
                             </>
                           )}
                           <Row>

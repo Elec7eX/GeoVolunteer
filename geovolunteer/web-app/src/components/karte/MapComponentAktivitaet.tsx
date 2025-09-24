@@ -17,31 +17,29 @@ import { GeoJsonGeometry } from "../../types/Types";
 
 interface MapComponentProps {
   address?: string | null;
-  position: [number, number] | null;
+  position?: [number, number] | null;
   radius?: number | null;
   zoom?: number | null;
   MapClickHandler?: React.ComponentType;
-  onShapeChange?: (geoJson: GeoJsonGeometry | null) => void; // neue Callback
+  drawShape?: boolean;
+  onShapeChange?: (geoJson: GeoJsonGeometry | null) => void;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({
+const MapComponentAktivitaet: React.FC<MapComponentProps> = ({
   address,
   position,
   radius,
   zoom,
   MapClickHandler,
+  drawShape,
   onShapeChange,
 }) => {
   const drawnItemsRef = useRef<L.FeatureGroup>(null);
   const [shapeDrawn, setShapeDrawn] = useState(false);
-  const [drawnGeoJson, setDrawnGeoJson] = useState<GeoJsonGeometry | null>(
-    null
-  );
 
   const onCreated = (e: any) => {
     const layer = e.layer;
     const geoJson = layer.toGeoJSON().geometry as GeoJsonGeometry;
-    setDrawnGeoJson(geoJson);
     setShapeDrawn(true);
     console.log("Shape created:", geoJson);
     if (onShapeChange) onShapeChange(geoJson);
@@ -54,7 +52,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const onEdited = (e: any) => {
     e.layers.eachLayer((layer: any) => {
       const geoJson = layer.toGeoJSON().geometry as GeoJsonGeometry;
-      setDrawnGeoJson(geoJson);
       console.log("Shape edited:", geoJson);
       if (onShapeChange) onShapeChange(geoJson);
     });
@@ -62,7 +59,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
   const onDeleted = (e: any) => {
     e.layers.eachLayer((layer: any) => {
-      setDrawnGeoJson(null);
       setShapeDrawn(false);
       console.log("Shape deleted:", layer.toGeoJSON());
       if (onShapeChange) onShapeChange(null);
@@ -97,22 +93,24 @@ const MapComponent: React.FC<MapComponentProps> = ({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         <ZoomControl position="topright" />
-        <FeatureGroup ref={drawnItemsRef}>
-          <EditControl
-            position="topleft"
-            onCreated={onCreated}
-            onEdited={onEdited}
-            onDeleted={onDeleted}
-            draw={{
-              rectangle: !shapeDrawn,
-              polygon: !shapeDrawn,
-              circle: !shapeDrawn,
-              marker: !shapeDrawn ? { icon: customIcon } : false,
-              circlemarker: false,
-              polyline: false,
-            }}
-          />
-        </FeatureGroup>
+        {drawShape && (
+          <FeatureGroup ref={drawnItemsRef}>
+            <EditControl
+              position="topleft"
+              onCreated={onCreated}
+              onEdited={onEdited}
+              onDeleted={onDeleted}
+              draw={{
+                rectangle: !shapeDrawn,
+                polygon: !shapeDrawn,
+                circle: !shapeDrawn,
+                marker: !shapeDrawn ? { icon: customIcon } : false,
+                circlemarker: false,
+                polyline: false,
+              }}
+            />
+          </FeatureGroup>
+        )}
 
         {MapClickHandler && <MapClickHandler />}
 
@@ -134,4 +132,4 @@ const MapComponent: React.FC<MapComponentProps> = ({
   );
 };
 
-export default MapComponent;
+export default MapComponentAktivitaet;
