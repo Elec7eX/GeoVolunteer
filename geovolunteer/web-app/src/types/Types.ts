@@ -1,4 +1,5 @@
 import { AdressInputEnum } from "../enums/Enums"
+import { Feature, Geometry } from "geojson";
 
 export enum UserType {
     ADMIN = "ADMIN",
@@ -6,17 +7,7 @@ export enum UserType {
     FREIWILLIGE = "FREIWILLIGE",
 }
 
-export type GeoJsonPoint = {
-  type: "Point";
-  coordinates: [number, number];
-};
-
-export type GeoJsonPolygon = {
-  type: "Polygon";
-  coordinates: [ [ [number, number] ] ];
-};
-
-export type GeoJsonGeometry = GeoJsonPoint | GeoJsonPolygon | null;
+export type GeoJsonFeature = Feature<Geometry, { [key: string]: any }> | null;
 
 export interface UserModel {
     id?: number,
@@ -75,7 +66,9 @@ export interface AktivitaetModel {
     hausnummer: string,
     plz: string,
     ort: string
-    shape: GeoJsonGeometry;
+    latitude: number,
+    longitude: number,
+    shape: GeoJsonFeature;
     teilnehmeranzahl: number,
     transport: string,
     verpflegung: string,

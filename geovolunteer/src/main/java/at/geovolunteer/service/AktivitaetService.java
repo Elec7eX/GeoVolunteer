@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import at.geovolunteer.model.AbstractAktivitaet;
 import at.geovolunteer.model.Aktivitaet;
@@ -24,6 +25,7 @@ public class AktivitaetService {
 	@Autowired
 	private BenutzerService benutzerService;
 
+	@Transactional
 	public Aktivitaet update(Aktivitaet model) {
 		Aktivitaet entity = getOrCreate(model);
 		Benutzer benutzer = benutzerService.getOrganisation();
@@ -114,6 +116,8 @@ public class AktivitaetService {
 		entity.setEndDatum(model.getEndDatum());
 		entity.setStartZeit(model.getStartZeit());
 		entity.setEndZeit(model.getEndZeit());
+		entity.setShape(model.getShape());
+		entity.setRadius(model.getRadius());
 
 		if (entity.getRessource() == null) {
 			Ressource ressource = new Ressource();

@@ -7,13 +7,14 @@ import { useEffect, useState } from "react";
 import { AktivitaetModel } from "../../types/Types";
 import aktivitaetService from "../../services/AktivitaetService";
 import { VerticalDivider } from "../../utils/Utils";
-import MapComponent from "../karte/MapComponent";
 import { PiMapPinArea } from "react-icons/pi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FiEdit } from "react-icons/fi";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
 import { BsHeartPulse } from "react-icons/bs";
+import { Feature, Geometry } from "geojson";
+import MapComponentAktivitaet from "../karte/MapComponentAktivitaet";
 
 export default function AktivitaetDetailPage() {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function AktivitaetDetailPage() {
 
   const [aktivitaet, setAktivitaet] = useState<AktivitaetModel | null>(null);
   const [position, setPosition]: any = useState(null);
+  const [geoJsonLayer, setGeoJsonLayer] = useState<Feature<Geometry, any>>();
   const [isShowMap, setIsShowMap] = useState<boolean>(false);
   const [show, setShow] = useState(false);
 
@@ -35,11 +37,17 @@ export default function AktivitaetDetailPage() {
         aktivitaetFromState.latitude,
         aktivitaetFromState.longitude,
       ]);
+      if (aktivitaetFromState.shape) {
+        setGeoJsonLayer(aktivitaetFromState.shape);
+      }
     } else {
       aktivitaetService
         .getById(id!)
         .then((resp) => {
           setAktivitaet(resp.data);
+          if (resp.data.shape) {
+            setGeoJsonLayer(resp.data.shape);
+          }
         })
         .catch(() => alert("Fehler beim Laden der Daten"));
     }
@@ -224,7 +232,16 @@ export default function AktivitaetDetailPage() {
               </Col>
             </Row>
             <Row style={{ padding: 10, marginTop: 40 }}>
-              {isShowMap && <MapComponent position={position} zoom={17} />}
+              {/** <MapComponent position={position} zoom={17} /> */}
+              <>{console.log(geoJsonLayer)}</>
+              {isShowMap && (
+                <MapComponentAktivitaet
+                  geoJsonData={geoJsonLayer}
+                  drawShape={false}
+                  editable={false}
+                  zoom={17}
+                />
+              )}
             </Row>
           </Card.Body>
           <Modal

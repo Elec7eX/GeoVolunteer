@@ -10,7 +10,7 @@ import {
   useFormikContext,
 } from "formik";
 import { useEffect, useRef, useState } from "react";
-import { AktivitaetModel, GeoJsonGeometry } from "../../types/Types";
+import { AktivitaetModel, GeoJsonFeature } from "../../types/Types";
 import { AdressInputEnum } from "../../enums/Enums";
 import { useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -37,7 +37,7 @@ export default function AktivitaetDetail() {
   const [address, setAddress] = useState("");
   const [latitude, setLatitude] = useState<number>(0);
   const [longitude, setLongitude] = useState<number>(0);
-  const [geoJson, setGeoJson] = useState<GeoJsonGeometry>();
+  const [geoJson, setGeoJson] = useState<GeoJsonFeature>();
 
   const [ressourcePosition, setRessourcePosition]: any = useState(null);
   const [ressourceAddress, setRessourceAddress] = useState("");
@@ -55,6 +55,8 @@ export default function AktivitaetDetail() {
         hausnummer: aktivitaetFromState.hausnummer,
         plz: aktivitaetFromState.plz,
         ort: aktivitaetFromState.ort,
+        latitude: aktivitaetFromState.latitude,
+        longitude: aktivitaetFromState.longitude,
         shape: aktivitaetFromState.shape,
         startDatum: aktivitaetFromState.startDatum,
         endDatum: aktivitaetFromState.endDatum,
@@ -109,6 +111,8 @@ export default function AktivitaetDetail() {
         hausnummer: "",
         plz: "",
         ort: "",
+        latitude: 0,
+        longitude: 0,
         shape: null,
         teilnehmeranzahl: 0,
         transport: "",
@@ -280,12 +284,6 @@ export default function AktivitaetDetail() {
     let shape = Yup.object().shape({
       name: Yup.string().required("required"),
       beschreibung: Yup.string().required("Required"),
-      strasse: Yup.string().required("Strasse is required"),
-      hausnummer: Yup.string().required("Hausnummer is required"),
-      plz: Yup.string().required("PLZ is required"),
-      ort: Yup.string().required("Ort is required"),
-      latitude: Yup.number().required("Latitude is required"),
-      longitude: Yup.number().required("Longitude is required"),
     }) as any;
     return shape;
   }
@@ -300,9 +298,11 @@ export default function AktivitaetDetail() {
   }
 
   const handleSubmit = async (result: FormularResult) => {
-    // result.values.shape = shape;
+    result.values.latitude = latitude;
+    result.values.longitude = longitude;
     result.values.ressource.latitude = ressourceLatitude;
     result.values.ressource.longitude = ressourceLongitude;
+    result.values.shape = geoJson!;
     await aktivitaetService.update(result.values).then((response) => {
       // 201 = CREATED
       if (response.status === 201) {
@@ -572,13 +572,11 @@ export default function AktivitaetDetail() {
                           )}
                           {values.addresseInput === AdressInputEnum.Map && (
                             <>
-                              {/*<MapComponent position={position} />*/}
                               <MapComponentAktivitaet
+                                geoJsonData={geoJson}
                                 drawShape={true}
-                                onShapeChange={(geoJson) => {
-                                  setGeoJson(geoJson);
-                                  console.log(geoJson);
-                                }}
+                                editable={true}
+                                onShapeChange={(geoJson) => setGeoJson(geoJson)}
                               />
                             </>
                           )}

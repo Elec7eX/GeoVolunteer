@@ -4,6 +4,7 @@ import { AktivitaetModel } from "../types/Types";
 const BASE_URL = "/aktivitaet"
 
 const update = (data: AktivitaetModel) => { 
+  console.log("Request-Daten:", data);
   return http.post<AktivitaetModel>(BASE_URL + "/update", data);
 };
 

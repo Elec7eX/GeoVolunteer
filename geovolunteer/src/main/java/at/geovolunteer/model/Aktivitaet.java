@@ -6,17 +6,23 @@ import java.util.List;
 import org.locationtech.jts.geom.Geometry;
 import org.springframework.lang.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import at.geovolunteer.config.CalendarDeserializer;
+import at.geovolunteer.config.CalendarSerializer;
+import at.geovolunteer.config.CalendarTimeDeserializer;
+import at.geovolunteer.config.CalendarTimeSerializer;
+import at.geovolunteer.config.GeometryDeserializer;
+import at.geovolunteer.config.GeometrySerializer;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -36,8 +42,13 @@ public class Aktivitaet extends AbstractAktivitaet {
 	private String transport;
 	private String verpflegung;
 
-	@Lob
+	@Column(columnDefinition = "geometry")
+	@JsonSerialize(using = GeometrySerializer.class)
+	@JsonDeserialize(using = GeometryDeserializer.class)
 	private Geometry shape;
+
+	@Column
+	private Double radius;
 
 	@Temporal(TemporalType.DATE)
 	@JsonSerialize(using = CalendarSerializer.class)
@@ -67,10 +78,10 @@ public class Aktivitaet extends AbstractAktivitaet {
 	// Der Ersteller der Aktivität (Organisation)
 	@ManyToOne
 	@JoinColumn(name = "organisation_id")
+	@JsonBackReference
 	private Benutzer organisation;
 
 	// Teilnehmer (Freiwillige)
-	@JsonManagedReference
 	@ManyToMany(mappedBy = "teilnahmen")
 	private List<Benutzer> teilnehmer;
 
@@ -104,6 +115,22 @@ public class Aktivitaet extends AbstractAktivitaet {
 
 	public void setVerpflegung(String verpflegung) {
 		this.verpflegung = verpflegung;
+	}
+
+	public Geometry getShape() {
+		return shape;
+	}
+
+	public void setShape(Geometry shape) {
+		this.shape = shape;
+	}
+
+	public Double getRadius() {
+		return radius;
+	}
+
+	public void setRadius(Double radius) {
+		this.radius = radius;
 	}
 
 	public Calendar getStartDatum() {
@@ -158,14 +185,6 @@ public class Aktivitaet extends AbstractAktivitaet {
 		return teilnehmer;
 	}
 
-	public Geometry getShape() {
-		return shape;
-	}
-
-	public void setShape(Geometry shape) {
-		this.shape = shape;
-	}
-
 	public void addTeilnehmer(Benutzer teilnehmer) {
 		if (!this.teilnehmer.contains(teilnehmer)) {
 			this.teilnehmer.add(teilnehmer);
@@ -178,11 +197,6 @@ public class Aktivitaet extends AbstractAktivitaet {
 			this.teilnehmer.remove(teilnehmer);
 			teilnehmer.getTeilnahmen().remove(this);
 		}
-	}
-
-	@Override
-	public String toString() {
-		return "[id='" + getId().toString() + "'; " + "name='" + getName() + "'" + "]";
 	}
 
 }

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -7,13 +7,16 @@ import {
   FeatureGroup,
   Circle,
   ZoomControl,
+  GeoJSON,
 } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import L, { Icon } from "leaflet";
 import { Form } from "react-bootstrap";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
-import { GeoJsonGeometry } from "../../types/Types";
+import { GeoJsonFeature } from "../../types/Types";
+import { Feature, Geometry } from "geojson";
+import FitBoundsOnShape from "./FitBoundsOnShapeProps";
 
 interface MapComponentProps {
   address?: string | null;
@@ -22,7 +25,9 @@ interface MapComponentProps {
   zoom?: number | null;
   MapClickHandler?: React.ComponentType;
   drawShape?: boolean;
-  onShapeChange?: (geoJson: GeoJsonGeometry | null) => void;
+  geoJsonData?: GeoJsonFeature;
+  onShapeChange?: (geoJson: GeoJsonFeature) => void;
+  editable?: boolean;
 }
 
 const MapComponentAktivitaet: React.FC<MapComponentProps> = ({
@@ -32,14 +37,30 @@ const MapComponentAktivitaet: React.FC<MapComponentProps> = ({
   zoom,
   MapClickHandler,
   drawShape,
+  geoJsonData,
   onShapeChange,
+  editable,
 }) => {
   const drawnItemsRef = useRef<L.FeatureGroup>(null);
   const [shapeDrawn, setShapeDrawn] = useState(false);
 
+  useEffect(() => {
+    if (geoJsonData != null) {
+      setShapeDrawn(true);
+    }
+  }, [geoJsonData]);
+
   const onCreated = (e: any) => {
     const layer = e.layer;
-    const geoJson = layer.toGeoJSON().geometry as GeoJsonGeometry;
+    const geoJson: Feature<Geometry, any> = layer.toGeoJSON();
+
+    if (e.layerType === "circle" && layer.getRadius) {
+      geoJson.properties = {
+        ...geoJson.properties,
+        radius: layer.getRadius(),
+      };
+    }
+
     setShapeDrawn(true);
     console.log("Shape created:", geoJson);
     if (onShapeChange) onShapeChange(geoJson);
@@ -51,7 +72,7 @@ const MapComponentAktivitaet: React.FC<MapComponentProps> = ({
 
   const onEdited = (e: any) => {
     e.layers.eachLayer((layer: any) => {
-      const geoJson = layer.toGeoJSON().geometry as GeoJsonGeometry;
+      const geoJson: Feature<Geometry, any> = layer.toGeoJSON();
       console.log("Shape edited:", geoJson);
       if (onShapeChange) onShapeChange(geoJson);
     });
@@ -95,6 +116,21 @@ const MapComponentAktivitaet: React.FC<MapComponentProps> = ({
         <ZoomControl position="topright" />
         {drawShape && (
           <FeatureGroup ref={drawnItemsRef}>
+            {geoJsonData && editable && (
+              <GeoJSON
+                key={JSON.stringify(geoJsonData)}
+                data={geoJsonData as any}
+                style={{ color: "red" }}
+                pointToLayer={(feature, latlng) => {
+                  if (feature.properties?.radius) {
+                    return L.circle(latlng, {
+                      radius: feature.properties.radius,
+                    });
+                  }
+                  return L.marker(latlng, { icon: customIcon });
+                }}
+              />
+            )}
             <EditControl
               position="topleft"
               onCreated={onCreated}
@@ -111,7 +147,25 @@ const MapComponentAktivitaet: React.FC<MapComponentProps> = ({
             />
           </FeatureGroup>
         )}
-
+        {geoJsonData && !editable && (
+          <>
+            <GeoJSON
+              key={JSON.stringify(geoJsonData)}
+              data={geoJsonData}
+              style={{ color: "red" }}
+              pointToLayer={(feature, latlng) => {
+                if (feature.properties?.radius) {
+                  return L.circle(latlng, {
+                    radius: feature.properties.radius,
+                    color: "red",
+                  });
+                }
+                return L.marker(latlng, { icon: customIcon });
+              }}
+            />
+            <FitBoundsOnShape geoJson={geoJsonData} />
+          </>
+        )}
         {MapClickHandler && <MapClickHandler />}
 
         {position && (

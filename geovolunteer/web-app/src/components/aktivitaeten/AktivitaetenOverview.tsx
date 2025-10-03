@@ -64,7 +64,6 @@ export default function AktivitaetenOverview() {
           })
           .catch((error) => {
             console.error("Fehler beim Laden der Daten:", error);
-            setError("Fehler beim Laden der Daten");
             setLoading(false);
           });
       }
@@ -114,7 +113,7 @@ export default function AktivitaetenOverview() {
                             />
                           </Col>
                           <Col>
-                            <div>{aktivitaet.organisation!.name}</div>
+                            <div>{aktivitaet.organisation?.name}</div>
                             {user.rolle === UserType.FREIWILLIGE && (
                               <div className="custom-cardheader_text">
                                 {aktivitaet.name}

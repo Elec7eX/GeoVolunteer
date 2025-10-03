@@ -1,14 +1,19 @@
 package at.geovolunteer.model;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import at.geovolunteer.config.CalendarDeserializer;
+import at.geovolunteer.config.CalendarSerializer;
+import at.geovolunteer.config.CalendarTimeDeserializer;
+import at.geovolunteer.config.CalendarTimeSerializer;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -83,15 +88,15 @@ public class Benutzer {
 	private Calendar verfuegbarBisZeit;
 
 	// Für Organisationen: Aktivitäten erstellen
-	@JsonIgnore
 	@OneToMany(mappedBy = "organisation")
+	@JsonManagedReference
 	private List<Aktivitaet> erstellteAktivitaeten;
 
 	// Für Freiwillige: Teilnahme an Aktivitäten
+	@JsonIgnore
 	@ManyToMany
-	@JsonBackReference
-	@JoinTable(joinColumns = @JoinColumn(name = "benutzer_id"), inverseJoinColumns = @JoinColumn(name = "aktivitaet_id"))
-	private List<Aktivitaet> teilnahmen;
+	@JoinTable(name = "benutzer_aktivitaet", joinColumns = @JoinColumn(name = "benutzer_id"), inverseJoinColumns = @JoinColumn(name = "aktivitaet_id"))
+	private List<Aktivitaet> teilnahmen = new ArrayList<>();
 
 	public Long getId() {
 		return id;

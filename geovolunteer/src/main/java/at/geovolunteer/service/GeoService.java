@@ -6,8 +6,6 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 
-import at.geovolunteer.model.Aktivitaet;
-
 @Service
 public class GeoService {
 
@@ -26,11 +24,21 @@ public class GeoService {
 	 * km × cos(Breitengrad)
 	 */
 
-	public boolean isVolunteerWithin(Aktivitaet aktivitaet, double lat, double lon, double radiusMeters) {
-		Point volunteer = factory.createPoint(new Coordinate(lon, lat));
-		Geometry shape = aktivitaet.getShape();
+//	public boolean isVolunteerWithin(Aktivitaet aktivitaet, double lat, double lon, double radiusMeters) {
+//		Point volunteer = factory.createPoint(new Coordinate(lon, lat));
+//		Geometry shape = aktivitaet.getShape();
+//
+//		double radiusDegrees = radiusMeters / 111_000.0; // grobe Umrechnung Meter → Grad
+//		return volunteer.isWithinDistance(shape, radiusDegrees);
+//	}
 
-		double radiusDegrees = radiusMeters / 111_000.0; // grobe Umrechnung Meter → Grad
-		return volunteer.isWithinDistance(shape, radiusDegrees);
+	// ob ein Punkt innerhalb des gespeicherten Polygons (shape) liegt?
+	public boolean isPointInside(Geometry shape, double lon, double lat) {
+		if (shape == null) {
+			return false;
+		}
+		// JTS: Koordinaten sind (x = lon, y = lat)
+		Point point = factory.createPoint(new Coordinate(lon, lat));
+		return shape.contains(point);
 	}
 }

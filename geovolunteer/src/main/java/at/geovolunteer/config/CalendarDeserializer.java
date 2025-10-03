@@ -1,4 +1,4 @@
-package at.geovolunteer.model;
+package at.geovolunteer.config;
 
 import java.io.IOException;
 import java.text.DateFormat;
