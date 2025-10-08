@@ -1,7 +1,14 @@
 package at.geovolunteer.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.locationtech.jts.geom.Geometry;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import at.geovolunteer.config.GeometryDeserializer;
+import at.geovolunteer.config.GeometrySerializer;
+import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 
 @JsonIgnoreProperties(value = { "addresseInput" })
@@ -14,8 +21,15 @@ public abstract class AbstractAktivitaet {
 	private String hausnummer;
 	private String plz;
 	private String ort;
-	private double latitude;
-	private double longitude;
+
+	@Column(columnDefinition = "geometry")
+	@JsonSerialize(using = GeometrySerializer.class)
+	@JsonDeserialize(using = GeometryDeserializer.class)
+	private Geometry shape;
+
+	@Column
+	private Double radius;
+
 	private String vorname;
 	private String nachname;
 	private String email;
@@ -69,20 +83,20 @@ public abstract class AbstractAktivitaet {
 		this.ort = ort;
 	}
 
-	public double getLatitude() {
-		return latitude;
+	public Geometry getShape() {
+		return shape;
 	}
 
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
+	public void setShape(Geometry shape) {
+		this.shape = shape;
 	}
 
-	public double getLongitude() {
-		return longitude;
+	public Double getRadius() {
+		return radius;
 	}
 
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
+	public void setRadius(Double radius) {
+		this.radius = radius;
 	}
 
 	public String getVorname() {

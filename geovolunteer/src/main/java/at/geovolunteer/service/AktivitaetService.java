@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import at.geovolunteer.model.AbstractAktivitaet;
 import at.geovolunteer.model.Aktivitaet;
@@ -60,6 +61,9 @@ public class AktivitaetService {
 		Optional<Aktivitaet> optional = getById(id);
 		if (optional.isPresent()) {
 			Aktivitaet entity = optional.get();
+			if (!CollectionUtils.isEmpty(entity.getTeilnehmer())) {
+				entity.getTeilnehmer().clear();
+			}
 			if (entity.getRessource() != null) {
 				repository.deleteById(entity.getRessource().getId());
 			}
@@ -116,8 +120,6 @@ public class AktivitaetService {
 		entity.setEndDatum(model.getEndDatum());
 		entity.setStartZeit(model.getStartZeit());
 		entity.setEndZeit(model.getEndZeit());
-		entity.setShape(model.getShape());
-		entity.setRadius(model.getRadius());
 
 		if (entity.getRessource() == null) {
 			Ressource ressource = new Ressource();
@@ -137,8 +139,8 @@ public class AktivitaetService {
 		entity.setHausnummer(model.getHausnummer());
 		entity.setPlz(model.getPlz());
 		entity.setOrt(model.getOrt());
-		entity.setLatitude(model.getLatitude());
-		entity.setLongitude(model.getLongitude());
+		entity.setShape(model.getShape());
+		entity.setRadius(model.getRadius());
 		entity.setVorname(model.getVorname());
 		entity.setNachname(model.getNachname());
 		entity.setEmail(model.getEmail());

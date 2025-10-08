@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { UserModel, UserType } from "../../types/Types";
 import { VerticalDivider } from "../../utils/Utils";
 import { PiMapPinArea } from "react-icons/pi";
-import MapComponent from "../karte/MapComponent";
+import MapComponent from "../karte/MapComponentOld";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CiGlobe } from "react-icons/ci";
 import { useLocalStorage } from "../../hooks/useLocalStorage";

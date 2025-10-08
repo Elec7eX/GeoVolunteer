@@ -17,10 +17,12 @@ const FitBoundsOnShape: React.FC<FitBoundsOnShapeProps> = ({ geoJson }) => {
     const layer = geoJsonLayerRef.current;
     if (!layer) return;
 
-    const bounds = layer.getBounds();
-    if (bounds.isValid()) {
-      map.fitBounds(bounds, { padding: [20, 20] });
-    }
+    setTimeout(() => {
+      const bounds = layer.getBounds();
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [20, 20] });
+      }
+    }, 100);
   }, [geoJson, map]);
 
   if (!geoJson) return null;

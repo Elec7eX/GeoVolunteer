@@ -8,7 +8,7 @@ import { UserModel, UserType } from "../../types/Types";
 import { IoPersonOutline } from "react-icons/io5";
 import { VerticalDivider } from "../../utils/Utils";
 import { PiMapPinArea } from "react-icons/pi";
-import MapComponent from "../karte/MapComponent";
+import MapComponent from "../karte/MapComponentOld";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import userService from "../../services/UserServices";

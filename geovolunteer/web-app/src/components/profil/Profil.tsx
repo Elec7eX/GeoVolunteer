@@ -16,7 +16,7 @@ import {
   useFormikContext,
 } from "formik";
 import axios from "axios";
-import MapComponent from "../karte/MapComponent";
+import MapComponent from "../karte/MapComponentOld";
 import { useNavigate } from "react-router-dom";
 
 interface FormularResult {

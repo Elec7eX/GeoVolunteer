@@ -7,18 +7,16 @@ import {
   Form as FormikForm,
   Formik,
   FormikHelpers,
-  useFormikContext,
+  FormikErrors,
 } from "formik";
 import { useEffect, useRef, useState } from "react";
 import { AktivitaetModel, GeoJsonFeature } from "../../types/Types";
 import { AdressInputEnum } from "../../enums/Enums";
-import { useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import aktivitaetService from "../../services/AktivitaetService";
 import MapComponent from "../karte/MapComponent";
-import MapComponentAktivitaet from "../karte/MapComponentAktivitaet";
 
 interface FormularResult {
   values: AktivitaetModel;
@@ -28,21 +26,19 @@ interface FormularResult {
 export default function AktivitaetDetail() {
   const navigate = useNavigate();
   const formRef = useRef<HTMLDivElement>(null);
+
   const location = useLocation();
   const aktivitaetFromState = location.state?.aktivitaet;
   const [currentPage, setCurrentPage] = useState<number>(0);
 
   const [initialValues, setInitialValues] = useState<AktivitaetModel>();
-  const [position, setPosition]: any = useState(null);
-  const [address, setAddress] = useState("");
+  const [aktivitaetenShape, setAktivitaetenShape] = useState<GeoJsonFeature>();
   const [latitude, setLatitude] = useState<number>(0);
   const [longitude, setLongitude] = useState<number>(0);
-  const [geoJson, setGeoJson] = useState<GeoJsonFeature>();
 
-  const [ressourcePosition, setRessourcePosition]: any = useState(null);
-  const [ressourceAddress, setRessourceAddress] = useState("");
   const [ressourceLatitude, setRessourceLatitude] = useState<number>(0);
   const [ressourceLongitude, setRessourceLongitude] = useState<number>(0);
+  const [ressourceShape, setRessourceShape] = useState<GeoJsonFeature>();
 
   useEffect(() => {
     if (aktivitaetFromState) {
@@ -55,8 +51,6 @@ export default function AktivitaetDetail() {
         hausnummer: aktivitaetFromState.hausnummer,
         plz: aktivitaetFromState.plz,
         ort: aktivitaetFromState.ort,
-        latitude: aktivitaetFromState.latitude,
-        longitude: aktivitaetFromState.longitude,
         shape: aktivitaetFromState.shape,
         startDatum: aktivitaetFromState.startDatum,
         endDatum: aktivitaetFromState.endDatum,
@@ -77,8 +71,7 @@ export default function AktivitaetDetail() {
           hausnummer: aktivitaetFromState.ressource.hausnummer,
           plz: aktivitaetFromState.ressource.plz,
           ort: aktivitaetFromState.ressource.ort,
-          latitude: aktivitaetFromState.ressource.latitude,
-          longitude: aktivitaetFromState.ressource.longitude,
+          shape: aktivitaetFromState.ressource.shape,
           materialien: aktivitaetFromState.ressource.materialien,
           sicherheitsanforderungen:
             aktivitaetFromState.ressource.sicherheitsanforderungen,
@@ -89,17 +82,9 @@ export default function AktivitaetDetail() {
           telefon: aktivitaetFromState.ressource.telefon,
         },
       });
-      setGeoJson(aktivitaetFromState.shape);
-      setPosition([
-        aktivitaetFromState.latitude,
-        aktivitaetFromState.longitude,
-      ]);
+      setAktivitaetenShape(aktivitaetFromState.shape);
       setLatitude(aktivitaetFromState.latitude);
       setLongitude(aktivitaetFromState.longitude);
-      setRessourcePosition([
-        aktivitaetFromState.ressource.latitude,
-        aktivitaetFromState.ressource.longitude,
-      ]);
       setRessourceLatitude(aktivitaetFromState.ressource.latitude);
       setRessourceLongitude(aktivitaetFromState.ressource.longitude);
     } else {
@@ -111,8 +96,6 @@ export default function AktivitaetDetail() {
         hausnummer: "",
         plz: "",
         ort: "",
-        latitude: 0,
-        longitude: 0,
         shape: null,
         teilnehmeranzahl: 0,
         transport: "",
@@ -129,8 +112,7 @@ export default function AktivitaetDetail() {
           hausnummer: "",
           plz: "",
           ort: "",
-          latitude: 0,
-          longitude: 0,
+          shape: null,
           materialien: "",
           sicherheitsanforderungen: "",
           anmerkung: "",
@@ -148,66 +130,72 @@ export default function AktivitaetDetail() {
     }
   }, [aktivitaetFromState]);
 
-  const MapClickHandler = () => {
-    const { setFieldValue } = useFormikContext();
-
-    useMapEvents({
-      click: async (event: any) => {
-        const { lat, lng } = event.latlng;
-        setPosition([lat, lng]);
-
-        // Fetch address using Nominatim API
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-        );
-        const data = await response.json();
-
-        if (data && data.display_name) {
-          setAddress(data.display_name);
-          if (data.address) {
-            setFieldValue("strasse", data.address.road);
-            setFieldValue("hausnummer", data.address.house_number);
-            setFieldValue("plz", data.address.postcode);
-            setFieldValue("ort", data.address.city);
-            setLatitude(data.lat);
-            setLongitude(data.lon);
+  const handleAktivitaetenShape = (
+    aktivitaetenShape: GeoJsonFeature,
+    setFieldValue: (
+      field: string,
+      value: any,
+      shouldValidate?: boolean | undefined
+    ) => Promise<void | FormikErrors<AktivitaetModel>>
+  ) => {
+    setAktivitaetenShape(aktivitaetenShape);
+    if (aktivitaetenShape?.properties?.data) {
+      const data = aktivitaetenShape?.properties.data;
+      if (data && data.display_name) {
+        if (data.address) {
+          setFieldValue("strasse", data.address.road);
+          setFieldValue("hausnummer", data.address.house_number);
+          setFieldValue("plz", data.address.postcode);
+          setFieldValue("ort", data.address.city);
+          if (aktivitaetenShape.geometry.type === "Point") {
+            const [lng, lat] = aktivitaetenShape.geometry.coordinates;
+            setLatitude(lat);
+            setLongitude(lng);
           }
         }
-      },
-    });
-
-    return null;
+      }
+    } else {
+      setFieldValue("strasse", null);
+      setFieldValue("hausnummer", null);
+      setFieldValue("plz", null);
+      setFieldValue("ort", null);
+      setLatitude(0);
+      setLongitude(0);
+    }
   };
 
-  const MapClickHandlerRessource = () => {
-    const { setFieldValue } = useFormikContext();
-
-    useMapEvents({
-      click: async (event: any) => {
-        const { lat, lng } = event.latlng;
-        setRessourcePosition([lat, lng]);
-
-        // Fetch address using Nominatim API
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-        );
-        const data = await response.json();
-
-        if (data && data.display_name) {
-          setRessourceAddress(data.display_name);
-          if (data.address) {
-            setFieldValue("ressource.strasse", data.address.road);
-            setFieldValue("ressource.hausnummer", data.address.house_number);
-            setFieldValue("ressource.plz", data.address.postcode);
-            setFieldValue("ressource.ort", data.address.city);
-            setRessourceLatitude(data.lat);
-            setRessourceLongitude(data.lon);
+  const handleRessourceShape = (
+    ressourceShape: GeoJsonFeature,
+    setFieldValue: (
+      field: string,
+      value: any,
+      shouldValidate?: boolean | undefined
+    ) => Promise<void | FormikErrors<AktivitaetModel>>
+  ) => {
+    setRessourceShape(ressourceShape);
+    if (ressourceShape?.properties?.data) {
+      const data = ressourceShape?.properties.data;
+      if (data && data.display_name) {
+        if (data.address) {
+          setFieldValue("ressource.strasse", data.address.road);
+          setFieldValue("ressource.hausnummer", data.address.house_number);
+          setFieldValue("ressource.plz", data.address.postcode);
+          setFieldValue("ressource.ort", data.address.city);
+          if (ressourceShape.geometry.type === "Point") {
+            const [lng, lat] = ressourceShape.geometry.coordinates;
+            setRessourceLatitude(lat);
+            setRessourceLongitude(lng);
           }
         }
-      },
-    });
-
-    return null;
+      }
+    } else {
+      setFieldValue("ressource.strasse", null);
+      setFieldValue("ressource.hausnummer", null);
+      setFieldValue("ressource.plz", null);
+      setFieldValue("ressource.ort", null);
+      setRessourceLatitude(0);
+      setRessourceLongitude(0);
+    }
   };
 
   const getCoordinatesBySetter = async (
@@ -298,11 +286,8 @@ export default function AktivitaetDetail() {
   }
 
   const handleSubmit = async (result: FormularResult) => {
-    result.values.latitude = latitude;
-    result.values.longitude = longitude;
-    result.values.ressource.latitude = ressourceLatitude;
-    result.values.ressource.longitude = ressourceLongitude;
-    result.values.shape = geoJson!;
+    result.values.shape = aktivitaetenShape!;
+    result.values.ressource.shape = ressourceShape!;
     await aktivitaetService.update(result.values).then((response) => {
       // 201 = CREATED
       if (response.status === 201) {
@@ -572,11 +557,15 @@ export default function AktivitaetDetail() {
                           )}
                           {values.addresseInput === AdressInputEnum.Map && (
                             <>
-                              <MapComponentAktivitaet
-                                geoJsonData={geoJson}
-                                drawShape={true}
+                              <MapComponent
+                                geoJsonData={aktivitaetenShape}
                                 editable={true}
-                                onShapeChange={(geoJson) => setGeoJson(geoJson)}
+                                onShapeChange={(geoJson) =>
+                                  handleAktivitaetenShape(
+                                    geoJson,
+                                    setFieldValue
+                                  )
+                                }
                               />
                             </>
                           )}
@@ -1020,13 +1009,14 @@ export default function AktivitaetDetail() {
                           )}
                           {values.ressource.addresseInput ===
                             AdressInputEnum.Map && (
-                            <>
-                              <MapComponent
-                                MapClickHandler={MapClickHandlerRessource}
-                                address={ressourceAddress}
-                                position={ressourcePosition}
-                              />
-                            </>
+                            <MapComponent
+                              geoJsonData={ressourceShape}
+                              editable={true}
+                              drawMarkerOnly={true}
+                              onShapeChange={(geoJson) =>
+                                handleRessourceShape(geoJson, setFieldValue)
+                              }
+                            />
                           )}
                           <Row>
                             <Form.Group className="mb-3">

@@ -3,7 +3,6 @@ package at.geovolunteer.model;
 import java.util.Calendar;
 import java.util.List;
 
-import org.locationtech.jts.geom.Geometry;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -14,10 +13,7 @@ import at.geovolunteer.config.CalendarDeserializer;
 import at.geovolunteer.config.CalendarSerializer;
 import at.geovolunteer.config.CalendarTimeDeserializer;
 import at.geovolunteer.config.CalendarTimeSerializer;
-import at.geovolunteer.config.GeometryDeserializer;
-import at.geovolunteer.config.GeometrySerializer;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -41,14 +37,6 @@ public class Aktivitaet extends AbstractAktivitaet {
 	private int teilnehmeranzahl;
 	private String transport;
 	private String verpflegung;
-
-	@Column(columnDefinition = "geometry")
-	@JsonSerialize(using = GeometrySerializer.class)
-	@JsonDeserialize(using = GeometryDeserializer.class)
-	private Geometry shape;
-
-	@Column
-	private Double radius;
 
 	@Temporal(TemporalType.DATE)
 	@JsonSerialize(using = CalendarSerializer.class)
@@ -115,22 +103,6 @@ public class Aktivitaet extends AbstractAktivitaet {
 
 	public void setVerpflegung(String verpflegung) {
 		this.verpflegung = verpflegung;
-	}
-
-	public Geometry getShape() {
-		return shape;
-	}
-
-	public void setShape(Geometry shape) {
-		this.shape = shape;
-	}
-
-	public Double getRadius() {
-		return radius;
-	}
-
-	public void setRadius(Double radius) {
-		this.radius = radius;
 	}
 
 	public Calendar getStartDatum() {

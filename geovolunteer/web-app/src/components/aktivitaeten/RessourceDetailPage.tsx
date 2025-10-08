@@ -7,9 +7,9 @@ import { useState, useEffect } from "react";
 import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel, RessourceModel } from "../../types/Types";
 import { VerticalDivider } from "../../utils/Utils";
-import MapComponent from "../karte/MapComponent";
 import { PiMapPinArea } from "react-icons/pi";
 import { BsHeartPulse } from "react-icons/bs";
+import MapComponent from "../karte/MapComponent";
 
 export default function RessourceDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,27 +19,18 @@ export default function RessourceDetailPage() {
 
   const [aktivitaet, setAktivitaet] = useState<AktivitaetModel | null>(null);
   const [ressource, setRessource] = useState<RessourceModel | null>(null);
-  const [position, setPosition]: any = useState(null);
   const [isShowMap, setIsShowMap] = useState<boolean>(false);
 
   useEffect(() => {
     if (aktivitaetFromState) {
       setAktivitaet(aktivitaetFromState);
       setRessource(aktivitaetFromState.ressource);
-      setPosition([
-        aktivitaetFromState.ressource.latitude,
-        aktivitaetFromState.ressource.longitude,
-      ]);
     } else {
       aktivitaetService
         .getById(id!)
         .then((resp) => {
           setAktivitaet(resp.data);
           setRessource(resp.data.ressource);
-          setPosition([
-            resp.data.ressource.latitude,
-            resp.data.ressource.longitude,
-          ]);
         })
         .catch(() => alert("Fehler beim Laden der Daten"));
     }
@@ -141,7 +132,9 @@ export default function RessourceDetailPage() {
               </Col>
             </Row>
             <Row style={{ padding: 10, marginTop: 40 }}>
-              {isShowMap && <MapComponent position={position} zoom={17} />}
+              {isShowMap && (
+                <MapComponent geoJsonData={ressource.shape} zoom={17} />
+              )}
             </Row>
           </Card.Body>
         </Card>

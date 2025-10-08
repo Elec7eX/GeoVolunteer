@@ -3,7 +3,7 @@ import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Card, Col, Modal, Nav, Row } from "react-bootstrap";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AktivitaetModel } from "../../types/Types";
 import aktivitaetService from "../../services/AktivitaetService";
 import { VerticalDivider } from "../../utils/Utils";
@@ -14,7 +14,7 @@ import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
 import { BsHeartPulse } from "react-icons/bs";
 import { Feature, Geometry } from "geojson";
-import MapComponentAktivitaet from "../karte/MapComponentAktivitaet";
+import MapComponent from "../karte/MapComponent";
 
 export default function AktivitaetDetailPage() {
   const navigate = useNavigate();
@@ -23,22 +23,19 @@ export default function AktivitaetDetailPage() {
   const [user] = useLocalStorage("user", null);
 
   const { aktivitaetFromState, isTeilnehmer } = location.state;
+  const mapRef = useRef<HTMLDivElement | null>(null);
 
   const [aktivitaet, setAktivitaet] = useState<AktivitaetModel | null>(null);
-  const [position, setPosition]: any = useState(null);
-  const [geoJsonLayer, setGeoJsonLayer] = useState<Feature<Geometry, any>>();
+  const [aktivitaetenShape, setAktivitaetenShape] =
+    useState<Feature<Geometry, any>>();
   const [isShowMap, setIsShowMap] = useState<boolean>(false);
   const [show, setShow] = useState(false);
 
   useEffect(() => {
     if (aktivitaetFromState) {
       setAktivitaet(aktivitaetFromState);
-      setPosition([
-        aktivitaetFromState.latitude,
-        aktivitaetFromState.longitude,
-      ]);
       if (aktivitaetFromState.shape) {
-        setGeoJsonLayer(aktivitaetFromState.shape);
+        setAktivitaetenShape(aktivitaetFromState.shape);
       }
     } else {
       aktivitaetService
@@ -46,14 +43,14 @@ export default function AktivitaetDetailPage() {
         .then((resp) => {
           setAktivitaet(resp.data);
           if (resp.data.shape) {
-            setGeoJsonLayer(resp.data.shape);
+            setAktivitaetenShape(resp.data.shape);
           }
         })
         .catch(() => alert("Fehler beim Laden der Daten"));
     }
   }, [id, aktivitaetFromState]);
 
-  const handleClose = () => setShow(false);
+  const handleClose = () => setShow(!show);
 
   if (!aktivitaet) return <div>Lädt...</div>;
 
@@ -97,10 +94,22 @@ export default function AktivitaetDetailPage() {
                 {user.rolle === UserType.ORGANISATION && (
                   <Row style={{ textAlign: "end" }}>
                     <Col>
-                      <RiDeleteBinLine size={25} />
+                      {id !== undefined && (
+                        <RiDeleteBinLine
+                          size={25}
+                          onClick={() => setShow(!show)}
+                        />
+                      )}
                     </Col>
                     <Col md="auto">
-                      <FiEdit size={25} />
+                      <FiEdit
+                        size={25}
+                        onClick={() =>
+                          navigate(`/aktivitäten/bearbeiten/${aktivitaet.id}`, {
+                            state: { aktivitaet },
+                          })
+                        }
+                      />
                     </Col>
                   </Row>
                 )}
@@ -226,21 +235,22 @@ export default function AktivitaetDetailPage() {
                   <PiMapPinArea
                     style={{ marginLeft: 100, color: "#00e7ff" }}
                     size={30}
-                    onClick={() => setIsShowMap(!isShowMap)}
+                    onClick={() => {
+                      setIsShowMap(!isShowMap);
+                      setTimeout(() => {
+                        mapRef.current?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }, 200);
+                    }}
                   />
                 </div>
               </Col>
             </Row>
-            <Row style={{ padding: 10, marginTop: 40 }}>
-              {/** <MapComponent position={position} zoom={17} /> */}
-              <>{console.log(geoJsonLayer)}</>
+            <Row style={{ padding: 10, marginTop: 40 }} ref={mapRef}>
               {isShowMap && (
-                <MapComponentAktivitaet
-                  geoJsonData={geoJsonLayer}
-                  drawShape={false}
-                  editable={false}
-                  zoom={17}
-                />
+                <MapComponent geoJsonData={aktivitaetenShape} zoom={17} />
               )}
             </Row>
           </Card.Body>

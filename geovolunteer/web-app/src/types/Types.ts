@@ -45,9 +45,8 @@ export interface RessourceModel {
     strasse: string,
     hausnummer: string,
     plz: string,
-    ort: string
-    latitude: number,
-    longitude: number,
+    ort: string,
+    shape: GeoJsonFeature;
     materialien: string,
     sicherheitsanforderungen: string,
     anmerkung: string,
@@ -65,9 +64,7 @@ export interface AktivitaetModel {
     strasse: string,
     hausnummer: string,
     plz: string,
-    ort: string
-    latitude: number,
-    longitude: number,
+    ort: string,
     shape: GeoJsonFeature;
     teilnehmeranzahl: number,
     transport: string,
