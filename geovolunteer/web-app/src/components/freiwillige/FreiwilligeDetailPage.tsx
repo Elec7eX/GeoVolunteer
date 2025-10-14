@@ -129,7 +129,7 @@ export default function FreiwilligeDetailPage() {
                 {freiwillige.plz} {freiwillige.ort}
               </div>
               <div>
-                {t("profil.verfuegbar.umkreis")} {freiwillige.radius}
+                {/*t("profil.verfuegbar.umkreis")} {freiwillige.radius*/}
                 {freiwillige.einheit === "M" ? "m" : "km"}
                 <PiMapPinArea
                   style={{ marginLeft: 100, color: "#00e7ff" }}

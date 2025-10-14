@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import org.locationtech.jts.geom.Geometry;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -14,6 +16,9 @@ import at.geovolunteer.config.CalendarDeserializer;
 import at.geovolunteer.config.CalendarSerializer;
 import at.geovolunteer.config.CalendarTimeDeserializer;
 import at.geovolunteer.config.CalendarTimeSerializer;
+import at.geovolunteer.config.GeometryDeserializer;
+import at.geovolunteer.config.GeometrySerializer;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -49,15 +54,20 @@ public class Benutzer {
 	private String strasse;
 	private String hausnummer;
 	private String beschreibung;
-	private double latitude;
-	private double longitude;
-	private double radius;
+
+	@Column(columnDefinition = "geometry")
+	@JsonSerialize(using = GeometrySerializer.class)
+	@JsonDeserialize(using = GeometryDeserializer.class)
+	private Geometry shape;
+
+	@Column
+	private Double radius;
+
 	@Enumerated(EnumType.STRING)
 	private Einheit einheit;
 	private String plz;
 	private String ort;
 	private String land;
-	private byte[] logo;
 
 	// Organisation
 	private String name;
@@ -186,14 +196,6 @@ public class Benutzer {
 		this.land = land;
 	}
 
-	public byte[] getLogo() {
-		return logo;
-	}
-
-	public void setLogo(byte[] logo) {
-		this.logo = logo;
-	}
-
 	public String getName() {
 		return name;
 	}
@@ -282,27 +284,19 @@ public class Benutzer {
 		this.active = active;
 	}
 
-	public double getLatitude() {
-		return latitude;
+	public Geometry getShape() {
+		return shape;
 	}
 
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
+	public void setShape(Geometry shape) {
+		this.shape = shape;
 	}
 
-	public double getLongitude() {
-		return longitude;
-	}
-
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-
-	public double getRadius() {
+	public Double getRadius() {
 		return radius;
 	}
 
-	public void setRadius(double radius) {
+	public void setRadius(Double radius) {
 		this.radius = radius;
 	}
 

@@ -119,8 +119,7 @@ public class BenutzerService {
 		entity.setHausnummer(user.getHausnummer());
 		entity.setPlz(user.getPlz());
 		entity.setOrt(user.getOrt());
-		entity.setLatitude(user.getLatitude());
-		entity.setLongitude(user.getLongitude());
+		entity.setShape(user.getShape());
 		entity.setLand(user.getLand());
 		entity.setBeschreibung(user.getBeschreibung());
 		if (Rolle.FREIWILLIGE.equals(rolle)) {

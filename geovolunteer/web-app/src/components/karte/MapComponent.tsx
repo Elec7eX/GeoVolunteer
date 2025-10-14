@@ -8,6 +8,7 @@ import React, {
 import {
   MapContainer,
   TileLayer,
+  Circle,
   FeatureGroup,
   ZoomControl,
   GeoJSON,
@@ -29,6 +30,8 @@ interface MapComponentProps {
   onShapeChange?: (geoJson: GeoJsonFeature | null) => void;
   editable?: boolean;
   drawMarkerOnly?: boolean;
+  markerWithRadiusMode?: boolean;
+  radius?: number;
 }
 
 const customIcon = new Icon({
@@ -43,9 +46,12 @@ const MapComponent: React.FC<MapComponentProps> = ({
   onShapeChange,
   editable,
   drawMarkerOnly,
+  markerWithRadiusMode,
+  radius,
 }) => {
   const drawnItemsRef = useRef<L.FeatureGroup>(null);
   const [shapeDrawn, setShapeDrawn] = useState(false);
+  const [effectiveRadius, setEffectiveRadius] = useState<number>(0);
 
   useEffect(() => {
     if (!geoJsonData || !editable) return;
@@ -69,10 +75,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
       });
 
       layer.eachLayer((l) => drawnItemsRef.current?.addLayer(l));
+      if (geoJsonData && geoJsonData.type === "Feature") {
+        setEffectiveRadius(radius ?? geoJsonData.properties?.radius ?? 0);
+      }
     }, 0);
 
     return () => clearTimeout(timeout);
-  }, [geoJsonData, editable]);
+  }, [geoJsonData, editable, radius]);
 
   const onCreated = useCallback(
     async (e: any) => {
@@ -165,7 +174,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
   };
 
   const drawOptions = useMemo(() => {
-    if (drawMarkerOnly) {
+    if (drawMarkerOnly || markerWithRadiusMode) {
       return {
         rectangle: false,
         polygon: false,
@@ -183,7 +192,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
       circlemarker: false,
       polyline: false,
     };
-  }, [shapeDrawn, drawMarkerOnly]);
+  }, [shapeDrawn, drawMarkerOnly, markerWithRadiusMode]);
 
   return (
     <>
@@ -255,6 +264,20 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   }
                 }}
               />
+              {markerWithRadiusMode &&
+                geoJsonData &&
+                geoJsonData.type === "Feature" &&
+                geoJsonData.geometry.type === "Point" && (
+                  <Circle
+                    key={`radius-${effectiveRadius}`} // zwingt Leaflet zum Neurendern bei Radiusänderung
+                    center={[
+                      (geoJsonData.geometry.coordinates as number[])[1],
+                      (geoJsonData.geometry.coordinates as number[])[0],
+                    ]}
+                    radius={radius || 0}
+                    pathOptions={{ color: "blue", fillOpacity: 0.1 }}
+                  />
+                )}
             </>
           )}
           {geoJsonData && !editable && (

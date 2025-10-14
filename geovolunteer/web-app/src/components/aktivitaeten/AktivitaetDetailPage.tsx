@@ -90,28 +90,34 @@ export default function AktivitaetDetailPage() {
               </Col>
               <Col>
                 <Card.Title>{aktivitaet.name}</Card.Title>
-                <Card.Text>{aktivitaet.organisation?.name}</Card.Text>
+
                 {user.rolle === UserType.ORGANISATION && (
-                  <Row style={{ textAlign: "end" }}>
-                    <Col>
-                      {id !== undefined && (
-                        <RiDeleteBinLine
+                  <>
+                    <Card.Text>{aktivitaet.organisation?.name}</Card.Text>
+                    <Row style={{ textAlign: "end" }}>
+                      <Col>
+                        {id !== undefined && (
+                          <RiDeleteBinLine
+                            size={25}
+                            onClick={() => setShow(!show)}
+                          />
+                        )}
+                      </Col>
+                      <Col md="auto">
+                        <FiEdit
                           size={25}
-                          onClick={() => setShow(!show)}
+                          onClick={() =>
+                            navigate(
+                              `/aktivitäten/bearbeiten/${aktivitaet.id}`,
+                              {
+                                state: { aktivitaet },
+                              }
+                            )
+                          }
                         />
-                      )}
-                    </Col>
-                    <Col md="auto">
-                      <FiEdit
-                        size={25}
-                        onClick={() =>
-                          navigate(`/aktivitäten/bearbeiten/${aktivitaet.id}`, {
-                            state: { aktivitaet },
-                          })
-                        }
-                      />
-                    </Col>
-                  </Row>
+                      </Col>
+                    </Row>
+                  </>
                 )}
               </Col>
             </Row>

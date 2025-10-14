@@ -21,10 +21,9 @@ export interface UserModel {
     addresseInput?: AdressInputEnum,
     plz?: string,
     ort?: string,
-    latitude?: number,
-    longitude?: number,
-    einheit?: string,
+    shape?: GeoJsonFeature;
     radius?: number,
+    einheit?: string,
     land?: string,
     name?: string,
     webseite?: string,

@@ -3,8 +3,8 @@ import { Header } from "../header/Header";
 import { Footer } from "../footer/Footer";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { AdressInputEnum, UserType } from "../../enums/Enums";
-import { useEffect, useState } from "react";
-import { UserModel } from "../../types/Types";
+import { useEffect, useRef, useState } from "react";
+import { GeoJsonFeature, UserModel } from "../../types/Types";
 import userService from "../../services/UserServices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useMapEvents } from "react-leaflet";
@@ -14,10 +14,11 @@ import {
   Formik,
   FormikHelpers,
   useFormikContext,
+  FormikErrors,
 } from "formik";
 import axios from "axios";
-import MapComponent from "../karte/MapComponentOld";
 import { useNavigate } from "react-router-dom";
+import MapComponent from "../karte/MapComponent";
 
 interface FormularResult {
   values: UserModel;
@@ -27,9 +28,12 @@ interface FormularResult {
 export default function Profil() {
   const navigate = useNavigate();
   const [user] = useLocalStorage("user", null);
+  const mapRef = useRef<HTMLDivElement | null>(null);
+
   const [initialValues, setInitialValues] = useState<UserModel>();
+
+  const [userShape, setUserShape] = useState<GeoJsonFeature>();
   const [edit, setEdit] = useState<boolean>(false);
-  const [position, setPosition]: any = useState(null);
   const [address, setAddress] = useState("");
   const [latitude, setLatitude] = useState<number>(0);
   const [longitude, setLongitude] = useState<number>(0);
@@ -57,10 +61,12 @@ export default function Profil() {
           plz: benutzer.plz,
           ort: benutzer.ort,
           land: benutzer.land,
-          latitude: benutzer.latitude,
-          longitude: benutzer.longitude,
-          einheit: benutzer.einheit,
-          radius: benutzer.radius,
+          shape: benutzer.shape,
+          radius: benutzer.radius === null ? 0 : benutzer.radius,
+          einheit:
+            benutzer.einheit == null
+              ? einheitOptions.find((e) => e.value === "M")?.value
+              : benutzer.einheit,
           name: benutzer.name,
           beschreibung: benutzer.beschreibung,
           webseite: benutzer.webseite,
@@ -72,45 +78,49 @@ export default function Profil() {
           verfuegbarVonZeit: benutzer.verfuegbarVonZeit,
           verfuegbarBisZeit: benutzer.verfuegbarBisZeit,
         });
-        setPosition([benutzer.latitude, benutzer.longitude]);
-        setLatitude(benutzer.latitude!);
-        setLongitude(benutzer.longitude!);
+        if (benutzer.shape && benutzer.shape.geometry.type === "Point") {
+          setUserShape(benutzer.shape);
+          const [lng, lat] = benutzer.shape.geometry.coordinates;
+          setLatitude(lat);
+          setLongitude(lng);
+        }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id]);
 
-  const MapClickHandler = () => {
-    const { setFieldValue } = useFormikContext();
-
-    useMapEvents({
-      click: async (event: any) => {
-        const { lat, lng } = event.latlng;
-        setPosition([lat, lng]);
-
-        // Fetch address using Nominatim API
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
-        );
-        const data = await response.json();
-
-        if (data && data.display_name) {
-          setAddress(data.display_name);
-          if (data.address) {
-            setFieldValue("strasse", data.address.road);
-            setFieldValue("hausnummer", data.address.house_number);
-            setFieldValue("plz", data.address.postcode);
-            setFieldValue(
-              "ort",
-              data.address.city ? data.address.city : data.address.town
-            );
-            setLatitude(data.lat);
-            setLongitude(data.lon);
+  const handleUserShape = (
+    userShape: GeoJsonFeature,
+    setFieldValue: (
+      field: string,
+      value: any,
+      shouldValidate?: boolean | undefined
+    ) => Promise<void | FormikErrors<UserModel>>
+  ) => {
+    setUserShape(userShape);
+    if (userShape?.properties?.data) {
+      const data = userShape?.properties.data;
+      if (data && data.display_name) {
+        if (data.address) {
+          setFieldValue("strasse", data.address.road);
+          setFieldValue("hausnummer", data.address.house_number);
+          setFieldValue("plz", data.address.postcode);
+          setFieldValue("ort", data.address.city);
+          if (userShape.geometry.type === "Point") {
+            const [lng, lat] = userShape.geometry.coordinates;
+            setLatitude(lat);
+            setLongitude(lng);
           }
         }
-      },
-    });
-
-    return null;
+      }
+    } else {
+      setFieldValue("strasse", null);
+      setFieldValue("hausnummer", null);
+      setFieldValue("plz", null);
+      setFieldValue("ort", null);
+      setLatitude(0);
+      setLongitude(0);
+    }
   };
 
   const getCoordinates = async (
@@ -137,7 +147,6 @@ export default function Profil() {
           const { lat, lon } = response.data[0];
           setLatitude(lat);
           setLongitude(lon);
-          setPosition([lat, lon]);
         } else {
           alert("Adresse nicht gefunden");
         }
@@ -152,8 +161,7 @@ export default function Profil() {
 
   const handleSubmit = async (result: FormularResult) => {
     var benutzer: UserModel = result.values;
-    benutzer.latitude = latitude;
-    benutzer.longitude = longitude;
+    benutzer.shape = userShape;
     userService.update(benutzer.id, benutzer).then(() => {
       setEdit(false);
       navigate("/");
@@ -405,12 +413,18 @@ export default function Profil() {
                                 checked={
                                   values.addresseInput === AdressInputEnum.Map
                                 }
-                                onChange={(e) =>
+                                onChange={(e) => {
                                   setFieldValue(
                                     "addresseInput",
                                     e.target.value as AdressInputEnum
-                                  )
-                                }
+                                  );
+                                  setTimeout(() => {
+                                    mapRef.current?.scrollIntoView({
+                                      behavior: "smooth",
+                                      block: "start",
+                                    });
+                                  }, 200);
+                                }}
                               />
                             </Form.Group>
                           </div>
@@ -541,16 +555,33 @@ export default function Profil() {
                         )}
                         {edit &&
                           values.addresseInput === AdressInputEnum.Map && (
-                            <MapComponent
-                              MapClickHandler={MapClickHandler}
-                              address={address}
-                              position={position}
-                              radius={
-                                isFreiwillige() && values.einheit === "KM"
-                                  ? values.radius! * 1000
-                                  : values.radius
-                              }
-                            />
+                            <div ref={mapRef}>
+                              {isFreiwillige() && (
+                                <MapComponent
+                                  editable
+                                  markerWithRadiusMode
+                                  radius={
+                                    values.einheit === "KM"
+                                      ? (values.radius || 0) * 1000
+                                      : values.radius || 0
+                                  }
+                                  geoJsonData={userShape}
+                                  onShapeChange={(geoJson) =>
+                                    handleUserShape(geoJson, setFieldValue)
+                                  }
+                                />
+                              )}
+                              {isOrganisation() && (
+                                <MapComponent
+                                  editable
+                                  drawMarkerOnly
+                                  geoJsonData={userShape}
+                                  onShapeChange={(geoJson) =>
+                                    handleUserShape(geoJson, setFieldValue)
+                                  }
+                                />
+                              )}
+                            </div>
                           )}
                         {isFreiwillige() && (
                           <>
@@ -562,44 +593,50 @@ export default function Profil() {
                                     {values.radius}{" "}
                                     {values.einheit === "KM" ? "km" : "m"}
                                   </Form.Label>
-                                  <Form.Range
-                                    id="radius"
-                                    name="radius"
-                                    min={0}
-                                    max={values.einheit === "KM" ? 25 : 25000}
-                                    value={values.radius}
-                                    onChange={handleChange}
-                                  />
+                                  {values.addresseInput ===
+                                    AdressInputEnum.Map && (
+                                    <Form.Range
+                                      id="radius"
+                                      name="radius"
+                                      min={0}
+                                      max={values.einheit === "KM" ? 25 : 25000}
+                                      value={values.radius}
+                                      onChange={handleChange}
+                                    />
+                                  )}
                                 </Col>
-                                <Col>
-                                  <Form.Group className="mb-3">
-                                    <Form.Label>
-                                      {t("profil.verfuegbar.einheit")}
-                                    </Form.Label>
-                                    <Form.Select
-                                      id="einheit"
-                                      name="einheit"
-                                      value={values.einheit}
-                                      onChange={(e) => {
-                                        e.preventDefault();
-                                        setFieldValue(
-                                          "einheit",
-                                          e.target.value
-                                        );
-                                        setFieldValue("radius", 0);
-                                      }}
-                                    >
-                                      {einheitOptions.map((option) => (
-                                        <option
-                                          key={option.value}
-                                          value={option.value}
-                                        >
-                                          {option.label}
-                                        </option>
-                                      ))}
-                                    </Form.Select>
-                                  </Form.Group>
-                                </Col>
+                                {values.addresseInput ===
+                                  AdressInputEnum.Map && (
+                                  <Col>
+                                    <Form.Group className="mb-3">
+                                      <Form.Label>
+                                        {t("profil.verfuegbar.einheit")}
+                                      </Form.Label>
+                                      <Form.Select
+                                        id="einheit"
+                                        name="einheit"
+                                        value={values.einheit}
+                                        onChange={(e) => {
+                                          e.preventDefault();
+                                          setFieldValue(
+                                            "einheit",
+                                            e.target.value
+                                          );
+                                          setFieldValue("radius", 0);
+                                        }}
+                                      >
+                                        {einheitOptions.map((option) => (
+                                          <option
+                                            key={option.value}
+                                            value={option.value}
+                                          >
+                                            {option.label}
+                                          </option>
+                                        ))}
+                                      </Form.Select>
+                                    </Form.Group>
+                                  </Col>
+                                )}
                               </Row>
                             )}
                             <Row style={{ marginTop: 40 }}>

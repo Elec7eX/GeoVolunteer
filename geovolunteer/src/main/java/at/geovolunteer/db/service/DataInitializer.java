@@ -1,19 +1,25 @@
 package at.geovolunteer.db.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import at.geovolunteer.model.Benutzer;
 import at.geovolunteer.model.Rolle;
 import at.geovolunteer.model.repo.BenutzerRepository;
+import at.geovolunteer.service.BenutzerService;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
 
 	private final BenutzerRepository benutzerRepository;
 
-	public DataInitializer(BenutzerRepository benutzerRepository) {
+	@Autowired
+	private final BenutzerService benutzerService;
+
+	public DataInitializer(BenutzerRepository benutzerRepository, BenutzerService benutzerService) {
 		this.benutzerRepository = benutzerRepository;
+		this.benutzerService = benutzerService;
 	}
 
 	@Override
@@ -32,6 +38,7 @@ public class DataInitializer implements CommandLineRunner {
 			benutzer2.setEmail("org@rotes-kreuz.com");
 			benutzer2.setPassword("aaa");
 			benutzerRepository.save(benutzer2);
+
 		}
 	}
 

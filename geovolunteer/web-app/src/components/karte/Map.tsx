@@ -80,7 +80,7 @@ export default function Map() {
             var org = resp.data;
             if (resp.status === 200) {
               setMeineOrganisation({
-                geocode: [org.latitude!, org.longitude!],
+                // geocode: [org.latitude!, org.longitude!],
                 popUp: org.name!,
               });
               aktivitaetService
@@ -101,7 +101,7 @@ export default function Map() {
                     if (teilnehmerData.length > 0) {
                       const teilnehmer: MarkerType[] = teilnehmerData.map(
                         (t: UserModel) => ({
-                          geocode: [t.latitude!, t.longitude!],
+                          // geocode: [t.latitude!, t.longitude!],
                           popUp: t.vorname! + " " + t.nachname!,
                         })
                       );
@@ -138,7 +138,7 @@ export default function Map() {
       userService.getOrganisationen().then((resp) => {
         if (resp.status === 200) {
           const markerArray: MarkerType[] = resp.data.map((org: UserModel) => ({
-            geocode: [org.latitude!, org.longitude!],
+            // geocode: [org.latitude!, org.longitude!],
             popUp: org.name!,
           }));
           setAlleOrganisationen(markerArray);
@@ -163,7 +163,7 @@ export default function Map() {
         if (resp.status === 200) {
           const markerArray: MarkerType[] = resp.data.map(
             (freiwillige: UserModel) => ({
-              geocode: [freiwillige.latitude!, freiwillige.longitude!],
+              //  geocode: [freiwillige.latitude!, freiwillige.longitude!],
               popUp: freiwillige.vorname! + " " + freiwillige.nachname,
             })
           );

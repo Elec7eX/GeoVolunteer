@@ -160,7 +160,7 @@ export default function AktivitaetenOverview() {
                       <BsHeartPulse size={30} style={{ marginRight: 15 }} />
                     </Col>
                     <Col>
-                      <div>{aktivitaet.organisation!.name}</div>
+                      <div>{aktivitaet.organisation?.name}</div>
                       {user.rolle === UserType.FREIWILLIGE && (
                         <div className="custom-cardheader_text">
                           {aktivitaet.name}
