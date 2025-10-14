@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import at.geovolunteer.builder.OrganisationBuilder;
 import at.geovolunteer.model.Benutzer;
 import at.geovolunteer.model.Rolle;
 import at.geovolunteer.model.repo.BenutzerRepository;
@@ -24,7 +25,7 @@ public class DataInitializer implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		if (benutzerRepository.count() == 0) {
+		if (benutzerService.getOrganisationen().size() == 0) {
 			Benutzer benutzer = new Benutzer();
 			benutzer.setRolle(Rolle.FREIWILLIGE);
 			benutzer.setLogin("user");
@@ -39,6 +40,14 @@ public class DataInitializer implements CommandLineRunner {
 			benutzer2.setPassword("aaa");
 			benutzerRepository.save(benutzer2);
 
+		}
+	}
+
+	private void createOrganisationen() {
+		if (benutzerService.getOrganisationen().stream().allMatch(org -> !org.getName().equals("Roteskreuz Linz"))) {
+			new OrganisationBuilder(benutzerService).name("Roteskreuz Linz")
+					.beschreibung("Wir sind das Roteskreuz Linz!").email("org@rotes-kreuz.com").login("org")
+					.password("aaa").telefon("06506984654").webseite("www.roteskreuz-linz.at").build();
 		}
 	}
 

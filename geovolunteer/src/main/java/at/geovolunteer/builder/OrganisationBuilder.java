@@ -9,7 +9,7 @@ public class OrganisationBuilder extends AbstractBenutzerBuilder<OrganisationBui
 	private String name;
 	private String webseite;
 
-	protected OrganisationBuilder(BenutzerService benutzerService) {
+	public OrganisationBuilder(BenutzerService benutzerService) {
 		super(benutzerService);
 		this.rolle = Rolle.ORGANISATION;
 	}
