@@ -144,9 +144,23 @@ export default function Profil() {
         );
 
         if (response.data.length > 0) {
-          const { lat, lon } = response.data[0];
+          const { lat, lon, display_name } = response.data[0];
           setLatitude(lat);
           setLongitude(lon);
+          const feature: GeoJsonFeature = {
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [parseFloat(lon), parseFloat(lat)],
+            },
+            properties: {
+              address: display_name || address,
+              source: "nominatim",
+              createdAt: new Date().toISOString(),
+            },
+          };
+
+          setUserShape(feature);
         } else {
           alert("Adresse nicht gefunden");
         }
@@ -413,11 +427,24 @@ export default function Profil() {
                                 checked={
                                   values.addresseInput === AdressInputEnum.Map
                                 }
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   setFieldValue(
                                     "addresseInput",
                                     e.target.value as AdressInputEnum
                                   );
+                                  if (
+                                    values.strasse &&
+                                    values.hausnummer &&
+                                    values.plz &&
+                                    values.ort
+                                  ) {
+                                    await getCoordinates(
+                                      values.strasse,
+                                      values.hausnummer,
+                                      values.plz,
+                                      values.ort
+                                    );
+                                  }
                                   setTimeout(() => {
                                     mapRef.current?.scrollIntoView({
                                       behavior: "smooth",

@@ -313,6 +313,9 @@ public class Benutzer {
 	}
 
 	public void addErstellteAktivitaeten(Aktivitaet aktivitaet) {
+		if (this.erstellteAktivitaeten == null) {
+			this.erstellteAktivitaeten = new ArrayList<Aktivitaet>();
+		}
 		if (!this.erstellteAktivitaeten.contains(aktivitaet)) {
 			this.erstellteAktivitaeten.add(aktivitaet);
 			aktivitaet.setOrganisation(this);
@@ -331,6 +334,9 @@ public class Benutzer {
 	}
 
 	public void addTeilnahmen(Aktivitaet aktivitaet) {
+		if (this.teilnahmen == null) {
+			this.teilnahmen = new ArrayList<Aktivitaet>();
+		}
 		if (!this.teilnahmen.contains(aktivitaet)) {
 			this.teilnahmen.add(aktivitaet);
 			aktivitaet.getTeilnehmer().add(this);

@@ -4,11 +4,11 @@ import org.locationtech.jts.geom.Geometry;
 
 import at.geovolunteer.model.Benutzer;
 import at.geovolunteer.model.Rolle;
-import at.geovolunteer.service.BenutzerService;
+import at.geovolunteer.model.repo.BenutzerRepository;
 
 public abstract class AbstractBenutzerBuilder<T extends AbstractBenutzerBuilder<T>> {
 
-	protected final BenutzerService benutzerService;
+	protected final BenutzerRepository benutzerRepository;
 
 	protected Rolle rolle;
 	protected boolean active;
@@ -24,8 +24,8 @@ public abstract class AbstractBenutzerBuilder<T extends AbstractBenutzerBuilder<
 	protected String beschreibung;
 	protected Geometry shape;
 
-	protected AbstractBenutzerBuilder(BenutzerService benutzerService) {
-		this.benutzerService = benutzerService;
+	protected AbstractBenutzerBuilder(BenutzerRepository benutzerRepository) {
+		this.benutzerRepository = benutzerRepository;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -80,7 +80,7 @@ public abstract class AbstractBenutzerBuilder<T extends AbstractBenutzerBuilder<
 
 	protected void applyCommonFields(Benutzer b) {
 		b.setRolle(rolle);
-		b.setActive(active);
+		b.setActive(false);
 		b.setLogin(login);
 		b.setPassword(password);
 		b.setEmail(email);

@@ -121,14 +121,17 @@ public class AktivitaetService {
 		entity.setStartZeit(model.getStartZeit());
 		entity.setEndZeit(model.getEndZeit());
 
-		if (entity.getRessource() == null) {
-			Ressource ressource = new Ressource();
-			updateDefaultValues(ressource, model.getRessource());
-			ressource.setMaterialien(model.getRessource().getMaterialien());
-			ressource.setSicherheitsanforderungen(model.getRessource().getSicherheitsanforderungen());
-			ressource.setAnmerkung(model.getRessource().getAnmerkung());
+		Ressource ressource;
+		if (entity.getRessource().getId() == null) {
+			ressource = new Ressource();
 			entity.setRessource(ressource);
+		} else {
+			ressource = entity.getRessource();
 		}
+		updateDefaultValues(ressource, model.getRessource());
+		ressource.setMaterialien(model.getRessource().getMaterialien());
+		ressource.setSicherheitsanforderungen(model.getRessource().getSicherheitsanforderungen());
+		ressource.setAnmerkung(model.getRessource().getAnmerkung());
 		return entity;
 	}
 

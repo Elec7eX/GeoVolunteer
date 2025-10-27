@@ -3,7 +3,7 @@ import { Header } from "../header/Header";
 import { Card, Row, Col, Nav } from "react-bootstrap";
 import { Footer } from "../footer/Footer";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel, RessourceModel } from "../../types/Types";
 import { VerticalDivider } from "../../utils/Utils";
@@ -16,6 +16,7 @@ export default function RessourceDetailPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const aktivitaetFromState = location.state?.aktivitaet;
+  const mapRef = useRef<HTMLDivElement | null>(null);
 
   const [aktivitaet, setAktivitaet] = useState<AktivitaetModel | null>(null);
   const [ressource, setRessource] = useState<RessourceModel | null>(null);
@@ -126,12 +127,20 @@ export default function RessourceDetailPage() {
                   <PiMapPinArea
                     style={{ marginLeft: 100, color: "#00e7ff" }}
                     size={30}
-                    onClick={() => setIsShowMap(!isShowMap)}
+                    onClick={() => {
+                      setIsShowMap(!isShowMap);
+                      setTimeout(() => {
+                        mapRef.current?.scrollIntoView({
+                          behavior: "smooth",
+                          block: "start",
+                        });
+                      }, 200);
+                    }}
                   />
                 </div>
               </Col>
             </Row>
-            <Row style={{ padding: 10, marginTop: 40 }}>
+            <Row style={{ padding: 10, marginTop: 40 }} ref={mapRef}>
               {isShowMap && (
                 <MapComponent geoJsonData={ressource.shape} zoom={17} />
               )}

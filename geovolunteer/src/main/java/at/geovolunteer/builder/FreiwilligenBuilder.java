@@ -5,7 +5,7 @@ import java.util.Calendar;
 import at.geovolunteer.model.Benutzer;
 import at.geovolunteer.model.Einheit;
 import at.geovolunteer.model.Rolle;
-import at.geovolunteer.service.BenutzerService;
+import at.geovolunteer.model.repo.BenutzerRepository;
 
 public class FreiwilligenBuilder extends AbstractBenutzerBuilder<FreiwilligenBuilder> {
 
@@ -21,8 +21,8 @@ public class FreiwilligenBuilder extends AbstractBenutzerBuilder<FreiwilligenBui
 	private Calendar verfuegbarVonZeit;
 	private Calendar verfuegbarBisZeit;
 
-	public FreiwilligenBuilder(BenutzerService benutzerService) {
-		super(benutzerService);
+	public FreiwilligenBuilder(BenutzerRepository benutzerRepository) {
+		super(benutzerRepository);
 		this.rolle = Rolle.FREIWILLIGE;
 	}
 
@@ -73,6 +73,6 @@ public class FreiwilligenBuilder extends AbstractBenutzerBuilder<FreiwilligenBui
 		b.setVerfuegbarBisDatum(verfuegbarBisDatum);
 		b.setVerfuegbarVonZeit(verfuegbarVonZeit);
 		b.setVerfuegbarBisZeit(verfuegbarBisZeit);
-		return benutzerService.create(b);
+		return benutzerRepository.save(b);
 	}
 }

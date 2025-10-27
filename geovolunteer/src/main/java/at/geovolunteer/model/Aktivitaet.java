@@ -15,9 +15,6 @@ import at.geovolunteer.config.CalendarTimeDeserializer;
 import at.geovolunteer.config.CalendarTimeSerializer;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
@@ -29,10 +26,6 @@ import jakarta.persistence.TemporalType;
 @Entity
 @Table(name = "aktivitaet")
 public class Aktivitaet extends AbstractAktivitaet {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
 
 	private int teilnehmeranzahl;
 	private String transport;
@@ -72,14 +65,6 @@ public class Aktivitaet extends AbstractAktivitaet {
 	// Teilnehmer (Freiwillige)
 	@ManyToMany(mappedBy = "teilnahmen")
 	private List<Benutzer> teilnehmer;
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
 
 	public int getTeilnehmeranzahl() {
 		return teilnehmeranzahl;

@@ -2,15 +2,15 @@ package at.geovolunteer.builder;
 
 import at.geovolunteer.model.Benutzer;
 import at.geovolunteer.model.Rolle;
-import at.geovolunteer.service.BenutzerService;
+import at.geovolunteer.model.repo.BenutzerRepository;
 
 public class OrganisationBuilder extends AbstractBenutzerBuilder<OrganisationBuilder> {
 
 	private String name;
 	private String webseite;
 
-	public OrganisationBuilder(BenutzerService benutzerService) {
-		super(benutzerService);
+	public OrganisationBuilder(BenutzerRepository benutzerRepository) {
+		super(benutzerRepository);
 		this.rolle = Rolle.ORGANISATION;
 	}
 
@@ -31,7 +31,7 @@ public class OrganisationBuilder extends AbstractBenutzerBuilder<OrganisationBui
 		b.setName(name);
 		b.setWebseite(webseite);
 		b.setRolle(Rolle.ORGANISATION);
-		return benutzerService.create(b);
+		return benutzerRepository.save(b);
 	}
 
 }
