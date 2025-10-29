@@ -21,7 +21,7 @@ import OrganisationDetailPage from "./components/organisation/OrganisationDetail
 const App: React.FC = () => {
   console.log(i18n);
   return (
-    <div className="app">
+    <div id="app-root" className="app">
       {<script src="http://localhost:8097"></script>}
       <AuthProvider>
         {/*<Pages />*/}

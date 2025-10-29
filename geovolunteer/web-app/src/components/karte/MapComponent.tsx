@@ -59,8 +59,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
     const timeout = setTimeout(() => {
       if (!drawnItemsRef.current) return;
 
-      drawnItemsRef.current.clearLayers();
-
       // GeoJSON Layer erzeugen
       const layer = L.geoJSON(geoJsonData as any, {
         pointToLayer: (feature, latlng) => {

@@ -94,10 +94,10 @@ export default function AktivitaetenOverview() {
         {user.rolle === UserType.FREIWILLIGE && (
           <>
             <div style={{ marginTop: 30 }}>
+              <h5>{t("aktivitaeten.overview.registered.title")}</h5>
               {angemeldeteAktivitaeten.length > 0 &&
                 angemeldeteAktivitaeten.map((aktivitaet) => (
                   <>
-                    <h5>{t("aktivitaeten.overview.registered.title")}</h5>
                     <Card
                       key={aktivitaet.id}
                       className="custom-card"
@@ -126,9 +126,9 @@ export default function AktivitaetenOverview() {
                         <Card.Text>{aktivitaet.beschreibung}</Card.Text>
                       </CardBody>
                     </Card>
-                    <hr style={{ marginTop: 30 }} />
                   </>
                 ))}
+              <hr style={{ marginTop: 30 }} />
             </div>
           </>
         )}
