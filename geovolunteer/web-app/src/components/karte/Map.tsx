@@ -20,9 +20,8 @@ import { UserType } from "../../enums/Enums";
 import userService from "../../services/UserServices";
 import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel, UserModel } from "../../types/Types";
-import { Button, DropdownDivider, Form, Offcanvas } from "react-bootstrap";
+import { Button, DropdownDivider, Form, Nav, Offcanvas } from "react-bootstrap";
 import { FaFilter, FaRoute } from "react-icons/fa";
-import type { Feature, Geometry } from "geojson";
 import { RoutingMachine } from "../karte/RoutingMachine";
 
 interface FilterType {
@@ -34,14 +33,16 @@ interface FilterType {
   alleFreiwilligen: boolean;
 }
 
+interface ToolsType {
+  routenplaner: boolean;
+}
+
 interface AktivitaetFilterType {
   visible: boolean;
   expanded: boolean;
   ressource: boolean;
   teilnehmer: { [id: string]: boolean };
 }
-
-type GeoJsonFeature = Feature<Geometry, { [key: string]: any }> | null;
 
 export default function Map() {
   const [user] = useLocalStorage("user", null);
@@ -52,6 +53,7 @@ export default function Map() {
   const [show, setShow] = useState(false);
 
   const [selectedPoints, setSelectedPoints] = useState<L.LatLng[]>([]);
+  const [activeTab, setActiveTab] = useState("filter"); // "filter" oder "aktionen"
 
   const [filter, setFilter] = useState<FilterType>({
     meineOrganisation: true,
@@ -76,6 +78,23 @@ export default function Map() {
     []
   );
   const [alleFreiwilligen, setAlleFreiwilligen] = useState<UserModel[]>([]);
+
+  const [tools, setTools] = useState<ToolsType>({
+    routenplaner: false,
+  });
+
+  const toolsRef = useRef(tools);
+
+  // ref immer aktuell halten
+  useEffect(() => {
+    toolsRef.current = tools;
+  }, [tools]);
+
+  useEffect(() => {
+    if (!tools.routenplaner) {
+      setSelectedPoints([]); // entfernt Waypoints → RoutingMachine wird unmounten
+    }
+  }, [tools.routenplaner]);
 
   useEffect(() => {
     if (!initialized.current) {
@@ -186,6 +205,19 @@ export default function Map() {
     }));
   };
 
+  const updateTools = (toolName: keyof ToolsType) => {
+    setTools((prev) => {
+      const newState = { ...prev, [toolName]: !prev[toolName] };
+
+      // wenn wir den Routenplaner gerade ausschalten -> Punkte löschen
+      if (toolName === "routenplaner" && prev.routenplaner) {
+        setSelectedPoints([]);
+      }
+
+      return newState;
+    });
+  };
+
   const orgIcon = new Icon({
     iconUrl: require("../../icons/organisation.png"),
     iconSize: [100, 100],
@@ -256,8 +288,9 @@ export default function Map() {
   }
 
   const handleRoutingClick = (e: any) => {
-    const layer = e.target;
+    if (!toolsRef.current.routenplaner) return;
 
+    const layer = e.target;
     const latlng = getPolygonCenter(layer);
 
     setSelectedPoints((prev) => {
@@ -267,8 +300,22 @@ export default function Map() {
       );
 
       if (isDuplicate) {
-        // Punkt existiert bereits → nichts tun
-        return prev;
+        // Visuelles Feedback: kurzes Popup
+        L.popup({
+          closeButton: false,
+          autoClose: true,
+          className: "duplicate-popup",
+        })
+          .setLatLng(latlng)
+          .setContent("Dieser Punkt wurde bereits gewählt")
+          .openOn(layer._map); // auf der Karte öffnen
+
+        // Popup nach 1,5 Sekunden schließen
+        setTimeout(() => {
+          layer._map.closePopup();
+        }, 1500);
+
+        return prev; // Punkt nicht hinzufügen
       }
       if (prev.length < 2) return [...prev, latlng];
       return [latlng]; // alte Route überschreiben
@@ -306,10 +353,6 @@ export default function Map() {
                       layer.bindPopup(
                         meineOrganistaion?.name ?? "Organisation"
                       );
-                      layer.bindTooltip(f.properties?.name || "Marker", {
-                        permanent: false,
-                        direction: "top",
-                      });
                       layer.on("click", handleRoutingClick);
                     }}
                   />
@@ -394,10 +437,12 @@ export default function Map() {
                     <GeoJSON
                       key={`alleOrganisationen-${index}`}
                       data={feature.shape!}
+                      pointToLayer={(feature, latlng) => {
+                        return L.marker(latlng, { icon: orgIcon });
+                      }}
                       onEachFeature={(f, layer) => {
-                        layer.bindPopup(
-                          f.properties?.vorname + " " + f.properties?.nachname
-                        );
+                        layer.bindPopup(f.properties?.name ?? "Organisation");
+                        layer.on("click", handleRoutingClick);
                       }}
                     />
                   ))}
@@ -406,6 +451,9 @@ export default function Map() {
                     <GeoJSON
                       key={`alleAktivitaeten-${index}`}
                       data={feature.shape!}
+                      pointToLayer={(feature, latlng) => {
+                        return L.marker(latlng, { icon: aktivitaetIcon });
+                      }}
                       style={() => ({
                         color: "#007bff",
                         weight: 2,
@@ -423,6 +471,9 @@ export default function Map() {
                     <GeoJSON
                       key={`alleFreiwilligen-${index}`}
                       data={feature.shape!}
+                      pointToLayer={(f, latlng) =>
+                        L.marker(latlng, { icon: freiwilligeIcon })
+                      }
                       onEachFeature={(f, layer) => {
                         layer.bindPopup(
                           f.properties?.vorname + " " + f.properties?.nachname
@@ -433,23 +484,25 @@ export default function Map() {
               </>
             )}
           </FeatureGroup>
-          {selectedPoints.length >= 2 && (
-            <RoutingMachine waypoints={selectedPoints} />
+          {tools.routenplaner && selectedPoints.length >= 2 && (
+            <>
+              <RoutingMachine waypoints={selectedPoints} />
+              <Button
+                onClick={() => setSelectedPoints([])}
+                variant="light"
+                style={{
+                  position: "absolute",
+                  marginRight: "40px",
+                  top: "10px",
+                  right: "10px",
+                  zIndex: 900,
+                  border: "2px solid rgba(0,0,0,0.3)",
+                }}
+              >
+                <FaRoute color="black" /> Route zurücksetzen
+              </Button>
+            </>
           )}
-          <Button
-            onClick={() => setSelectedPoints([])}
-            variant="light"
-            style={{
-              position: "absolute",
-              marginRight: "40px",
-              top: "10px",
-              right: "10px",
-              zIndex: 900,
-              border: "2px solid rgba(0,0,0,0.3)",
-            }}
-          >
-            <FaRoute color="black" /> Route zurücksetzen
-          </Button>
           <Button
             onClick={toggleShow}
             className="me-2 map-dropdown"
@@ -481,169 +534,153 @@ export default function Map() {
                 <Offcanvas.Title
                   style={{ fontWeight: "bold", fontSize: "30px" }}
                 >
-                  {t("map.filter.header.title")}
+                  {activeTab === "filter" && t("map.filter.header.title")}
+                  {activeTab === "tools" && t("map.tools.header.title")}
                 </Offcanvas.Title>
               </Offcanvas.Header>
               <Offcanvas.Body>
-                <div>
-                  <h1 className="map-dropdown_title">
-                    {t("map.filter.organisation.alle.title")}
-                  </h1>
-                  <Form.Check
-                    type="checkbox"
-                    id="alleOrganisationen"
-                    label={t("map.filter.organisation.alle.organisationen")}
-                    checked={filter.alleOrganisationen}
-                    onChange={() => updateFilter("alleOrganisationen")}
-                    style={{ marginBottom: "5px" }}
-                  />
-                  <Form.Check
-                    type="checkbox"
-                    id="alleAktivitaeten"
-                    label={t("map.filter.organisation.alle.aktivitaeten")}
-                    checked={filter.alleAktivitaeten}
-                    onChange={() => updateFilter("alleAktivitaeten")}
-                  />
-                  <Form.Check
-                    type="checkbox"
-                    id="alleFreiwilligen"
-                    label={t("map.filter.organisation.alle.freiwillige")}
-                    checked={filter.alleFreiwilligen}
-                    onChange={() => updateFilter("alleFreiwilligen")}
-                    style={{ marginBottom: "5px" }}
-                  />
-                </div>
-                <DropdownDivider />
-                <div style={{ padding: "10px" }}>
-                  <div style={{ marginBottom: "10px" }}>
-                    <h1 className="map-dropdown_title">
-                      {t("map.filter.organisation.eigene.title")}
-                    </h1>
-                    <Form.Check
-                      type="checkbox"
-                      id="meineOrganisation"
-                      label={t("map.filter.organisation.eigene")}
-                      checked={filter.meineOrganisation}
-                      onChange={() => updateFilter("meineOrganisation")}
-                    />
-                    <Form.Check
-                      type="checkbox"
-                      id="meineAktivitaeten"
-                      label={t("map.filter.organisation.submenu.arrow")}
-                      checked={filter.meineAktivitaeten}
-                      onChange={() => updateFilter("meineAktivitaeten")}
-                    />
-                    {filter.meineAktivitaeten &&
-                      meineAktivitaeten.length > 0 && (
-                        <div style={{ marginLeft: "15px", marginTop: "5px" }}>
-                          {meineAktivitaeten.map((feature, index) => {
-                            const id = feature?.id ?? index;
-                            const name = feature?.name ?? +` ${index + 1}`;
-                            const aFilter = aktivitaetenFilter[id];
+                <Nav variant="tabs" defaultActiveKey="filter" className="mb-3">
+                  <Nav.Item>
+                    <Nav.Link
+                      active={activeTab === "filter"}
+                      onClick={() => setActiveTab("filter")}
+                    >
+                      {t("map.filter.header.title")}
+                    </Nav.Link>
+                  </Nav.Item>
+                  <Nav.Item>
+                    <Nav.Link
+                      active={activeTab === "tools"}
+                      onClick={() => setActiveTab("tools")}
+                    >
+                      {t("map.tools.header.title")}
+                    </Nav.Link>
+                  </Nav.Item>
+                </Nav>
+                {activeTab === "filter" && (
+                  <>
+                    <div>
+                      <h1 className="map-dropdown_title">
+                        {t("map.filter.organisation.alle.title")}
+                      </h1>
+                      <Form.Check
+                        type="checkbox"
+                        id="alleOrganisationen"
+                        label={t("map.filter.organisation.alle.organisationen")}
+                        checked={filter.alleOrganisationen}
+                        onChange={() => updateFilter("alleOrganisationen")}
+                        style={{ marginBottom: "5px" }}
+                      />
+                      <Form.Check
+                        type="checkbox"
+                        id="alleAktivitaeten"
+                        label={t("map.filter.organisation.alle.aktivitaeten")}
+                        checked={filter.alleAktivitaeten}
+                        onChange={() => updateFilter("alleAktivitaeten")}
+                      />
+                      <Form.Check
+                        type="checkbox"
+                        id="alleFreiwilligen"
+                        label={t("map.filter.organisation.alle.freiwillige")}
+                        checked={filter.alleFreiwilligen}
+                        onChange={() => updateFilter("alleFreiwilligen")}
+                        style={{ marginBottom: "5px" }}
+                      />
+                    </div>
+                    <DropdownDivider />
+                    <div style={{ padding: "10px" }}>
+                      <div style={{ marginBottom: "10px" }}>
+                        <h1 className="map-dropdown_title">
+                          {t("map.filter.organisation.eigene.title")}
+                        </h1>
+                        <Form.Check
+                          type="checkbox"
+                          id="meineOrganisation"
+                          label={t("map.filter.organisation.eigene")}
+                          checked={filter.meineOrganisation}
+                          onChange={() => updateFilter("meineOrganisation")}
+                        />
+                        <Form.Check
+                          type="checkbox"
+                          id="meineAktivitaeten"
+                          label={t("map.filter.organisation.submenu.arrow")}
+                          checked={filter.meineAktivitaeten}
+                          onChange={() => updateFilter("meineAktivitaeten")}
+                        />
+                        {filter.meineAktivitaeten &&
+                          meineAktivitaeten.length > 0 && (
+                            <div
+                              style={{ marginLeft: "15px", marginTop: "5px" }}
+                            >
+                              {meineAktivitaeten.map((feature, index) => {
+                                const id = feature?.id ?? index;
+                                const name = feature?.name ?? +` ${index + 1}`;
+                                const aFilter = aktivitaetenFilter[id];
 
-                            if (!aFilter) return null;
+                                if (!aFilter) return null;
 
-                            return (
-                              <div key={id} style={{ marginBottom: "5px" }}>
-                                {/* Aktivität */}
-                                <div
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <Form.Check
-                                    type="checkbox"
-                                    id={`aktivitaet-${id}`}
-                                    label={name}
-                                    checked={aFilter.visible}
-                                    onChange={() =>
-                                      setAktivitaetenFilter((prev) => ({
-                                        ...prev,
-                                        [id]: {
-                                          ...prev[id],
-                                          visible: !prev[id].visible,
-                                        },
-                                      }))
-                                    }
-                                  />
-                                  <span
-                                    style={{
-                                      cursor: "pointer",
-                                      fontSize: "14px",
-                                      marginRight: "10px",
-                                    }}
-                                    onClick={() =>
-                                      setAktivitaetenFilter((prev) => ({
-                                        ...prev,
-                                        [id]: {
-                                          ...prev[id],
-                                          expanded: !prev[id].expanded,
-                                        },
-                                      }))
-                                    }
-                                  >
-                                    {aFilter.expanded ? "▲" : "▼"}
-                                  </span>
-                                </div>
-
-                                {/* Aktivität aufklappen */}
-                                {aFilter.expanded && (
-                                  <div
-                                    style={{
-                                      marginLeft: "25px",
-                                      marginTop: "5px",
-                                      paddingLeft: "10px",
-                                      borderLeft: "2px solid rgba(0,0,0,0.1)",
-                                    }}
-                                  >
-                                    {/* Ressource */}
-                                    {aFilter.visible ? (
-                                      <strong style={{ fontSize: "0.9rem" }}>
-                                        {t("ressourcen.card.link")}
-                                      </strong>
-                                    ) : (
-                                      <strong
+                                return (
+                                  <div key={id} style={{ marginBottom: "5px" }}>
+                                    {/* Aktivität */}
+                                    <div
+                                      style={{
+                                        display: "flex",
+                                        justifyContent: "space-between",
+                                        alignItems: "center",
+                                      }}
+                                    >
+                                      <Form.Check
+                                        type="checkbox"
+                                        id={`aktivitaet-${id}`}
+                                        label={name}
+                                        checked={aFilter.visible}
+                                        onChange={() =>
+                                          setAktivitaetenFilter((prev) => ({
+                                            ...prev,
+                                            [id]: {
+                                              ...prev[id],
+                                              visible: !prev[id].visible,
+                                            },
+                                          }))
+                                        }
+                                      />
+                                      <span
                                         style={{
-                                          fontSize: "0.9rem",
-                                          cursor: "default",
-                                          opacity: 0.5,
+                                          cursor: "pointer",
+                                          fontSize: "14px",
+                                          marginRight: "10px",
+                                        }}
+                                        onClick={() =>
+                                          setAktivitaetenFilter((prev) => ({
+                                            ...prev,
+                                            [id]: {
+                                              ...prev[id],
+                                              expanded: !prev[id].expanded,
+                                            },
+                                          }))
+                                        }
+                                      >
+                                        {aFilter.expanded ? "▲" : "▼"}
+                                      </span>
+                                    </div>
+
+                                    {/* Aktivität aufklappen */}
+                                    {aFilter.expanded && (
+                                      <div
+                                        style={{
+                                          marginLeft: "25px",
+                                          marginTop: "5px",
+                                          paddingLeft: "10px",
+                                          borderLeft:
+                                            "2px solid rgba(0,0,0,0.1)",
                                         }}
                                       >
-                                        {t("ressourcen.card.link")}
-                                      </strong>
-                                    )}
-                                    <Form.Check
-                                      type="checkbox"
-                                      id={`ressource-${id}`}
-                                      label={feature.ressource.name}
-                                      disabled={!aFilter.visible}
-                                      checked={
-                                        aFilter.visible && aFilter.ressource
-                                      }
-                                      onChange={() =>
-                                        setAktivitaetenFilter((prev) => ({
-                                          ...prev,
-                                          [id]: {
-                                            ...prev[id],
-                                            ressource: !prev[id].ressource,
-                                          },
-                                        }))
-                                      }
-                                    />
-
-                                    {/* Teilnehmer */}
-                                    {Object.entries(aFilter.teilnehmer).length >
-                                      0 && (
-                                      <>
+                                        {/* Ressource */}
                                         {aFilter.visible ? (
                                           <strong
                                             style={{ fontSize: "0.9rem" }}
                                           >
-                                            {t(
-                                              "map.filter.organisation.teilnehmer"
-                                            )}
+                                            {t("ressourcen.card.link")}
                                           </strong>
                                         ) : (
                                           <strong
@@ -653,54 +690,115 @@ export default function Map() {
                                               opacity: 0.5,
                                             }}
                                           >
-                                            {t(
-                                              "map.filter.organisation.teilnehmer"
-                                            )}
+                                            {t("ressourcen.card.link")}
                                           </strong>
                                         )}
-                                      </>
-                                    )}
-                                    {Object.entries(aFilter.teilnehmer).map(
-                                      ([tid, visible]) => (
                                         <Form.Check
-                                          key={tid}
                                           type="checkbox"
-                                          id={`teilnehmer-${tid}`}
+                                          id={`ressource-${id}`}
+                                          label={feature.ressource.name}
                                           disabled={!aFilter.visible}
-                                          label={feature.teilnehmer
-                                            ?.filter(
-                                              (t) => String(t.id) === tid
-                                            )
-                                            .map(
-                                              (t) =>
-                                                t.vorname + " " + t.nachname
-                                            )}
-                                          checked={aFilter.visible && visible}
+                                          checked={
+                                            aFilter.visible && aFilter.ressource
+                                          }
                                           onChange={() =>
                                             setAktivitaetenFilter((prev) => ({
                                               ...prev,
                                               [id]: {
                                                 ...prev[id],
-                                                teilnehmer: {
-                                                  ...prev[id].teilnehmer,
-                                                  [tid]: !visible,
-                                                },
+                                                ressource: !prev[id].ressource,
                                               },
                                             }))
                                           }
-                                          style={{ marginLeft: "10px" }}
                                         />
-                                      )
+
+                                        {/* Teilnehmer */}
+                                        {Object.entries(aFilter.teilnehmer)
+                                          .length > 0 && (
+                                          <>
+                                            {aFilter.visible ? (
+                                              <strong
+                                                style={{ fontSize: "0.9rem" }}
+                                              >
+                                                {t(
+                                                  "map.filter.organisation.teilnehmer"
+                                                )}
+                                              </strong>
+                                            ) : (
+                                              <strong
+                                                style={{
+                                                  fontSize: "0.9rem",
+                                                  cursor: "default",
+                                                  opacity: 0.5,
+                                                }}
+                                              >
+                                                {t(
+                                                  "map.filter.organisation.teilnehmer"
+                                                )}
+                                              </strong>
+                                            )}
+                                          </>
+                                        )}
+                                        {Object.entries(aFilter.teilnehmer).map(
+                                          ([tid, visible]) => (
+                                            <Form.Check
+                                              key={tid}
+                                              type="checkbox"
+                                              id={`teilnehmer-${tid}`}
+                                              disabled={!aFilter.visible}
+                                              label={feature.teilnehmer
+                                                ?.filter(
+                                                  (t) => String(t.id) === tid
+                                                )
+                                                .map(
+                                                  (t) =>
+                                                    t.vorname + " " + t.nachname
+                                                )}
+                                              checked={
+                                                aFilter.visible && visible
+                                              }
+                                              onChange={() =>
+                                                setAktivitaetenFilter(
+                                                  (prev) => ({
+                                                    ...prev,
+                                                    [id]: {
+                                                      ...prev[id],
+                                                      teilnehmer: {
+                                                        ...prev[id].teilnehmer,
+                                                        [tid]: !visible,
+                                                      },
+                                                    },
+                                                  })
+                                                )
+                                              }
+                                              style={{ marginLeft: "10px" }}
+                                            />
+                                          )
+                                        )}
+                                      </div>
                                     )}
                                   </div>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                  </div>
-                </div>
+                                );
+                              })}
+                            </div>
+                          )}
+                      </div>
+                    </div>
+                  </>
+                )}
+                {activeTab === "tools" && (
+                  <>
+                    <div>
+                      <Form.Check
+                        type="switch"
+                        id="routingSwitch"
+                        label={t("map.tools.routing.title")}
+                        checked={tools.routenplaner}
+                        onChange={() => updateTools("routenplaner")}
+                      />
+                    </div>
+                  </>
+                )}
               </Offcanvas.Body>
             </Offcanvas>
           )}

@@ -26,6 +26,7 @@ export function RoutingMachine({ waypoints }: { waypoints: L.LatLng[] }) {
         lineOptions: {
           styles: [{ color: "#007bff", weight: 5, opacity: 0.7 }],
         },
+        language: "de",
         routeWhileDragging: false,
         addWaypoints: false,
         draggableWaypoints: false,

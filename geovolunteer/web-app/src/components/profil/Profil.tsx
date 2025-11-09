@@ -7,13 +7,11 @@ import { useEffect, useRef, useState } from "react";
 import { GeoJsonFeature, UserModel } from "../../types/Types";
 import userService from "../../services/UserServices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useMapEvents } from "react-leaflet";
 import { Card, Row, Col, Button, Form, InputGroup } from "react-bootstrap";
 import {
   Form as FormikForm,
   Formik,
   FormikHelpers,
-  useFormikContext,
   FormikErrors,
 } from "formik";
 import axios from "axios";
@@ -34,7 +32,6 @@ export default function Profil() {
 
   const [userShape, setUserShape] = useState<GeoJsonFeature>();
   const [edit, setEdit] = useState<boolean>(false);
-  const [address, setAddress] = useState("");
   const [latitude, setLatitude] = useState<number>(0);
   const [longitude, setLongitude] = useState<number>(0);
   const [showPassword, setShowPassword] = useState(false);
