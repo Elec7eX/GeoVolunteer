@@ -21,12 +21,11 @@ import userService from "../../services/UserServices";
 import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel, UserModel } from "../../types/Types";
 import { Button, DropdownDivider, Form, Offcanvas } from "react-bootstrap";
-import { FaFilter } from "react-icons/fa";
+import { FaFilter, FaRoute } from "react-icons/fa";
 import type { Feature, Geometry } from "geojson";
 import { RoutingMachine } from "../karte/RoutingMachine";
 
 interface FilterType {
-  showSubmenu: boolean;
   meineOrganisation: boolean;
   meineAktivitaeten: boolean;
   meineFreiwilligen: boolean;
@@ -52,8 +51,9 @@ export default function Map() {
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const [show, setShow] = useState(false);
 
+  const [selectedPoints, setSelectedPoints] = useState<L.LatLng[]>([]);
+
   const [filter, setFilter] = useState<FilterType>({
-    showSubmenu: false,
     meineOrganisation: true,
     meineAktivitaeten: true,
     meineFreiwilligen: false,
@@ -71,34 +71,12 @@ export default function Map() {
   );
   const [meineFreiwilligen, setMeineFreiwilligen] = useState<UserModel[]>([]);
 
-  const [alleOrganistaionen, setAlleOrganisationen] = useState<
-    GeoJsonFeature[]
-  >([]);
-  const [alleAktivitaeten, setAlleAktivitaeten] = useState<GeoJsonFeature[]>(
+  const [alleOrganistaionen, setAlleOrganisationen] = useState<UserModel[]>([]);
+  const [alleAktivitaeten, setAlleAktivitaeten] = useState<AktivitaetModel[]>(
     []
   );
-  const [alleFreiwilligen, setAlleFreiwilligen] = useState<GeoJsonFeature[]>(
-    []
-  );
+  const [alleFreiwilligen, setAlleFreiwilligen] = useState<UserModel[]>([]);
 
-  const [selectedPoints, setSelectedPoints] = useState<L.LatLng[]>([]);
-
-  const allOptions: { label: string; feature: GeoJsonFeature }[] = [
-    ...(meineOrganistaion?.shape
-      ? [
-          {
-            label: meineOrganistaion.name ?? "Organisation",
-            feature: meineOrganistaion.shape,
-          },
-        ]
-      : []),
-    ...meineAktivitaeten
-      .filter((a) => a.shape)
-      .map((a) => ({ label: a.name ?? "Aktivität", feature: a.shape! })),
-    ...meineFreiwilligen
-      .filter((f) => f.shape)
-      .map((f) => ({ label: f.vorname + " " + f.nachname, feature: f.shape! })),
-  ];
   useEffect(() => {
     if (!initialized.current) {
       if (UserType.ORGANISATION === user.rolle) {
@@ -181,9 +159,7 @@ export default function Map() {
     if (filterName === "alleOrganisationen" && alleOrganistaionen.length < 1) {
       userService.getOrganisationen().then((resp) => {
         if (resp.status === 200) {
-          const organisationenShapes: GeoJsonFeature[] = resp.data.map(
-            (org: UserModel) => org.shape!
-          );
+          const organisationenShapes: UserModel[] = resp.data;
           setAlleOrganisationen(organisationenShapes);
         }
       });
@@ -191,9 +167,7 @@ export default function Map() {
     if (filterName === "alleAktivitaeten" && alleAktivitaeten.length < 1) {
       aktivitaetService.getAll().then((resp) => {
         if (resp.status === 200) {
-          const aktivitaetenShapes: GeoJsonFeature[] = resp.data.map(
-            (aktivitaet: AktivitaetModel) => aktivitaet.shape
-          );
+          const aktivitaetenShapes: AktivitaetModel[] = resp.data;
           setAlleAktivitaeten(aktivitaetenShapes);
         }
       });
@@ -201,20 +175,11 @@ export default function Map() {
     if (filterName === "alleFreiwilligen" && alleFreiwilligen.length < 1) {
       userService.getFreiwillige().then((resp) => {
         if (resp.status === 200) {
-          const freiwilligenShapes: GeoJsonFeature[] = resp.data.map(
-            (freiwillige: UserModel) => freiwillige.shape!
-          );
+          const freiwilligenShapes: UserModel[] = resp.data;
           setAlleFreiwilligen(freiwilligenShapes);
         }
       });
     }
-    setFilter((prev) => ({
-      ...prev,
-      [filterName]: !prev[filterName],
-    }));
-  };
-
-  const updateSubmenu = (filterName: keyof FilterType) => {
     setFilter((prev) => ({
       ...prev,
       [filterName]: !prev[filterName],
@@ -243,6 +208,72 @@ export default function Map() {
 
   const handleClose = () => setShow(false);
   const toggleShow = () => setShow((s) => !s);
+
+  function getPolygonCenter(layer: any): L.LatLng {
+    const geometry = layer.feature?.geometry;
+
+    if (!geometry) {
+      // Fallback → Marker oder Klickkoordinate
+      if (layer.getLatLng) return layer.getLatLng();
+      return layer.getBounds ? layer.getBounds().getCenter() : L.latLng(0, 0);
+    }
+
+    let coords: [number, number][] = [];
+
+    switch (geometry.type) {
+      case "Polygon":
+        // Polygon → alle Punkte flatten
+        coords = geometry.coordinates.flat();
+        break;
+
+      case "MultiPolygon":
+        // Multipolygon → alle Punkte aller Polygone flatten
+        coords = geometry.coordinates.flat(2);
+        break;
+
+      case "Point":
+        return L.latLng(geometry.coordinates[1], geometry.coordinates[0]);
+
+      default:
+        // Fallback: Bounding Box
+        if (layer.getBounds) return layer.getBounds().getCenter();
+        return L.latLng(0, 0);
+    }
+
+    if (coords.length === 0) return L.latLng(0, 0);
+
+    // Berechne Durchschnittsposition
+    const sum = coords.reduce(
+      (acc: [number, number], [lng, lat]: [number, number]) => [
+        acc[0] + lat,
+        acc[1] + lng,
+      ],
+      [0, 0]
+    );
+
+    const count = coords.length;
+    return L.latLng(sum[0] / count, sum[1] / count);
+  }
+
+  const handleRoutingClick = (e: any) => {
+    const layer = e.target;
+
+    const latlng = getPolygonCenter(layer);
+
+    setSelectedPoints((prev) => {
+      // Prüfen, ob der Punkt schon gesetzt ist
+      const isDuplicate = prev.some(
+        (p) => p.lat === latlng.lat && p.lng === latlng.lng
+      );
+
+      if (isDuplicate) {
+        // Punkt existiert bereits → nichts tun
+        return prev;
+      }
+      if (prev.length < 2) return [...prev, latlng];
+      return [latlng]; // alte Route überschreiben
+    });
+  };
 
   return (
     <>
@@ -279,6 +310,7 @@ export default function Map() {
                         permanent: false,
                         direction: "top",
                       });
+                      layer.on("click", handleRoutingClick);
                     }}
                   />
                 )}
@@ -298,19 +330,7 @@ export default function Map() {
                         }
                         onEachFeature={(f, layer) => {
                           layer.bindPopup(feature.name ?? "Aktivität");
-                          layer.bindTooltip(f.properties?.name || "Marker", {
-                            permanent: false,
-                            direction: "top",
-                          });
-                          layer.on("click", (e) => {
-                            const latlng = e.latlng;
-                            setSelectedPoints((prev) => {
-                              const newPoints = [...prev, latlng];
-                              // Nach zwei Punkten Route starten
-                              if (newPoints.length > 2) newPoints.shift(); // Nur 2 behalten
-                              return newPoints;
-                            });
-                          });
+                          layer.on("click", handleRoutingClick);
                         }}
                       />
                     );
@@ -328,6 +348,7 @@ export default function Map() {
                             layer.bindPopup(
                               feature.ressource?.name ?? "Ressource"
                             );
+                            layer.on("click", handleRoutingClick);
                           }}
                         />
                       ) : null;
@@ -349,6 +370,7 @@ export default function Map() {
                                   " " +
                                   (f.properties?.nachname ?? "")
                               );
+                              layer.on("click", handleRoutingClick);
                             }}
                           />
                         )) ?? [];
@@ -371,7 +393,7 @@ export default function Map() {
                   alleOrganistaionen.map((feature, index) => (
                     <GeoJSON
                       key={`alleOrganisationen-${index}`}
-                      data={feature!}
+                      data={feature.shape!}
                       onEachFeature={(f, layer) => {
                         layer.bindPopup(
                           f.properties?.vorname + " " + f.properties?.nachname
@@ -383,7 +405,7 @@ export default function Map() {
                   alleAktivitaeten.map((feature, index) => (
                     <GeoJSON
                       key={`alleAktivitaeten-${index}`}
-                      data={feature!}
+                      data={feature.shape!}
                       style={() => ({
                         color: "#007bff",
                         weight: 2,
@@ -400,7 +422,7 @@ export default function Map() {
                   alleFreiwilligen.map((feature, index) => (
                     <GeoJSON
                       key={`alleFreiwilligen-${index}`}
-                      data={feature!}
+                      data={feature.shape!}
                       onEachFeature={(f, layer) => {
                         layer.bindPopup(
                           f.properties?.vorname + " " + f.properties?.nachname
@@ -414,6 +436,20 @@ export default function Map() {
           {selectedPoints.length >= 2 && (
             <RoutingMachine waypoints={selectedPoints} />
           )}
+          <Button
+            onClick={() => setSelectedPoints([])}
+            variant="light"
+            style={{
+              position: "absolute",
+              marginRight: "40px",
+              top: "10px",
+              right: "10px",
+              zIndex: 900,
+              border: "2px solid rgba(0,0,0,0.3)",
+            }}
+          >
+            <FaRoute color="black" /> Route zurücksetzen
+          </Button>
           <Button
             onClick={toggleShow}
             className="me-2 map-dropdown"
