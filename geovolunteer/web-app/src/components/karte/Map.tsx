@@ -23,6 +23,7 @@ import { AktivitaetModel, UserModel } from "../../types/Types";
 import { Button, DropdownDivider, Form, Nav, Offcanvas } from "react-bootstrap";
 import { FaFilter, FaRoute } from "react-icons/fa";
 import { RoutingMachine } from "../karte/RoutingMachine";
+import * as turf from "@turf/turf";
 
 interface FilterType {
   meineOrganisation: boolean;
@@ -35,6 +36,7 @@ interface FilterType {
 
 interface ToolsType {
   routenplaner: boolean;
+  distanzberechnung: boolean;
 }
 
 interface AktivitaetFilterType {
@@ -53,6 +55,9 @@ export default function Map() {
   const [show, setShow] = useState(false);
 
   const [selectedPoints, setSelectedPoints] = useState<L.LatLng[]>([]);
+  const [distanceLine, setDistanceLine] = useState<L.Polyline | null>(null);
+  const [distanceLabel, setDistanceLabel] = useState<L.Marker | null>(null);
+
   const [activeTab, setActiveTab] = useState("filter"); // "filter" oder "aktionen"
 
   const [filter, setFilter] = useState<FilterType>({
@@ -81,6 +86,7 @@ export default function Map() {
 
   const [tools, setTools] = useState<ToolsType>({
     routenplaner: false,
+    distanzberechnung: false,
   });
 
   const toolsRef = useRef(tools);
@@ -91,10 +97,10 @@ export default function Map() {
   }, [tools]);
 
   useEffect(() => {
-    if (!tools.routenplaner) {
+    if (!tools.routenplaner || !tools.distanzberechnung) {
       setSelectedPoints([]); // entfernt Waypoints → RoutingMachine wird unmounten
     }
-  }, [tools.routenplaner]);
+  }, [tools.routenplaner, tools.distanzberechnung]);
 
   useEffect(() => {
     if (!initialized.current) {
@@ -288,7 +294,8 @@ export default function Map() {
   }
 
   const handleRoutingClick = (e: any) => {
-    if (!toolsRef.current.routenplaner) return;
+    if (!toolsRef.current.routenplaner && !toolsRef.current.distanzberechnung)
+      return;
 
     const layer = e.target;
     const latlng = getPolygonCenter(layer);
@@ -321,6 +328,77 @@ export default function Map() {
       return [latlng]; // alte Route überschreiben
     });
   };
+
+  useEffect(() => {
+    const map = (drawnItemsRef.current as any)?._map as L.Map | undefined;
+    if (!map) return;
+
+    // Nur ausführen, wenn der Routenplaner aktiv ist
+    if (!toolsRef.current.distanzberechnung) {
+      if (distanceLine) {
+        distanceLine.remove();
+        setDistanceLine(null);
+      }
+      if (distanceLabel) {
+        distanceLabel.remove();
+        setDistanceLabel(null);
+      }
+      return;
+    }
+
+    // Wenn zwei Punkte gesetzt sind → Distanz anzeigen
+    if (selectedPoints.length === 2) {
+      const [p1, p2] = selectedPoints;
+
+      const from = turf.point([p1.lng, p1.lat]);
+      const to = turf.point([p2.lng, p2.lat]);
+      const options = { units: "kilometers" as "kilometers" };
+      const distance = turf.distance(from, to, options);
+
+      // Alte Linie/Label entfernen
+      if (distanceLine) distanceLine.remove();
+      if (distanceLabel) distanceLabel.remove();
+
+      // Linie zeichnen
+      const line = L.polyline([p1, p2], { color: "red", weight: 3 }).addTo(map);
+
+      // Mittelpunkt
+      const midLat = (p1.lat + p2.lat) / 2;
+      const midLng = (p1.lng + p2.lng) / 2;
+
+      // Label erzeugen
+      const label = L.marker([midLat, midLng], {
+        icon: L.divIcon({
+          className: "distance-label",
+          html: `<span style="
+                  background: white; 
+                  border: 1px solid gray; 
+                  padding: 2px 6px; 
+                  border-radius: 4px; 
+                  font-size: 12px;
+                  white-space: nowrap;
+                  ">
+                    ${distance.toFixed(2)} km
+                </span>`,
+        }),
+        interactive: false,
+      }).addTo(map);
+
+      setDistanceLine(line);
+      setDistanceLabel(label);
+    } else {
+      // weniger als 2 Punkte → alte Elemente löschen
+      if (distanceLine) {
+        distanceLine.remove();
+        setDistanceLine(null);
+      }
+      if (distanceLabel) {
+        distanceLabel.remove();
+        setDistanceLabel(null);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPoints, toolsRef.current.distanzberechnung]);
 
   return (
     <>
@@ -484,25 +562,38 @@ export default function Map() {
               </>
             )}
           </FeatureGroup>
-          {tools.routenplaner && selectedPoints.length >= 2 && (
-            <>
-              <RoutingMachine waypoints={selectedPoints} />
-              <Button
-                onClick={() => setSelectedPoints([])}
-                variant="light"
-                style={{
-                  position: "absolute",
-                  marginRight: "40px",
-                  top: "10px",
-                  right: "10px",
-                  zIndex: 900,
-                  border: "2px solid rgba(0,0,0,0.3)",
-                }}
-              >
-                <FaRoute color="black" /> Route zurücksetzen
-              </Button>
-            </>
-          )}
+          {(tools.routenplaner || tools.distanzberechnung) &&
+            selectedPoints.length >= 2 && (
+              <>
+                {tools.routenplaner && (
+                  <RoutingMachine waypoints={selectedPoints} />
+                )}
+                <Button
+                  onClick={() => {
+                    setSelectedPoints([]);
+                    if (distanceLine) {
+                      distanceLine.remove();
+                      setDistanceLine(null);
+                    }
+                    if (distanceLabel) {
+                      distanceLabel.remove();
+                      setDistanceLabel(null);
+                    }
+                  }}
+                  variant="light"
+                  style={{
+                    position: "absolute",
+                    marginRight: "40px",
+                    top: "10px",
+                    right: "10px",
+                    zIndex: 900,
+                    border: "2px solid rgba(0,0,0,0.3)",
+                  }}
+                >
+                  <FaRoute color="black" /> Route zurücksetzen
+                </Button>
+              </>
+            )}
           <Button
             onClick={toggleShow}
             className="me-2 map-dropdown"
@@ -795,6 +886,15 @@ export default function Map() {
                         label={t("map.tools.routing.title")}
                         checked={tools.routenplaner}
                         onChange={() => updateTools("routenplaner")}
+                      />
+                    </div>
+                    <div>
+                      <Form.Check
+                        type="switch"
+                        id="distanceSwitch"
+                        label={t("map.tools.distance.title")}
+                        checked={tools.distanzberechnung}
+                        onChange={() => updateTools("distanzberechnung")}
                       />
                     </div>
                   </>
