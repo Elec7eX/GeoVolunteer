@@ -24,7 +24,14 @@ import { Button, DropdownDivider, Form, Nav, Offcanvas } from "react-bootstrap";
 import { FaFilter, FaRoute } from "react-icons/fa";
 import { RoutingMachine } from "../karte/RoutingMachine";
 import * as turf from "@turf/turf";
-import { BsBuilding } from "react-icons/bs";
+import { useMapEvents } from "react-leaflet";
+import type { Feature, Point } from "geojson";
+import {
+  orgIcon,
+  aktivitaetIcon,
+  markerIcon,
+  freiwilligeIcon,
+} from "./MapIcons";
 
 interface FilterType {
   meineOrganisation: boolean;
@@ -81,15 +88,34 @@ export default function Map() {
   const [alleFreiwilligen, setAlleFreiwilligen] = useState<UserModel[]>([]);
 
   const [activeTab, setActiveTab] = useState("filter");
-  const [selectedPoints, setSelectedPoints] = useState<L.LatLng[]>([]);
-  const [distanceLine, setDistanceLine] = useState<L.Polyline | null>(null);
-  const [distanceLabel, setDistanceLabel] = useState<L.Marker | null>(null);
-
   const [tools, setTools] = useState<ToolsType>({
     routenplaner: false,
     distanzberechnung: false,
     umkreis: false,
   });
+
+  const [selectedPoints, setSelectedPoints] = useState<L.LatLng[]>([]);
+  const [distanceLine, setDistanceLine] = useState<L.Polyline | null>(null);
+  const [distanceLabel, setDistanceLabel] = useState<L.Marker | null>(null);
+  const [radius, setRadius] = useState(1000); // in Metern
+  const [circle, setCircle] = useState<L.Circle | null>(null);
+  const [circleCenter, setCircleCenter] = useState<L.LatLng | null>(null);
+
+  const [filteredMeineAktivitaeten, setFilteredMeineAktivitaeten] = useState<
+    AktivitaetModel[]
+  >([]);
+  const [filteredMeineFreiwilligen, setFilteredMeineFreiwilligen] = useState<
+    UserModel[]
+  >([]);
+  const [filteredAlleOrganisationen, setFilteredAlleOrganisationen] = useState<
+    UserModel[]
+  >([]);
+  const [filteredAlleAktivitaeten, setFilteredAlleAktivitaeten] = useState<
+    AktivitaetModel[]
+  >([]);
+  const [filteredAlleFreiwilligen, setFilteredAlleFreiwilligen] = useState<
+    UserModel[]
+  >([]);
 
   const toolsRef = useRef(tools);
 
@@ -182,155 +208,6 @@ export default function Map() {
     }
   }, [user.id, user.rolle]);
 
-  const updateFilter = (filterName: keyof FilterType) => {
-    if (filterName === "alleOrganisationen" && alleOrganistaionen.length < 1) {
-      userService.getOrganisationen().then((resp) => {
-        if (resp.status === 200) {
-          const organisationenShapes: UserModel[] = resp.data;
-          setAlleOrganisationen(organisationenShapes);
-        }
-      });
-    }
-    if (filterName === "alleAktivitaeten" && alleAktivitaeten.length < 1) {
-      aktivitaetService.getAll().then((resp) => {
-        if (resp.status === 200) {
-          const aktivitaetenShapes: AktivitaetModel[] = resp.data;
-          setAlleAktivitaeten(aktivitaetenShapes);
-        }
-      });
-    }
-    if (filterName === "alleFreiwilligen" && alleFreiwilligen.length < 1) {
-      userService.getFreiwillige().then((resp) => {
-        if (resp.status === 200) {
-          const freiwilligenShapes: UserModel[] = resp.data;
-          setAlleFreiwilligen(freiwilligenShapes);
-        }
-      });
-    }
-    setFilter((prev) => ({
-      ...prev,
-      [filterName]: !prev[filterName],
-    }));
-  };
-
-  const updateTools = (toolName: keyof ToolsType) => {
-    setTools((prev) => {
-      const newState = { ...prev, [toolName]: !prev[toolName] };
-
-      // wenn wir den Routenplaner gerade ausschalten -> Punkte löschen
-      if (toolName === "routenplaner" && prev.routenplaner) {
-        setSelectedPoints([]);
-      }
-
-      return newState;
-    });
-  };
-
-  const orgIcon = new Icon({
-    iconUrl: require("../../icons/building.png"),
-    iconSize: [45, 45],
-  });
-
-  const markerIcon = new Icon({
-    iconUrl: require("../../icons/box.png"),
-    iconSize: [38, 38],
-  });
-
-  const aktivitaetIcon = new Icon({
-    iconUrl: require("../../icons/heart-rate_1.png"),
-    iconSize: [40, 40],
-  });
-
-  const freiwilligeIcon = new Icon({
-    iconUrl: require("../../icons/user.png"),
-    iconSize: [30, 30],
-  });
-
-  const handleClose = () => setShow(false);
-  const toggleShow = () => setShow((s) => !s);
-
-  function getPolygonCenter(layer: any): L.LatLng {
-    const geometry = layer.feature?.geometry;
-
-    if (!geometry) {
-      // Fallback → Marker oder Klickkoordinate
-      if (layer.getLatLng) return layer.getLatLng();
-      return layer.getBounds ? layer.getBounds().getCenter() : L.latLng(0, 0);
-    }
-
-    let coords: [number, number][] = [];
-
-    switch (geometry.type) {
-      case "Polygon":
-        // Polygon → alle Punkte flatten
-        coords = geometry.coordinates.flat();
-        break;
-
-      case "MultiPolygon":
-        // Multipolygon → alle Punkte aller Polygone flatten
-        coords = geometry.coordinates.flat(2);
-        break;
-
-      case "Point":
-        return L.latLng(geometry.coordinates[1], geometry.coordinates[0]);
-
-      default:
-        // Fallback: Bounding Box
-        if (layer.getBounds) return layer.getBounds().getCenter();
-        return L.latLng(0, 0);
-    }
-
-    if (coords.length === 0) return L.latLng(0, 0);
-
-    // Berechne Durchschnittsposition
-    const sum = coords.reduce(
-      (acc: [number, number], [lng, lat]: [number, number]) => [
-        acc[0] + lat,
-        acc[1] + lng,
-      ],
-      [0, 0]
-    );
-
-    const count = coords.length;
-    return L.latLng(sum[0] / count, sum[1] / count);
-  }
-
-  const handleRoutingClick = (e: any) => {
-    if (!toolsRef.current.routenplaner && !toolsRef.current.distanzberechnung)
-      return;
-
-    const layer = e.target;
-    const latlng = getPolygonCenter(layer);
-
-    setSelectedPoints((prev) => {
-      // Prüfen, ob der Punkt schon gesetzt ist
-      const isDuplicate = prev.some(
-        (p) => p.lat === latlng.lat && p.lng === latlng.lng
-      );
-
-      if (isDuplicate) {
-        // Visuelles Feedback: kurzes Popup
-        L.popup({
-          closeButton: false,
-          autoClose: true,
-          className: "duplicate-popup",
-        })
-          .setLatLng(latlng)
-          .setContent("Dieser Punkt wurde bereits gewählt")
-          .openOn(layer._map); // auf der Karte öffnen
-
-        // Popup nach 1,5 Sekunden schließen
-        setTimeout(() => {
-          layer._map.closePopup();
-        }, 1500);
-
-        return prev; // Punkt nicht hinzufügen
-      }
-      if (prev.length < 2) return [...prev, latlng];
-      return [latlng]; // alte Route überschreiben
-    });
-  };
-
   useEffect(() => {
     const map = (drawnItemsRef.current as any)?._map as L.Map | undefined;
     if (!map) return;
@@ -402,6 +279,249 @@ export default function Map() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPoints, toolsRef.current.distanzberechnung]);
 
+  useEffect(() => {
+    const map = (drawnItemsRef.current as any)?._map as L.Map | undefined;
+    if (!map) return;
+
+    if (!toolsRef.current.umkreis) {
+      if (circle) {
+        circle.remove();
+        setCircle(null);
+      }
+      return;
+    }
+
+    // Wenn ein Zentrum gewählt wurde
+    if (circleCenter) {
+      if (circle) circle.remove();
+
+      const newCircle = L.circle(circleCenter, {
+        radius,
+        color: "blue",
+        weight: 2,
+        fillOpacity: 0.15,
+      }).addTo(map);
+
+      setCircle(newCircle);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [circleCenter, radius, toolsRef.current.umkreis]);
+
+  useEffect(() => {
+    if (!toolsRef.current.umkreis || !circleCenter) {
+      setFilteredMeineAktivitaeten(meineAktivitaeten);
+      setFilteredMeineFreiwilligen(meineFreiwilligen);
+      setFilteredAlleOrganisationen(alleOrganistaionen);
+      setFilteredAlleAktivitaeten(alleAktivitaeten);
+      setFilteredAlleFreiwilligen(alleFreiwilligen);
+      return;
+    }
+
+    const circle = turf.circle(
+      [circleCenter.lng, circleCenter.lat],
+      radius / 1000,
+      { units: "kilometers" }
+    );
+
+    const isInside = (shape: any) => {
+      if (!shape) return false;
+      const geom = shape.geometry ?? shape;
+      const type = geom.type;
+      let points: Feature<Point>[];
+
+      switch (type) {
+        case "Point":
+          points = [turf.point(geom.coordinates)];
+          break;
+        case "Polygon":
+          points = geom.coordinates[0].map((c: [number, number]) =>
+            turf.point(c)
+          );
+          break;
+        case "MultiPolygon":
+          points = geom.coordinates
+            .flat(2)
+            .map((c: [number, number]) => turf.point(c));
+          break;
+        default:
+          return false;
+      }
+
+      return points.some((pt) => turf.booleanPointInPolygon(pt, circle));
+    };
+
+    setFilteredMeineAktivitaeten(
+      meineAktivitaeten.filter((a) => isInside(a.shape))
+    );
+    setFilteredMeineFreiwilligen(
+      meineFreiwilligen.filter((f) => isInside(f.shape))
+    );
+    setFilteredAlleOrganisationen(
+      alleOrganistaionen.filter((o) => isInside(o.shape))
+    );
+    setFilteredAlleAktivitaeten(
+      alleAktivitaeten.filter((a) => isInside(a.shape))
+    );
+    setFilteredAlleFreiwilligen(
+      alleFreiwilligen.filter((f) => isInside(f.shape))
+    );
+  }, [
+    circleCenter,
+    radius,
+    toolsRef.current.umkreis,
+    meineAktivitaeten,
+    meineFreiwilligen,
+    alleOrganistaionen,
+    alleAktivitaeten,
+    alleFreiwilligen,
+  ]);
+
+  const updateFilter = (filterName: keyof FilterType) => {
+    if (filterName === "alleOrganisationen" && alleOrganistaionen.length < 1) {
+      userService.getOrganisationen().then((resp) => {
+        if (resp.status === 200) {
+          const organisationenShapes: UserModel[] = resp.data;
+          setAlleOrganisationen(organisationenShapes);
+        }
+      });
+    }
+    if (filterName === "alleAktivitaeten" && alleAktivitaeten.length < 1) {
+      aktivitaetService.getAll().then((resp) => {
+        if (resp.status === 200) {
+          const aktivitaetenShapes: AktivitaetModel[] = resp.data;
+          setAlleAktivitaeten(aktivitaetenShapes);
+        }
+      });
+    }
+    if (filterName === "alleFreiwilligen" && alleFreiwilligen.length < 1) {
+      userService.getFreiwillige().then((resp) => {
+        if (resp.status === 200) {
+          const freiwilligenShapes: UserModel[] = resp.data;
+          setAlleFreiwilligen(freiwilligenShapes);
+        }
+      });
+    }
+    setFilter((prev) => ({
+      ...prev,
+      [filterName]: !prev[filterName],
+    }));
+  };
+
+  const updateTools = (toolName: keyof ToolsType) => {
+    setTools((prev) => {
+      const newState = { ...prev, [toolName]: !prev[toolName] };
+
+      // wenn wir den Routenplaner gerade ausschalten -> Punkte löschen
+      if (toolName === "routenplaner" && prev.routenplaner) {
+        setSelectedPoints([]);
+      }
+
+      return newState;
+    });
+  };
+
+  function getPolygonCenter(layer: any): L.LatLng {
+    const geometry = layer.feature?.geometry;
+
+    if (!geometry) {
+      // Fallback → Marker oder Klickkoordinate
+      if (layer.getLatLng) return layer.getLatLng();
+      return layer.getBounds ? layer.getBounds().getCenter() : L.latLng(0, 0);
+    }
+
+    let coords: [number, number][] = [];
+
+    switch (geometry.type) {
+      case "Polygon":
+        // Polygon → alle Punkte flatten
+        coords = geometry.coordinates.flat();
+        break;
+
+      case "MultiPolygon":
+        // Multipolygon → alle Punkte aller Polygone flatten
+        coords = geometry.coordinates.flat(2);
+        break;
+
+      case "Point":
+        return L.latLng(geometry.coordinates[1], geometry.coordinates[0]);
+
+      default:
+        // Fallback: Bounding Box
+        if (layer.getBounds) return layer.getBounds().getCenter();
+        return L.latLng(0, 0);
+    }
+
+    if (coords.length === 0) return L.latLng(0, 0);
+
+    // Berechne Durchschnittsposition
+    const sum = coords.reduce(
+      (acc: [number, number], [lng, lat]: [number, number]) => [
+        acc[0] + lat,
+        acc[1] + lng,
+      ],
+      [0, 0]
+    );
+
+    const count = coords.length;
+    return L.latLng(sum[0] / count, sum[1] / count);
+  }
+
+  const handleRoutingClick = (e: any) => {
+    const layer = e.target;
+    const latlng = getPolygonCenter(layer);
+
+    if (toolsRef.current.umkreis) {
+      setCircleCenter(latlng);
+      return; // Kein Routing ausführen
+    }
+    if (!toolsRef.current.routenplaner && !toolsRef.current.distanzberechnung)
+      return;
+
+    setSelectedPoints((prev) => {
+      // Prüfen, ob der Punkt schon gesetzt ist
+      const isDuplicate = prev.some(
+        (p) => p.lat === latlng.lat && p.lng === latlng.lng
+      );
+
+      if (isDuplicate) {
+        // Visuelles Feedback: kurzes Popup
+        L.popup({
+          closeButton: false,
+          autoClose: true,
+          className: "duplicate-popup",
+        })
+          .setLatLng(latlng)
+          .setContent("Dieser Punkt wurde bereits gewählt")
+          .openOn(layer._map); // auf der Karte öffnen
+
+        // Popup nach 1,5 Sekunden schließen
+        setTimeout(() => {
+          layer._map.closePopup();
+        }, 1500);
+
+        return prev; // Punkt nicht hinzufügen
+      }
+      if (prev.length < 2) return [...prev, latlng];
+      return [latlng]; // alte Route überschreiben
+    });
+  };
+
+  function MapClickHandler() {
+    useMapEvents({
+      click(e) {
+        // Prüfen, ob das Umkreis-Tool aktiv ist
+        if (toolsRef.current.umkreis) {
+          setCircleCenter(e.latlng);
+        }
+      },
+    });
+
+    return null; // Kein sichtbares Element
+  }
+
+  const handleClose = () => setShow(false);
+  const toggleShow = () => setShow((s) => !s);
+
   return (
     <>
       <Header title={t("map.overview.title")} />
@@ -419,6 +539,7 @@ export default function Map() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           <ZoomControl position="topright" />
+          <MapClickHandler />
           <FeatureGroup ref={drawnItemsRef}>
             {UserType.ORGANISATION === user.rolle && (
               <>
@@ -435,6 +556,9 @@ export default function Map() {
                       );
                       layer.on("click", handleRoutingClick);
                     }}
+                    style={() => ({
+                      opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                    })}
                   />
                 )}
                 {filter.meineAktivitaeten &&
@@ -455,6 +579,9 @@ export default function Map() {
                           layer.bindPopup(feature.name ?? "Aktivität");
                           layer.on("click", handleRoutingClick);
                         }}
+                        style={() => ({
+                          opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                        })}
                       />
                     );
 
@@ -473,6 +600,9 @@ export default function Map() {
                             );
                             layer.on("click", handleRoutingClick);
                           }}
+                          style={() => ({
+                            opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                          })}
                         />
                       ) : null;
 
@@ -495,6 +625,9 @@ export default function Map() {
                               );
                               layer.on("click", handleRoutingClick);
                             }}
+                            style={() => ({
+                              opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                            })}
                           />
                         )) ?? [];
 
@@ -510,6 +643,9 @@ export default function Map() {
                           f.properties?.vorname + " " + f.properties?.nachname
                         );
                       }}
+                      style={() => ({
+                        opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                      })}
                     />
                   ))}
                 {filter.alleOrganisationen &&
@@ -524,6 +660,9 @@ export default function Map() {
                         layer.bindPopup(f.properties?.name ?? "Organisation");
                         layer.on("click", handleRoutingClick);
                       }}
+                      style={() => ({
+                        opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                      })}
                     />
                   ))}
                 {filter.alleAktivitaeten &&
@@ -538,6 +677,7 @@ export default function Map() {
                         color: "#007bff",
                         weight: 2,
                         fillOpacity: 0.3,
+                        opacity: toolsRef.current.umkreis ? 0.5 : 1,
                       })}
                       onEachFeature={(f, layer) => {
                         layer.bindPopup(
@@ -559,6 +699,9 @@ export default function Map() {
                           f.properties?.vorname + " " + f.properties?.nachname
                         );
                       }}
+                      style={() => ({
+                        opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                      })}
                     />
                   ))}
               </>
@@ -899,6 +1042,33 @@ export default function Map() {
                         onChange={() => updateTools("distanzberechnung")}
                       />
                     </div>
+                    <div>
+                      <Form.Check
+                        type="switch"
+                        id="radiusSwitch"
+                        label={t("map.tools.radius.title")}
+                        checked={tools.umkreis}
+                        onChange={() => updateTools("umkreis")}
+                      />
+                    </div>
+                    {tools.umkreis && (
+                      <div style={{ marginTop: "10px" }}>
+                        <Form.Label>
+                          {t("map.tools.radius.range")} (
+                          {radius >= 1000
+                            ? `${radius / 1000} km`
+                            : `${radius} m`}
+                          )
+                        </Form.Label>
+                        <Form.Range
+                          min={100}
+                          max={10000}
+                          step={100}
+                          value={radius}
+                          onChange={(e) => setRadius(Number(e.target.value))}
+                        />
+                      </div>
+                    )}
                   </>
                 )}
               </Offcanvas.Body>

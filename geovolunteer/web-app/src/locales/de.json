@@ -78,6 +78,8 @@
   "map.tools.header.title": "Werkzeuge",
   "map.tools.routing.title": "Routenplaner",
   "map.tools.distance.title": "Distanz Berechnung",
+  "map.tools.radius.title": "Umkreisfilter",
+  "map.tools.radius.range": "Radius wählen",
   "organisation.overview.title": "Organisation",
   "organisation.detail.title": "Organisation Übersicht",
   "organisation.detail.kontakt": "Kontakt",
