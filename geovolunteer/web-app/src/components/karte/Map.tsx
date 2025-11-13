@@ -24,6 +24,7 @@ import { Button, DropdownDivider, Form, Nav, Offcanvas } from "react-bootstrap";
 import { FaFilter, FaRoute } from "react-icons/fa";
 import { RoutingMachine } from "../karte/RoutingMachine";
 import * as turf from "@turf/turf";
+import { BsBuilding } from "react-icons/bs";
 
 interface FilterType {
   meineOrganisation: boolean;
@@ -37,6 +38,7 @@ interface FilterType {
 interface ToolsType {
   routenplaner: boolean;
   distanzberechnung: boolean;
+  umkreis: boolean;
 }
 
 interface AktivitaetFilterType {
@@ -53,12 +55,6 @@ export default function Map() {
 
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const [show, setShow] = useState(false);
-
-  const [selectedPoints, setSelectedPoints] = useState<L.LatLng[]>([]);
-  const [distanceLine, setDistanceLine] = useState<L.Polyline | null>(null);
-  const [distanceLabel, setDistanceLabel] = useState<L.Marker | null>(null);
-
-  const [activeTab, setActiveTab] = useState("filter"); // "filter" oder "aktionen"
 
   const [filter, setFilter] = useState<FilterType>({
     meineOrganisation: true,
@@ -84,9 +80,15 @@ export default function Map() {
   );
   const [alleFreiwilligen, setAlleFreiwilligen] = useState<UserModel[]>([]);
 
+  const [activeTab, setActiveTab] = useState("filter");
+  const [selectedPoints, setSelectedPoints] = useState<L.LatLng[]>([]);
+  const [distanceLine, setDistanceLine] = useState<L.Polyline | null>(null);
+  const [distanceLabel, setDistanceLabel] = useState<L.Marker | null>(null);
+
   const [tools, setTools] = useState<ToolsType>({
     routenplaner: false,
     distanzberechnung: false,
+    umkreis: false,
   });
 
   const toolsRef = useRef(tools);
@@ -225,23 +227,23 @@ export default function Map() {
   };
 
   const orgIcon = new Icon({
-    iconUrl: require("../../icons/organisation.png"),
-    iconSize: [100, 100],
+    iconUrl: require("../../icons/building.png"),
+    iconSize: [45, 45],
   });
 
   const markerIcon = new Icon({
-    iconUrl: require("../../icons/marker-icon.png"),
+    iconUrl: require("../../icons/box.png"),
     iconSize: [38, 38],
   });
 
   const aktivitaetIcon = new Icon({
-    iconUrl: require("../../icons/aktivitaet.png"),
-    iconSize: [100, 100],
+    iconUrl: require("../../icons/heart-rate_1.png"),
+    iconSize: [40, 40],
   });
 
   const freiwilligeIcon = new Icon({
-    iconUrl: require("../../icons/freiwillige.png"),
-    iconSize: [100, 100],
+    iconUrl: require("../../icons/user.png"),
+    iconSize: [30, 30],
   });
 
   const handleClose = () => setShow(false);
