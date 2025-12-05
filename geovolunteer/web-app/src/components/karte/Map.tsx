@@ -148,14 +148,12 @@ export default function Map() {
                       (aktivitaet: AktivitaetModel) => aktivitaet
                     );
                     setMeineAktivitaeten(aktivitaetenArray);
-
                     const aktivitaetenMap: {
                       [id: string]: AktivitaetFilterType;
                     } = {};
 
                     res.data.forEach((aktivitaet: AktivitaetModel) => {
                       const teilnehmerMap: { [id: string]: boolean } = {};
-
                       aktivitaet.teilnehmer?.forEach((t: UserModel) => {
                         teilnehmerMap[t.id!] = true;
                       });
@@ -562,12 +560,11 @@ export default function Map() {
                   />
                 )}
                 {filter.meineAktivitaeten &&
-                  meineAktivitaeten.map((feature, index) => {
+                  filteredMeineAktivitaeten.map((feature, index) => {
                     const id = feature.id ?? index;
                     const aFilter = aktivitaetenFilter[id];
                     if (!aFilter?.visible) return null;
-
-                    // Aktivität selbst
+                    // Aktivität
                     const layer = (
                       <GeoJSON
                         key={`aktivitaet-${id}`}
@@ -576,7 +573,12 @@ export default function Map() {
                           L.marker(latlng, { icon: aktivitaetIcon })
                         }
                         onEachFeature={(f, layer) => {
-                          layer.bindPopup(feature.name ?? "Aktivität");
+                          layer.bindPopup(
+                            feature.name
+                              ? feature.name +
+                                  `<div style="font-size: 12px;fontStyle: italic;">${feature.organisation?.name}</div>`
+                              : "Aktivität"
+                          );
                           layer.on("click", handleRoutingClick);
                         }}
                         style={() => ({
@@ -585,7 +587,7 @@ export default function Map() {
                       />
                     );
 
-                    // Ressource (einzeln)
+                    // Ressource
                     const ressourceLayer =
                       aFilter.ressource && feature?.ressource?.shape ? (
                         <GeoJSON
@@ -619,9 +621,7 @@ export default function Map() {
                             }
                             onEachFeature={(f, layer) => {
                               layer.bindPopup(
-                                (f.properties?.vorname ?? "") +
-                                  " " +
-                                  (f.properties?.nachname ?? "")
+                                (t.vorname ?? "") + " " + (t.nachname ?? "")
                               );
                               layer.on("click", handleRoutingClick);
                             }}
@@ -640,7 +640,7 @@ export default function Map() {
                       data={feature!.shape!}
                       onEachFeature={(f, layer) => {
                         layer.bindPopup(
-                          f.properties?.vorname + " " + f.properties?.nachname
+                          feature.vorname + " " + feature.nachname
                         );
                       }}
                       style={() => ({
@@ -657,7 +657,7 @@ export default function Map() {
                         return L.marker(latlng, { icon: orgIcon });
                       }}
                       onEachFeature={(f, layer) => {
-                        layer.bindPopup(f.properties?.name ?? "Organisation");
+                        layer.bindPopup(feature.name ?? "Organisation");
                         layer.on("click", handleRoutingClick);
                       }}
                       style={() => ({
@@ -666,7 +666,7 @@ export default function Map() {
                     />
                   ))}
                 {filter.alleAktivitaeten &&
-                  alleAktivitaeten.map((feature, index) => (
+                  filteredAlleAktivitaeten.map((feature, index) => (
                     <GeoJSON
                       key={`alleAktivitaeten-${index}`}
                       data={feature.shape!}
@@ -681,8 +681,12 @@ export default function Map() {
                       })}
                       onEachFeature={(f, layer) => {
                         layer.bindPopup(
-                          f.properties?.vorname + " " + f.properties?.nachname
+                          feature.name
+                            ? feature.name +
+                                `<div style="font-size: 12px;fontStyle: italic;">${feature.organisation?.name}</div>`
+                            : "Aktivität"
                         );
+                        layer.on("click", handleRoutingClick);
                       }}
                     />
                   ))}
@@ -696,8 +700,9 @@ export default function Map() {
                       }
                       onEachFeature={(f, layer) => {
                         layer.bindPopup(
-                          f.properties?.vorname + " " + f.properties?.nachname
+                          feature.vorname + " " + feature.nachname
                         );
+                        layer.on("click", handleRoutingClick);
                       }}
                       style={() => ({
                         opacity: toolsRef.current.umkreis ? 0.5 : 1,
@@ -802,7 +807,12 @@ export default function Map() {
                       <Form.Check
                         type="checkbox"
                         id="alleOrganisationen"
-                        label={t("map.filter.organisation.alle.organisationen")}
+                        label={
+                          t("map.filter.organisation.alle.organisationen") +
+                          (alleOrganistaionen.length > 0
+                            ? " (" + alleOrganistaionen.length + ")"
+                            : "")
+                        }
                         checked={filter.alleOrganisationen}
                         onChange={() => updateFilter("alleOrganisationen")}
                         style={{ marginBottom: "5px" }}
@@ -810,16 +820,31 @@ export default function Map() {
                       <Form.Check
                         type="checkbox"
                         id="alleAktivitaeten"
-                        label={t("map.filter.organisation.alle.aktivitaeten")}
+                        label={
+                          t("map.filter.organisation.alle.aktivitaeten") +
+                          (alleAktivitaeten.length > 0
+                            ? " (" + alleAktivitaeten.length + ")"
+                            : "")
+                        }
                         checked={filter.alleAktivitaeten}
                         onChange={() => updateFilter("alleAktivitaeten")}
                       />
                       <Form.Check
                         type="checkbox"
                         id="alleFreiwilligen"
-                        label={t("map.filter.organisation.alle.freiwillige")}
+                        label={
+                          t("map.filter.organisation.alle.freiwillige") +
+                          (alleFreiwilligen.length > 0
+                            ? " (" + alleFreiwilligen.length + ")"
+                            : "")
+                        }
                         checked={filter.alleFreiwilligen}
-                        onChange={() => updateFilter("alleFreiwilligen")}
+                        onChange={() =>
+                          updateFilter("alleFreiwilligen") +
+                          " (" +
+                          alleFreiwilligen.length +
+                          ")"
+                        }
                         style={{ marginBottom: "5px" }}
                       />
                     </div>
@@ -839,7 +864,12 @@ export default function Map() {
                         <Form.Check
                           type="checkbox"
                           id="meineAktivitaeten"
-                          label={t("map.filter.organisation.submenu.arrow")}
+                          label={
+                            t("map.filter.organisation.submenu.arrow") +
+                            " (" +
+                            meineAktivitaeten.length +
+                            ")"
+                          }
                           checked={filter.meineAktivitaeten}
                           onChange={() => updateFilter("meineAktivitaeten")}
                         />
@@ -958,7 +988,12 @@ export default function Map() {
                                               >
                                                 {t(
                                                   "map.filter.organisation.teilnehmer"
-                                                )}
+                                                ) +
+                                                  " (" +
+                                                  Object.entries(
+                                                    aFilter.teilnehmer
+                                                  ).length +
+                                                  ")"}
                                               </strong>
                                             ) : (
                                               <strong
