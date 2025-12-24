@@ -113,11 +113,13 @@ export default function AktivitaetenOverview() {
                             />
                           </Col>
                           <Col>
-                            <div>{aktivitaet.organisation?.name}</div>
                             {user.rolle === UserType.FREIWILLIGE && (
-                              <div className="custom-cardheader_text">
-                                {aktivitaet.name}
-                              </div>
+                              <>
+                                <div className="custom-cardheader_text">
+                                  {aktivitaet.name}
+                                </div>
+                                <div>{aktivitaet.organisation?.name}</div>
+                              </>
                             )}
                           </Col>
                         </CardHeader>
@@ -160,11 +162,13 @@ export default function AktivitaetenOverview() {
                       <BsHeartPulse size={30} style={{ marginRight: 15 }} />
                     </Col>
                     <Col>
-                      <div>{aktivitaet.organisation?.name}</div>
                       {user.rolle === UserType.FREIWILLIGE && (
-                        <div className="custom-cardheader_text">
-                          {aktivitaet.name}
-                        </div>
+                        <>
+                          <div className="custom-cardheader_text">
+                            {aktivitaet.name}
+                          </div>
+                          <div>{aktivitaet.organisation?.name}</div>
+                        </>
                       )}
                     </Col>
                   </CardHeader>

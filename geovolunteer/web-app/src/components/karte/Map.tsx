@@ -292,7 +292,6 @@ export default function Map() {
     // Wenn ein Zentrum gewählt wurde
     if (circleCenter) {
       if (circle) circle.remove();
-
       const newCircle = L.circle(circleCenter, {
         radius,
         color: "blue",
@@ -407,10 +406,21 @@ export default function Map() {
 
   const updateTools = (toolName: keyof ToolsType) => {
     setTools((prev) => {
-      const newState = { ...prev, [toolName]: !prev[toolName] };
+      const isCurrentlyActive = prev[toolName];
 
-      // wenn wir den Routenplaner gerade ausschalten -> Punkte löschen
-      if (toolName === "routenplaner" && prev.routenplaner) {
+      // Neues State-Objekt: alles false
+      const newState = Object.keys(prev).reduce((acc, key) => {
+        acc[key as keyof ToolsType] = false;
+        return acc;
+      }, {} as ToolsType);
+
+      // Nur aktivieren, wenn es vorher aus war
+      if (!isCurrentlyActive) {
+        newState[toolName] = true;
+      }
+
+      // Routenplaner wird ausgeschaltet → Punkte löschen
+      if (toolName === "routenplaner" && isCurrentlyActive) {
         setSelectedPoints([]);
       }
 
@@ -634,7 +644,7 @@ export default function Map() {
                     return [layer, ressourceLayer, ...teilnehmerLayer];
                   })}
                 {filter.meineFreiwilligen &&
-                  meineFreiwilligen.map((feature, index) => (
+                  filteredMeineFreiwilligen.map((feature, index) => (
                     <GeoJSON
                       key={`freiwillige-${index}`}
                       data={feature!.shape!}
@@ -649,7 +659,7 @@ export default function Map() {
                     />
                   ))}
                 {filter.alleOrganisationen &&
-                  alleOrganistaionen.map((feature, index) => (
+                  filteredAlleOrganisationen.map((feature, index) => (
                     <GeoJSON
                       key={`alleOrganisationen-${index}`}
                       data={feature.shape!}
@@ -691,7 +701,7 @@ export default function Map() {
                     />
                   ))}
                 {filter.alleFreiwilligen &&
-                  alleFreiwilligen.map((feature, index) => (
+                  filteredAlleFreiwilligen.map((feature, index) => (
                     <GeoJSON
                       key={`alleFreiwilligen-${index}`}
                       data={feature.shape!}

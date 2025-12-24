@@ -75,7 +75,16 @@ export default function RessourceDetailPage() {
               </Col>
               <Col>
                 <Card.Title>{ressource.name}</Card.Title>
-                <Card.Text>{aktivitaet.organisation?.name}</Card.Text>
+                <Card.Text>
+                  <div>{aktivitaet.organisation?.name}</div>
+                  <div>
+                    {aktivitaet.organisation?.strasse}{" "}
+                    {aktivitaet.organisation?.hausnummer}
+                    {", "}
+                    {aktivitaet.organisation?.plz}{" "}
+                    {aktivitaet.organisation?.ort}
+                  </div>
+                </Card.Text>
               </Col>
             </Row>
           </Card.Body>

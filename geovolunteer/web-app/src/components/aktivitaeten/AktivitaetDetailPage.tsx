@@ -90,7 +90,20 @@ export default function AktivitaetDetailPage() {
               </Col>
               <Col>
                 <Card.Title>{aktivitaet.name}</Card.Title>
-
+                {user.rolle === UserType.FREIWILLIGE && (
+                  <>
+                    <Card.Text>
+                      <div>{aktivitaet.organisation?.name}</div>
+                      <div>
+                        {aktivitaet.organisation?.strasse}{" "}
+                        {aktivitaet.organisation?.hausnummer}
+                        {", "}
+                        {aktivitaet.organisation?.plz}{" "}
+                        {aktivitaet.organisation?.ort}
+                      </div>
+                    </Card.Text>
+                  </>
+                )}
                 {user.rolle === UserType.ORGANISATION && (
                   <>
                     <Card.Text>{aktivitaet.organisation?.name}</Card.Text>

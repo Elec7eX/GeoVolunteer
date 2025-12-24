@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.lang.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -59,7 +59,7 @@ public class Aktivitaet extends AbstractAktivitaet {
 	// Der Ersteller der Aktivität (Organisation)
 	@ManyToOne
 	@JoinColumn(name = "organisation_id")
-	@JsonBackReference
+	@JsonIgnoreProperties({ "password", "teilnahmen", "erstellteAktivitaeten", "shape", "radius" })
 	private Benutzer organisation;
 
 	// Teilnehmer (Freiwillige)

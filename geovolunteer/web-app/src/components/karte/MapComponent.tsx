@@ -246,12 +246,6 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 data={geoJsonData as any}
                 style={{ color: "red" }}
                 pointToLayer={(feature, latlng) => {
-                  if (feature.properties?.radius) {
-                    return L.circle(latlng, {
-                      radius: feature.properties.radius,
-                      color: "red",
-                    });
-                  }
                   return L.marker(latlng, { icon: customIcon });
                 }}
                 ref={(layer: any) => {

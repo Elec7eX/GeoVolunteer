@@ -36,10 +36,9 @@ export function RoutingMachine({ waypoints }: { waypoints: L.LatLng[] }) {
       }).addTo(map);
     }
 
-    // Waypoints mit kleiner Verzögerung setzen
     setTimeout(() => {
       controlRef.current?.setWaypoints(waypoints);
-    }, 50); // 50ms Verzögerung reicht meistens
+    }, 50);
 
     return () => {
       if (controlRef.current) {
