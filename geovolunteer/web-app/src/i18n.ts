@@ -3,22 +3,20 @@ import { initReactI18next } from 'react-i18next';
 import de from './locales/de.json'
 
 i18n
-    .use(initReactI18next)
-    .init({
-        lng: 'de',
-        fallbackLng: 'de',
-        debug: process.env.NODE_ENV !== 'production',
-        resources: {
-            'de': {
-                translation: de,
-            },
-        },
-        keySeparator: false,
-        nsSeparator: false,
-
-        interpolation: {
-            escapeValue: false,
-        },
-    })
-
+  .use(initReactI18next)
+  .init({
+    lng: "de",
+    fallbackLng: "de",
+    supportedLngs: ["de"],
+    resources: {
+      de: {
+        translation: de,
+      },
+    },
+    keySeparator: false,
+    nsSeparator: false,
+    interpolation: {
+      escapeValue: false,
+    },
+  });
 export default i18n;

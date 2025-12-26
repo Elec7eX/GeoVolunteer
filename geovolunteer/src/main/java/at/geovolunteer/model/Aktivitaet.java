@@ -15,6 +15,8 @@ import at.geovolunteer.config.CalendarTimeDeserializer;
 import at.geovolunteer.config.CalendarTimeSerializer;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
@@ -30,6 +32,9 @@ public class Aktivitaet extends AbstractAktivitaet {
 	private int teilnehmeranzahl;
 	private String transport;
 	private String verpflegung;
+
+	@Enumerated(EnumType.STRING)
+	private Kategorie kategorie;
 
 	@Temporal(TemporalType.DATE)
 	@JsonSerialize(using = CalendarSerializer.class)
@@ -154,6 +159,14 @@ public class Aktivitaet extends AbstractAktivitaet {
 			this.teilnehmer.remove(teilnehmer);
 			teilnehmer.getTeilnahmen().remove(this);
 		}
+	}
+
+	public Kategorie getKategorie() {
+		return kategorie;
+	}
+
+	public void setKategorie(Kategorie kategorie) {
+		this.kategorie = kategorie;
 	}
 
 }

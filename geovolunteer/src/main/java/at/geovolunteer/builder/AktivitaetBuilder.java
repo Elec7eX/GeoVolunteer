@@ -3,6 +3,7 @@ package at.geovolunteer.builder;
 import java.util.Calendar;
 
 import at.geovolunteer.model.Aktivitaet;
+import at.geovolunteer.model.Kategorie;
 import at.geovolunteer.model.Ressource;
 
 public class AktivitaetBuilder extends AbstractAktivitaetBuilder<Aktivitaet, AktivitaetBuilder> {
@@ -23,6 +24,11 @@ public class AktivitaetBuilder extends AbstractAktivitaetBuilder<Aktivitaet, Akt
 
 	public AktivitaetBuilder verpflegung(String verpflegung) {
 		entity.setVerpflegung(verpflegung);
+		return this;
+	}
+
+	public AktivitaetBuilder kategorie(Kategorie kategorie) {
+		entity.setKategorie(kategorie);
 		return this;
 	}
 

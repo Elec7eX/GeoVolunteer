@@ -1,6 +1,7 @@
 package at.geovolunteer.service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -51,8 +52,21 @@ public class BenutzerService {
 	}
 
 	public List<Benutzer> getFreiwillige() {
+		List<Benutzer> teilnehmer = getAllTeilnehmer().stream().distinct().collect(Collectors.toList());
+		return findAll().stream().filter(b -> Rolle.FREIWILLIGE.equals(b.getRolle()))
+				.filter(b -> b.getVorname() != null && b.getNachname() != null).filter(b -> !teilnehmer.contains(b))
+				.sorted(Comparator.comparing(Benutzer::getVorname)).collect(Collectors.toList());
+	}
+
+	public List<Benutzer> getAllFreiwillige() {
 		return findAll().stream().filter(b -> Rolle.FREIWILLIGE.equals(b.getRolle()))
 				.filter(b -> b.getVorname() != null && b.getNachname() != null).collect(Collectors.toList());
+	}
+
+	public List<Benutzer> getAllTeilnehmer() {
+		return aktivitaetService.getErstellteAktivitaeten().stream()
+				.flatMap(e -> e.getTeilnehmer().stream().sorted(Comparator.comparing(Benutzer::getVorname)))
+				.collect(Collectors.toList());
 	}
 
 	public List<Benutzer> getOrganisationen() {

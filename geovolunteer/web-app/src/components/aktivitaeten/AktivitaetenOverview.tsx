@@ -92,7 +92,6 @@ export default function AktivitaetenOverview() {
       <Header title={t("aktivitaeten.overview.title")} />
       <div className="body">
         {user.rolle === UserType.FREIWILLIGE && (
-          <>
             <div style={{ marginTop: 30 }}>
               <h5>{t("aktivitaeten.overview.registered.title")}</h5>
               {angemeldeteAktivitaeten.length > 0 &&
@@ -132,7 +131,6 @@ export default function AktivitaetenOverview() {
                 ))}
               <hr style={{ marginTop: 30 }} />
             </div>
-          </>
         )}
         <h5 style={{ marginTop: 30 }}>
           {user.rolle === UserType.ORGANISATION

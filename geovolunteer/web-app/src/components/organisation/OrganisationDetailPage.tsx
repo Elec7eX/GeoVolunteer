@@ -3,33 +3,33 @@ import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
 import { Card, Col, Row } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UserModel, UserType } from "../../types/Types";
 import { VerticalDivider } from "../../utils/Utils";
 import { PiMapPinArea } from "react-icons/pi";
-import MapComponent from "../karte/MapComponentOld";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CiGlobe } from "react-icons/ci";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import userService from "../../services/UserServices";
+import MapComponent from "../karte/MapComponent";
+import { Feature, Geometry } from "geojson";
 
 export default function OrganisationDetailPage() {
   const location = useLocation();
   const [user] = useLocalStorage("user", null);
   const navigate = useNavigate();
+  const mapRef = useRef<HTMLDivElement | null>(null);
 
   const organisationFromState = location.state?.user;
   const [organisation, setOrganisation] = useState<UserModel | null>();
   const [isShowMap, setIsShowMap] = useState<boolean>(false);
-  const [position, setPosition]: any = useState(null);
+  const [organisationShape, setOrganisationShape] =
+      useState<Feature<Geometry, any>>();
 
   useEffect(() => {
     if (organisationFromState) {
       setOrganisation(organisationFromState);
-      setPosition([
-        organisationFromState.latitude,
-        organisationFromState.longitude,
-      ]);
+      setOrganisationShape(organisationFromState.shape);
     }
   }, [organisationFromState]);
 
@@ -89,7 +89,15 @@ export default function OrganisationDetailPage() {
                   <PiMapPinArea
                     style={{ marginLeft: 100, color: "#00e7ff" }}
                     size={30}
-                    onClick={() => setIsShowMap(!isShowMap)}
+                    onClick={() => {
+                    setIsShowMap(!isShowMap);
+                    setTimeout(() => {
+                      mapRef.current?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
+                    }, 200);
+                  }}
                   />
                 </div>
               </Col>
@@ -102,8 +110,11 @@ export default function OrganisationDetailPage() {
                 <div>{organisation.telefon}</div>
               </Col>
             </Row>
-            <Row style={{ padding: 10, marginTop: 40 }}>
-              {isShowMap && <MapComponent position={position} zoom={20} />}
+            <Row style={{ padding: 10, marginTop: 40 }} ref={mapRef}>
+              {isShowMap && <MapComponent
+                  geoJsonData={organisationShape}
+                  zoom={17}
+                />}
             </Row>
           </Card.Body>
         </Card>

@@ -4,7 +4,7 @@ import { Header } from "../header/Header";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Button, Card, Col, Modal, Nav, Row } from "react-bootstrap";
 import { useEffect, useRef, useState } from "react";
-import { AktivitaetModel } from "../../types/Types";
+import { AktivitaetModel, KategorieLabels } from "../../types/Types";
 import aktivitaetService from "../../services/AktivitaetService";
 import { VerticalDivider } from "../../utils/Utils";
 import { PiMapPinArea } from "react-icons/pi";
@@ -97,7 +97,8 @@ export default function AktivitaetDetailPage() {
                       <div>
                         {aktivitaet.organisation?.strasse}{" "}
                         {aktivitaet.organisation?.hausnummer}
-                        {", "}
+                      </div>
+                      <div>
                         {aktivitaet.organisation?.plz}{" "}
                         {aktivitaet.organisation?.ort}
                       </div>
@@ -175,6 +176,13 @@ export default function AktivitaetDetailPage() {
             <Card.Text>{aktivitaet.beschreibung}</Card.Text>
           </Card.Body>
           <Card.Body>
+            <Row>
+              <h5>{t("aktivitaeten.detail.kategorie")}</h5>
+              <Col>
+                <div>{KategorieLabels[aktivitaet.kategorie!]}</div>
+              </Col>
+            </Row>
+            <br />
             <Row>
               <h5>{t("aktivitaeten.detail.zeit.title")}</h5>
               <Col md={5}>

@@ -7,6 +7,26 @@ export enum UserType {
     FREIWILLIGE = "FREIWILLIGE",
 }
 
+export enum Kategorie {
+  SOZIALES = "SOZIALES",
+  GESUNDHEIT = "GESUNDHEIT",
+  UMWELT = "UMWELT",
+  BILDUNG = "BILDUNG",
+  KINDER_UND_JUGEND = "KINDER_UND_JUGEND",
+  INTEGRATION_UND_BERATUNG = "INTEGRATION_UND_BERATUNG",
+  OEFFENTLICHKEITSARBEIT = "OEFFENTLICHKEITSARBEIT",
+}
+
+export const KategorieLabels: Record<Kategorie, string> = {
+    [Kategorie.SOZIALES]: "Soziales",
+    [Kategorie.GESUNDHEIT]: "Gesundheit",
+    [Kategorie.UMWELT]: "Umwelt",
+    [Kategorie.BILDUNG]: "Bildung",
+    [Kategorie.KINDER_UND_JUGEND]: "Kinder & Jugend",
+    [Kategorie.INTEGRATION_UND_BERATUNG]: "Integration & Beratung",
+    [Kategorie.OEFFENTLICHKEITSARBEIT]: "Öffentlichkeitsarbeit",
+  };
+
 export type GeoJsonFeature = Feature<Geometry, { [key: string]: any }> | null;
 
 export interface UserModel {
@@ -59,6 +79,7 @@ export interface AktivitaetModel {
     id?: number,
     name: string,
     beschreibung: string,
+    kategorie?: Kategorie,
     addresseInput: AdressInputEnum,
     strasse: string,
     hausnummer: string,

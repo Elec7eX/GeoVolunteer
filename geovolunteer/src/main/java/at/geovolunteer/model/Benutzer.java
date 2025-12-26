@@ -8,7 +8,6 @@ import org.locationtech.jts.geom.Geometry;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
@@ -99,7 +98,7 @@ public class Benutzer {
 
 	// Für Organisationen: Aktivitäten erstellen
 	@OneToMany(mappedBy = "organisation")
-	@JsonManagedReference
+	@JsonIgnore
 	private List<Aktivitaet> erstellteAktivitaeten;
 
 	// Für Freiwillige: Teilnahme an Aktivitäten

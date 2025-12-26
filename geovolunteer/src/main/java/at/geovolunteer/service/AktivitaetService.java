@@ -39,11 +39,15 @@ public class AktivitaetService {
 		return benutzerService.getActive().getErstellteAktivitaeten();
 	}
 
-	public List<Aktivitaet> geAktivitaeten() {
+	public List<Aktivitaet> getAktivitaeten() {
 		return benutzerService.getOrganisationen().stream().flatMap(e -> e.getErstellteAktivitaeten().stream())
 				.filter(e -> e.getTeilnehmer().size() <= e.getTeilnehmeranzahl()).filter(e -> e.getTeilnehmer().stream()
 						.noneMatch(b -> b.getId() == benutzerService.getActive().getId()))
 				.collect(Collectors.toList());
+	}
+
+	public List<Aktivitaet> getAllAktivitaeten() {
+		return repository.findAll();
 	}
 
 	public List<Aktivitaet> geAngemeldeteAktivitaeten() {
@@ -116,13 +120,14 @@ public class AktivitaetService {
 		entity.setTeilnehmeranzahl(model.getTeilnehmeranzahl());
 		entity.setTransport(model.getTransport());
 		entity.setVerpflegung(model.getVerpflegung());
+		entity.setKategorie(model.getKategorie());
 		entity.setStartDatum(model.getStartDatum());
 		entity.setEndDatum(model.getEndDatum());
 		entity.setStartZeit(model.getStartZeit());
 		entity.setEndZeit(model.getEndZeit());
 
 		Ressource ressource;
-		if (entity.getRessource().getId() == null) {
+		if (entity.getRessource() == null || entity.getRessource().getId() == null) {
 			ressource = new Ressource();
 			entity.setRessource(ressource);
 		} else {

@@ -60,7 +60,7 @@ public class AktivitaetRessource {
 	@GetMapping(value = "/aktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Aktivitaet>> getAktivitaten() {
 		try {
-			List<Aktivitaet> list = service.geAktivitaeten();
+			List<Aktivitaet> list = service.getAktivitaeten();
 			if (CollectionUtils.isEmpty(list)) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			}

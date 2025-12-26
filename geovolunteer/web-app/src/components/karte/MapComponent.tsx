@@ -68,7 +68,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
               color: "red",
             });
           }
-          return L.marker(latlng, { icon: customIcon });
+          return L.marker(latlng, { icon: customIcon, draggable: true });
         },
       });
 

@@ -10,7 +10,12 @@ import {
   FormikErrors,
 } from "formik";
 import { SetStateAction, useEffect, useRef, useState } from "react";
-import { AktivitaetModel, GeoJsonFeature } from "../../types/Types";
+import {
+  AktivitaetModel,
+  GeoJsonFeature,
+  Kategorie,
+  KategorieLabels,
+} from "../../types/Types";
 import { AdressInputEnum } from "../../enums/Enums";
 import "leaflet/dist/leaflet.css";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -47,6 +52,7 @@ export default function AktivitaetDetail() {
         id: aktivitaetFromState.id,
         name: aktivitaetFromState.name,
         beschreibung: aktivitaetFromState.beschreibung,
+        kategorie: aktivitaetFromState.kategorie,
         addresseInput: AdressInputEnum.Manual,
         strasse: aktivitaetFromState.strasse,
         hausnummer: aktivitaetFromState.hausnummer,
@@ -98,6 +104,7 @@ export default function AktivitaetDetail() {
       const model: AktivitaetModel = {
         name: "",
         beschreibung: "",
+        kategorie: undefined,
         addresseInput: AdressInputEnum.Manual,
         strasse: "",
         hausnummer: "",
@@ -401,6 +408,24 @@ export default function AktivitaetDetail() {
                               onChange={handleChange}
                               onBlur={handleBlur}
                             />
+                          </Form.Group>
+                          <Form.Group className="mb-3">
+                            <Form.Label>
+                              {t("aktivitaeten.detail.kategorie")}
+                            </Form.Label>
+                            <Form.Select
+                              id="kategorie"
+                              name="kategorie"
+                              value={values.kategorie}
+                              onChange={handleChange}
+                            >
+                              <option value="">Bitte auswählen</option>
+                              {Object.values(Kategorie).map((kategorie) => (
+                                <option key={kategorie} value={kategorie}>
+                                  {KategorieLabels[kategorie]}
+                                </option>
+                              ))}
+                            </Form.Select>
                           </Form.Group>
                           <div className="mb-3">
                             <Form.Group className="d-flex align-items-center">
@@ -1228,6 +1253,10 @@ export default function AktivitaetDetail() {
                             <div>
                               {t("aktivitaeten.detail.beschreibung")}:{" "}
                               {values.beschreibung}
+                            </div>
+                            <div>
+                              {t("aktivitaeten.detail.kategorie")}:{" "}
+                              {values.kategorie}
                             </div>
                             <div>
                               {t("aktivitaeten.detail.adress.strasse")}:{" "}

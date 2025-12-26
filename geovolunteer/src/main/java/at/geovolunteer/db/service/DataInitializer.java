@@ -19,9 +19,11 @@ import at.geovolunteer.builder.OrganisationBuilder;
 import at.geovolunteer.builder.RessourceBuilder;
 import at.geovolunteer.model.Aktivitaet;
 import at.geovolunteer.model.Benutzer;
+import at.geovolunteer.model.Kategorie;
 import at.geovolunteer.model.Ressource;
 import at.geovolunteer.model.repo.AktivitaetRepository;
 import at.geovolunteer.model.repo.BenutzerRepository;
+import at.geovolunteer.service.AktivitaetService;
 import at.geovolunteer.service.BenutzerService;
 import lombok.RequiredArgsConstructor;
 
@@ -35,19 +37,24 @@ public class DataInitializer implements CommandLineRunner {
 	@Autowired
 	private final BenutzerService benutzerService;
 
+	@Autowired
+	private final AktivitaetService aktivitaetService;
+
 	public DataInitializer(BenutzerService benutzerService, BenutzerRepository benutzerRepository,
-			AktivitaetRepository aktivitaetRepository) {
+			AktivitaetService aktivitaetService, AktivitaetRepository aktivitaetRepository) {
 		this.benutzerRepository = benutzerRepository;
 		this.benutzerService = benutzerService;
+		this.aktivitaetService = aktivitaetService;
 		this.aktivitaetRepository = aktivitaetRepository;
 	}
 
 	@Override
 	@Transactional
 	public void run(String... args) throws Exception {
-		createOrganisationen();
-		createAktivitaeten();
-		createFreiwillige();
+//		setKategorien();
+//		createOrganisationen();
+//		createAktivitaeten();
+//		createFreiwillige();
 		System.out.println("GEO_VOLUNTEER_APP wurde gestartet!");
 	}
 
@@ -145,9 +152,10 @@ public class DataInitializer implements CommandLineRunner {
 
 				Aktivitaet lebensmittelVerteilung = new AktivitaetBuilder().name("Lebensmittelverteilung an Bedürftige")
 						.beschreibung("HelferInnen sortieren und verteilen gespendete Lebensmittel.")
-						.strasse("Kapuzinerstraße").hausnummer("84").plz("4020").ort("Linz").teilnehmeranzahl(10)
-						.transport("Öffi oder Fahrrad").verpflegung("Getränke vorhanden").vorname("Maria")
-						.nachname("Huber").email("maria.huber@caritas.at").telefon("+43 732 123456")
+						.kategorie(Kategorie.SOZIALES).strasse("Kapuzinerstraße").hausnummer("84").plz("4020")
+						.ort("Linz").teilnehmeranzahl(10).transport("Öffi oder Fahrrad")
+						.verpflegung("Getränke vorhanden").vorname("Maria").nachname("Huber")
+						.email("maria.huber@caritas.at").telefon("+43 732 123456")
 						.startDatum(new GregorianCalendar(2025, Calendar.MARCH, 10))
 						.endDatum(new GregorianCalendar(2025, Calendar.MARCH, 10))
 						.startZeit(new GregorianCalendar(0, 0, 0, 9, 0)).endZeit(new GregorianCalendar(0, 0, 0, 14, 0))
@@ -167,9 +175,10 @@ public class DataInitializer implements CommandLineRunner {
 
 				Aktivitaet kleidersortierung = new AktivitaetBuilder().name("Kleiderspenden sortieren")
 						.beschreibung("Sortieren und Verpacken von Kleiderspenden für Bedürftige.")
-						.strasse("Industriezeile").hausnummer("47").plz("4020").ort("Linz").vorname("Birgit")
-						.nachname("Leitner").email("birgit.leitner@caritas.at").telefon("+43 732 654322")
-						.teilnehmeranzahl(8).transport("Keine notwendig").verpflegung("Mittagessen inkludiert")
+						.kategorie(Kategorie.SOZIALES).strasse("Industriezeile").hausnummer("47").plz("4020")
+						.ort("Linz").vorname("Birgit").nachname("Leitner").email("birgit.leitner@caritas.at")
+						.telefon("+43 732 654322").teilnehmeranzahl(8).transport("Keine notwendig")
+						.verpflegung("Mittagessen inkludiert")
 						.startDatum(new GregorianCalendar(2025, Calendar.APRIL, 5))
 						.endDatum(new GregorianCalendar(2025, Calendar.APRIL, 5))
 						.startZeit(new GregorianCalendar(0, 0, 0, 10, 0)).endZeit(new GregorianCalendar(0, 0, 0, 16, 0))
@@ -188,10 +197,11 @@ public class DataInitializer implements CommandLineRunner {
 						.anmerkung("Wird zentral aus dem Büro geliefert").build();
 
 				Aktivitaet sozialdienst = new AktivitaetBuilder().name("Sozialberatung unterstützen")
-						.beschreibung("Begleitung von BeraterInnen bei Infoveranstaltungen.").strasse("Bürgerstraße")
-						.hausnummer("20").plz("4020").ort("Linz").vorname("Michael").nachname("Hager")
-						.email("michael.hager@caritas.at").telefon("+43 732 789457").teilnehmeranzahl(5)
-						.transport("Öffi").verpflegung("Keine").startDatum(new GregorianCalendar(2025, Calendar.MAY, 2))
+						.beschreibung("Begleitung von BeraterInnen bei Infoveranstaltungen.")
+						.kategorie(Kategorie.INTEGRATION_UND_BERATUNG).strasse("Bürgerstraße").hausnummer("20")
+						.plz("4020").ort("Linz").vorname("Michael").nachname("Hager").email("michael.hager@caritas.at")
+						.telefon("+43 732 789457").teilnehmeranzahl(5).transport("Öffi").verpflegung("Keine")
+						.startDatum(new GregorianCalendar(2025, Calendar.MAY, 2))
 						.endDatum(new GregorianCalendar(2025, Calendar.MAY, 2))
 						.startZeit(new GregorianCalendar(0, 0, 0, 13, 0)).endZeit(new GregorianCalendar(0, 0, 0, 17, 0))
 						.ressource(sozialberatung).build();
@@ -228,10 +238,10 @@ public class DataInitializer implements CommandLineRunner {
 
 				Aktivitaet blutspendeAktion = new AktivitaetBuilder().name("Blutspendeaktion Linz")
 						.beschreibung("HelferInnen unterstützen bei Registrierung und Betreuung von SpenderInnen.")
-						.strasse("Bürgerstraße").hausnummer("26").plz("4020").ort("Linz").teilnehmeranzahl(12)
-						.transport("Öffi").verpflegung("Jause vorhanden").vorname("Peter").nachname("Lehner")
-						.email("peter.lehner@roteskreuz.at").telefon("+43 732 987654")
-						.startDatum(new GregorianCalendar(2025, Calendar.JUNE, 14))
+						.kategorie(Kategorie.GESUNDHEIT).strasse("Bürgerstraße").hausnummer("26").plz("4020")
+						.ort("Linz").teilnehmeranzahl(12).transport("Öffi").verpflegung("Jause vorhanden")
+						.vorname("Peter").nachname("Lehner").email("peter.lehner@roteskreuz.at")
+						.telefon("+43 732 987654").startDatum(new GregorianCalendar(2025, Calendar.JUNE, 14))
 						.endDatum(new GregorianCalendar(2025, Calendar.JUNE, 14))
 						.startZeit(new GregorianCalendar(0, 0, 0, 9, 0)).endZeit(new GregorianCalendar(0, 0, 0, 16, 0))
 						.ressource(blutspende).build();
@@ -251,9 +261,9 @@ public class DataInitializer implements CommandLineRunner {
 						.anmerkung("Nur von geschultem Personal zu verwenden").build();
 
 				Aktivitaet ersteHilfeTraining = new AktivitaetBuilder().name("Erste-Hilfe-Training für Freiwillige")
-						.beschreibung("Schulung in lebensrettenden Sofortmaßnahmen.").strasse("Fadingerstraße")
-						.hausnummer("27").plz("4020").ort("Linz").teilnehmeranzahl(20).transport("Individuell")
-						.verpflegung("Getränke").vorname("Katrin").nachname("Fischer")
+						.beschreibung("Schulung in lebensrettenden Sofortmaßnahmen.").kategorie(Kategorie.BILDUNG)
+						.strasse("Fadingerstraße").hausnummer("27").plz("4020").ort("Linz").teilnehmeranzahl(20)
+						.transport("Individuell").verpflegung("Getränke").vorname("Katrin").nachname("Fischer")
 						.email("katrin.fischer@roteskreuz.at").telefon("+43 732 222222")
 						.startDatum(new GregorianCalendar(2025, Calendar.JULY, 20))
 						.endDatum(new GregorianCalendar(2025, Calendar.JULY, 20))
@@ -275,9 +285,10 @@ public class DataInitializer implements CommandLineRunner {
 						.anmerkung("Aufbau durch Freiwillige vor Ort").build();
 
 				Aktivitaet infostandLinz = new AktivitaetBuilder().name("Infostand am Hauptplatz")
-						.beschreibung("Aufklärung über Erste Hilfe und Freiwilligenarbeit.").strasse("Goethestraße")
-						.hausnummer("17").plz("4020").ort("Linz").teilnehmeranzahl(6).transport("Öffi")
-						.verpflegung("Keine").vorname("Julia").nachname("Wagner").email("julia.wagner@roteskreuz.at")
+						.beschreibung("Aufklärung über Erste Hilfe und Freiwilligenarbeit.")
+						.kategorie(Kategorie.OEFFENTLICHKEITSARBEIT).strasse("Goethestraße").hausnummer("17")
+						.plz("4020").ort("Linz").teilnehmeranzahl(6).transport("Öffi").verpflegung("Keine")
+						.vorname("Julia").nachname("Wagner").email("julia.wagner@roteskreuz.at")
 						.telefon("+43 732 333333").startDatum(new GregorianCalendar(2025, Calendar.AUGUST, 10))
 						.endDatum(new GregorianCalendar(2025, Calendar.AUGUST, 10))
 						.startZeit(new GregorianCalendar(0, 0, 0, 11, 0)).endZeit(new GregorianCalendar(0, 0, 0, 17, 0))
@@ -317,9 +328,9 @@ public class DataInitializer implements CommandLineRunner {
 
 				Aktivitaet pflanzaktion = new AktivitaetBuilder().name("Baumpflanzaktion Frühling")
 						.beschreibung("Pflanzen junger Bäume im Stadtpark gemeinsam mit Freiwilligen.")
-						.strasse("Parkstraße").hausnummer("9").plz("4020").ort("Linz").teilnehmeranzahl(15)
-						.transport("Öffi").verpflegung("Snacks & Wasser").vorname("Florian").nachname("Maier")
-						.email("florian.maier@baumpatenschaft.at").telefon("+43 732 444555")
+						.kategorie(Kategorie.UMWELT).strasse("Parkstraße").hausnummer("9").plz("4020").ort("Linz")
+						.teilnehmeranzahl(15).transport("Öffi").verpflegung("Snacks & Wasser").vorname("Florian")
+						.nachname("Maier").email("florian.maier@baumpatenschaft.at").telefon("+43 732 444555")
 						.startDatum(new GregorianCalendar(2025, Calendar.APRIL, 15))
 						.endDatum(new GregorianCalendar(2025, Calendar.APRIL, 15))
 						.startZeit(new GregorianCalendar(0, 0, 0, 9, 0)).endZeit(new GregorianCalendar(0, 0, 0, 14, 0))
@@ -340,10 +351,10 @@ public class DataInitializer implements CommandLineRunner {
 						.anmerkung("Nach Aktion bitte wieder abgeben").build();
 
 				Aktivitaet baumpflege = new AktivitaetBuilder().name("Baumpflege im Sommer")
-						.beschreibung("Pflege bestehender Stadtbäume und Bewässerung.").strasse("Museumstraße")
-						.hausnummer("31").plz("4020").ort("Linz").teilnehmeranzahl(10).transport("Fahrrad möglich")
-						.verpflegung("Wasser wird gestellt").vorname("Eva").nachname("Koller")
-						.email("eva.koller@baumpatenschaft.at").telefon("+43 732 444556")
+						.beschreibung("Pflege bestehender Stadtbäume und Bewässerung.").kategorie(Kategorie.UMWELT)
+						.strasse("Museumstraße").hausnummer("31").plz("4020").ort("Linz").teilnehmeranzahl(10)
+						.transport("Fahrrad möglich").verpflegung("Wasser wird gestellt").vorname("Eva")
+						.nachname("Koller").email("eva.koller@baumpatenschaft.at").telefon("+43 732 444556")
 						.startDatum(new GregorianCalendar(2025, Calendar.JULY, 1))
 						.endDatum(new GregorianCalendar(2025, Calendar.JULY, 1))
 						.startZeit(new GregorianCalendar(0, 0, 0, 8, 30)).endZeit(new GregorianCalendar(0, 0, 0, 12, 0))
@@ -364,9 +375,9 @@ public class DataInitializer implements CommandLineRunner {
 
 				Aktivitaet infotag = new AktivitaetBuilder().name("Infotag Stadtbegrünung")
 						.beschreibung("Informationsstand zur Baumpatenschaft und Klimaschutz.")
-						.strasse("Landwiedstraße").hausnummer("70").plz("4020").ort("Linz").teilnehmeranzahl(5)
-						.transport("Öffi").verpflegung("Keine").vorname("Lukas").nachname("Wiesinger")
-						.email("lukas.wiesinger@baumpatenschaft.at").telefon("+43 732 444557")
+						.kategorie(Kategorie.UMWELT).strasse("Landwiedstraße").hausnummer("70").plz("4020").ort("Linz")
+						.teilnehmeranzahl(5).transport("Öffi").verpflegung("Keine").vorname("Lukas")
+						.nachname("Wiesinger").email("lukas.wiesinger@baumpatenschaft.at").telefon("+43 732 444557")
 						.startDatum(new GregorianCalendar(2025, Calendar.SEPTEMBER, 12))
 						.endDatum(new GregorianCalendar(2025, Calendar.SEPTEMBER, 12))
 						.startZeit(new GregorianCalendar(0, 0, 0, 10, 0)).endZeit(new GregorianCalendar(0, 0, 0, 16, 0))
@@ -406,9 +417,9 @@ public class DataInitializer implements CommandLineRunner {
 
 				Aktivitaet seniorenBesuch = new AktivitaetBuilder().name("Besuchsdienst im Seniorenheim")
 						.beschreibung("Zeit mit älteren Menschen verbringen und kleine Tätigkeiten übernehmen.")
-						.strasse("Lederergasse").hausnummer("9").plz("4020").ort("Linz").teilnehmeranzahl(6)
-						.transport("Öffi").verpflegung("Kaffee & Kuchen").vorname("Andrea").nachname("Leitner")
-						.email("andrea.leitner@volkshilfe.at").telefon("+43 732 555111")
+						.kategorie(Kategorie.SOZIALES).strasse("Lederergasse").hausnummer("9").plz("4020").ort("Linz")
+						.teilnehmeranzahl(6).transport("Öffi").verpflegung("Kaffee & Kuchen").vorname("Andrea")
+						.nachname("Leitner").email("andrea.leitner@volkshilfe.at").telefon("+43 732 555111")
 						.startDatum(new GregorianCalendar(2025, Calendar.MARCH, 8))
 						.endDatum(new GregorianCalendar(2025, Calendar.MARCH, 8))
 						.startZeit(new GregorianCalendar(0, 0, 0, 14, 0)).endZeit(new GregorianCalendar(0, 0, 0, 17, 0))
@@ -429,11 +440,11 @@ public class DataInitializer implements CommandLineRunner {
 						.anmerkung("Material aus Spendenbestand").build();
 
 				Aktivitaet kinderworkshop = new AktivitaetBuilder().name("Kinderworkshop - Kreatives Gestalten")
-						.beschreibung("Bastelnachmittag für Kinder aus betreuten Familien.").strasse("Humboldtstraße")
-						.hausnummer("18").plz("4020").ort("Linz").teilnehmeranzahl(8).transport("Keine")
-						.verpflegung("Snacks & Getränke").vorname("Sarah").nachname("Kogler")
-						.email("sarah.kogler@volkshilfe.at").telefon("+43 732 555112")
-						.startDatum(new GregorianCalendar(2025, Calendar.MAY, 18))
+						.beschreibung("Bastelnachmittag für Kinder aus betreuten Familien.")
+						.kategorie(Kategorie.KINDER_UND_JUGEND).strasse("Humboldtstraße").hausnummer("18").plz("4020")
+						.ort("Linz").teilnehmeranzahl(8).transport("Keine").verpflegung("Snacks & Getränke")
+						.vorname("Sarah").nachname("Kogler").email("sarah.kogler@volkshilfe.at")
+						.telefon("+43 732 555112").startDatum(new GregorianCalendar(2025, Calendar.MAY, 18))
 						.endDatum(new GregorianCalendar(2025, Calendar.MAY, 18))
 						.startZeit(new GregorianCalendar(0, 0, 0, 13, 0)).endZeit(new GregorianCalendar(0, 0, 0, 17, 0))
 						.ressource(kindermaterial).build();
@@ -453,10 +464,10 @@ public class DataInitializer implements CommandLineRunner {
 
 				Aktivitaet jobhilfe = new AktivitaetBuilder().name("Beratung zur Arbeitssuche")
 						.beschreibung("Begleitung von Menschen bei Bewerbungen und Jobcoaching.")
-						.strasse("Nietzschestraße").hausnummer("31").plz("4020").ort("Linz").teilnehmeranzahl(4)
-						.transport("Öffi").verpflegung("Keine").vorname("Martin").nachname("Bauer")
-						.email("martin.bauer@volkshilfe.at").telefon("+43 732 555113")
-						.startDatum(new GregorianCalendar(2025, Calendar.JUNE, 30))
+						.kategorie(Kategorie.INTEGRATION_UND_BERATUNG).strasse("Nietzschestraße").hausnummer("31")
+						.plz("4020").ort("Linz").teilnehmeranzahl(4).transport("Öffi").verpflegung("Keine")
+						.vorname("Martin").nachname("Bauer").email("martin.bauer@volkshilfe.at")
+						.telefon("+43 732 555113").startDatum(new GregorianCalendar(2025, Calendar.JUNE, 30))
 						.endDatum(new GregorianCalendar(2025, Calendar.JUNE, 30))
 						.startZeit(new GregorianCalendar(0, 0, 0, 9, 0)).endZeit(new GregorianCalendar(0, 0, 0, 13, 0))
 						.ressource(arbeitsberatung).build();
@@ -493,11 +504,11 @@ public class DataInitializer implements CommandLineRunner {
 						.anmerkung("Nur bei trockenem Wetter nutzbar").build();
 
 				Aktivitaet sporttag = new AktivitaetBuilder().name("Jugendsporttag im Park")
-						.beschreibung("Gemeinsamer Sporttag mit Fußball und Volleyball.").strasse("Kudlichstraße")
-						.hausnummer("25").plz("4020").ort("Linz").teilnehmeranzahl(25).transport("Selbstanreise")
-						.verpflegung("Wasser & Obst").vorname("Daniel").nachname("Pichler")
-						.email("daniel.pichler@jugendzentrum.at").telefon("+43 732 666777")
-						.startDatum(new GregorianCalendar(2025, Calendar.APRIL, 20))
+						.beschreibung("Gemeinsamer Sporttag mit Fußball und Volleyball.")
+						.kategorie(Kategorie.KINDER_UND_JUGEND).strasse("Kudlichstraße").hausnummer("25").plz("4020")
+						.ort("Linz").teilnehmeranzahl(25).transport("Selbstanreise").verpflegung("Wasser & Obst")
+						.vorname("Daniel").nachname("Pichler").email("daniel.pichler@jugendzentrum.at")
+						.telefon("+43 732 666777").startDatum(new GregorianCalendar(2025, Calendar.APRIL, 20))
 						.endDatum(new GregorianCalendar(2025, Calendar.APRIL, 20))
 						.startZeit(new GregorianCalendar(0, 0, 0, 11, 0)).endZeit(new GregorianCalendar(0, 0, 0, 16, 0))
 						.ressource(sportausstattung).build();
@@ -517,9 +528,9 @@ public class DataInitializer implements CommandLineRunner {
 						.anmerkung("Wird von Technikteam gewartet").build();
 
 				Aktivitaet musikWorkshop = new AktivitaetBuilder().name("Musikworkshop für Jugendliche")
-						.beschreibung("Musikproduktion mit regionalen KünstlerInnen.").strasse("Franckstraße")
-						.hausnummer("45").plz("4020").ort("Linz").teilnehmeranzahl(12).transport("Keine")
-						.verpflegung("Pizza & Getränke").vorname("Johanna").nachname("Schuster")
+						.beschreibung("Musikproduktion mit regionalen KünstlerInnen.").kategorie(Kategorie.BILDUNG)
+						.strasse("Franckstraße").hausnummer("45").plz("4020").ort("Linz").teilnehmeranzahl(12)
+						.transport("Keine").verpflegung("Pizza & Getränke").vorname("Johanna").nachname("Schuster")
 						.email("johanna.schuster@jugendzentrum.at").telefon("+43 732 666778")
 						.startDatum(new GregorianCalendar(2025, Calendar.JULY, 12))
 						.endDatum(new GregorianCalendar(2025, Calendar.JULY, 12))
@@ -541,10 +552,10 @@ public class DataInitializer implements CommandLineRunner {
 
 				Aktivitaet freiwilligentag = new AktivitaetBuilder().name("Freiwilligentag im Jugendzentrum")
 						.beschreibung("Gemeinsame Aktionstag für Freiwillige, Basteln & Sport.")
-						.strasse("Blumauerstraße").hausnummer("43").plz("4020").ort("Linz").teilnehmeranzahl(10)
-						.transport("Öffi").verpflegung("Snacks & Getränke").vorname("Lena").nachname("Huber")
-						.email("lena.huber@jugendzentrum.at").telefon("+43 732 666779")
-						.startDatum(new GregorianCalendar(2025, Calendar.SEPTEMBER, 5))
+						.kategorie(Kategorie.KINDER_UND_JUGEND).strasse("Blumauerstraße").hausnummer("43").plz("4020")
+						.ort("Linz").teilnehmeranzahl(10).transport("Öffi").verpflegung("Snacks & Getränke")
+						.vorname("Lena").nachname("Huber").email("lena.huber@jugendzentrum.at")
+						.telefon("+43 732 666779").startDatum(new GregorianCalendar(2025, Calendar.SEPTEMBER, 5))
 						.endDatum(new GregorianCalendar(2025, Calendar.SEPTEMBER, 5))
 						.startZeit(new GregorianCalendar(0, 0, 0, 10, 0)).endZeit(new GregorianCalendar(0, 0, 0, 15, 0))
 						.ressource(infostand).build();
@@ -557,7 +568,7 @@ public class DataInitializer implements CommandLineRunner {
 	}
 
 	private void createFreiwillige() {
-		List<Benutzer> freiwilligen = Optional.ofNullable(benutzerService.getFreiwillige())
+		List<Benutzer> freiwilligen = Optional.ofNullable(benutzerService.getAllFreiwillige())
 				.orElse(Collections.emptyList());
 
 		Aktivitaet aktivitaet = aktivitaetRepository.findAll().stream().filter(Objects::nonNull)
@@ -1013,6 +1024,59 @@ public class DataInitializer implements CommandLineRunner {
 			aktivitaet15.addTeilnehmer(b);
 		}
 
+	}
+
+	private void setKategorien() {
+		List<Aktivitaet> allAktivitaeten = aktivitaetService.getAllAktivitaeten();
+
+		for (Aktivitaet aktivitaet : allAktivitaeten) {
+			if (aktivitaet.getName().equals("Lebensmittelverteilung an Bedürftige")) {
+				aktivitaet.setKategorie(Kategorie.SOZIALES);
+			}
+			if (aktivitaet.getName().equals("Kleiderspenden sortieren")) {
+				aktivitaet.setKategorie(Kategorie.SOZIALES);
+			}
+			if (aktivitaet.getName().equals("Sozialberatung unterstützen")) {
+				aktivitaet.setKategorie(Kategorie.INTEGRATION_UND_BERATUNG);
+			}
+			if (aktivitaet.getName().equals("Blutspendeaktion Linz")) {
+				aktivitaet.setKategorie(Kategorie.GESUNDHEIT);
+			}
+			if (aktivitaet.getName().equals("Erste-Hilfe-Training für Freiwillige")) {
+				aktivitaet.setKategorie(Kategorie.BILDUNG);
+			}
+			if (aktivitaet.getName().equals("Infostand am Hauptplatz")) {
+				aktivitaet.setKategorie(Kategorie.OEFFENTLICHKEITSARBEIT);
+			}
+			if (aktivitaet.getName().equals("Baumpflanzaktion Frühling")) {
+				aktivitaet.setKategorie(Kategorie.UMWELT);
+			}
+			if (aktivitaet.getName().equals("Baumpflege im Sommer")) {
+				aktivitaet.setKategorie(Kategorie.UMWELT);
+			}
+			if (aktivitaet.getName().equals("Infotag Stadtbegrünung")) {
+				aktivitaet.setKategorie(Kategorie.UMWELT);
+			}
+			if (aktivitaet.getName().equals("Besuchsdienst im Seniorenheim")) {
+				aktivitaet.setKategorie(Kategorie.SOZIALES);
+			}
+			if (aktivitaet.getName().equals("Kinderworkshop - Kreatives Gestalten")) {
+				aktivitaet.setKategorie(Kategorie.KINDER_UND_JUGEND);
+			}
+			if (aktivitaet.getName().equals("Beratung zur Arbeitssuche")) {
+				aktivitaet.setKategorie(Kategorie.INTEGRATION_UND_BERATUNG);
+			}
+			if (aktivitaet.getName().equals("Jugendsporttag im Park")) {
+				aktivitaet.setKategorie(Kategorie.KINDER_UND_JUGEND);
+			}
+			if (aktivitaet.getName().equals("Musikworkshop für Jugendliche")) {
+				aktivitaet.setKategorie(Kategorie.BILDUNG);
+			}
+			if (aktivitaet.getName().equals("Freiwilligentag im Jugendzentrum")) {
+				aktivitaet.setKategorie(Kategorie.KINDER_UND_JUGEND);
+			}
+			aktivitaetRepository.save(aktivitaet);
+		}
 	}
 
 	private GregorianCalendar vormittagsZeitVon() {

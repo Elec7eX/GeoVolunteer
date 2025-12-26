@@ -6,7 +6,6 @@ import HomePage from "./components/HomePage";
 import { Login } from "./login/Login";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedRoute } from "./roots/ProtectedRoute";
-import i18n from "./i18n";
 import Map from "./components/karte/Map";
 import Organisaiton from "./components/organisation/Organisation";
 import AktivitaetenOverview from "./components/aktivitaeten/AktivitaetenOverview";
@@ -19,7 +18,6 @@ import FreiwilligeDetailPage from "./components/freiwillige/FreiwilligeDetailPag
 import OrganisationDetailPage from "./components/organisation/OrganisationDetailPage";
 
 const App: React.FC = () => {
-  console.log(i18n);
   return (
     <div id="app-root" className="app">
       {<script src="http://localhost:8097"></script>}

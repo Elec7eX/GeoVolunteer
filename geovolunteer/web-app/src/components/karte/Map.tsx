@@ -13,19 +13,24 @@ import {
   ZoomControl,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L, { Icon } from "leaflet";
+import L from "leaflet";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { useEffect, useRef, useState } from "react";
 import { UserType } from "../../enums/Enums";
 import userService from "../../services/UserServices";
 import aktivitaetService from "../../services/AktivitaetService";
-import { AktivitaetModel, UserModel } from "../../types/Types";
+import {
+  AktivitaetModel,
+  Kategorie,
+  KategorieLabels,
+  UserModel,
+} from "../../types/Types";
 import { Button, DropdownDivider, Form, Nav, Offcanvas } from "react-bootstrap";
 import { FaFilter, FaRoute } from "react-icons/fa";
 import { RoutingMachine } from "../karte/RoutingMachine";
 import * as turf from "@turf/turf";
 import { useMapEvents } from "react-leaflet";
-import type { Feature, Point } from "geojson";
+import type { Feature, GeoJsonProperties, Point, Polygon } from "geojson";
 import {
   orgIcon,
   aktivitaetIcon,
@@ -71,6 +76,16 @@ export default function Map() {
     alleAktivitaeten: false,
     alleFreiwilligen: false,
   });
+
+  const [kategorieFilter, setKategorieFilter] = useState<{
+    [key in Kategorie]: boolean;
+  }>(
+    Object.values(Kategorie).reduce((acc, k) => {
+      acc[k] = true; // initial: alle sichtbar
+      return acc;
+    }, {} as { [key in Kategorie]: boolean })
+  );
+
   const [aktivitaetenFilter, setAktivitaetenFilter] = useState<{
     [id: string]: AktivitaetFilterType;
   }>({});
@@ -305,20 +320,24 @@ export default function Map() {
   }, [circleCenter, radius, toolsRef.current.umkreis]);
 
   useEffect(() => {
-    if (!toolsRef.current.umkreis || !circleCenter) {
-      setFilteredMeineAktivitaeten(meineAktivitaeten);
-      setFilteredMeineFreiwilligen(meineFreiwilligen);
-      setFilteredAlleOrganisationen(alleOrganistaionen);
-      setFilteredAlleAktivitaeten(alleAktivitaeten);
-      setFilteredAlleFreiwilligen(alleFreiwilligen);
-      return;
-    }
+    const applyFilter = (a: AktivitaetModel) => {
+      // Kategorie
+      if (!isKategorieVisible(a)) return false;
 
-    const circle = turf.circle(
-      [circleCenter.lng, circleCenter.lat],
-      radius / 1000,
-      { units: "kilometers" }
-    );
+      // Umkreis
+      if (!toolsRef.current.umkreis || !circleCenter) return true;
+
+      return isInside(a.shape);
+    };
+
+    var circle: Feature<Polygon, GeoJsonProperties>;
+    if (circleCenter) {
+      circle = turf.circle(
+        [circleCenter.lng, circleCenter.lat],
+        radius / 1000,
+        { units: "kilometers" }
+      );
+    }
 
     const isInside = (shape: any) => {
       if (!shape) return false;
@@ -343,22 +362,20 @@ export default function Map() {
         default:
           return false;
       }
-
-      return points.some((pt) => turf.booleanPointInPolygon(pt, circle));
+      return points.some((pt) => {
+        if (!circleCenter) return true; // kein Umkreis → alles erlauben
+        return turf.booleanPointInPolygon(pt, circle);
+      });
     };
 
-    setFilteredMeineAktivitaeten(
-      meineAktivitaeten.filter((a) => isInside(a.shape))
-    );
+    setFilteredMeineAktivitaeten(meineAktivitaeten.filter(applyFilter));
     setFilteredMeineFreiwilligen(
       meineFreiwilligen.filter((f) => isInside(f.shape))
     );
     setFilteredAlleOrganisationen(
       alleOrganistaionen.filter((o) => isInside(o.shape))
     );
-    setFilteredAlleAktivitaeten(
-      alleAktivitaeten.filter((a) => isInside(a.shape))
-    );
+    setFilteredAlleAktivitaeten(alleAktivitaeten.filter(applyFilter));
     setFilteredAlleFreiwilligen(
       alleFreiwilligen.filter((f) => isInside(f.shape))
     );
@@ -371,6 +388,7 @@ export default function Map() {
     alleOrganistaionen,
     alleAktivitaeten,
     alleFreiwilligen,
+    kategorieFilter,
   ]);
 
   const updateFilter = (filterName: keyof FilterType) => {
@@ -527,6 +545,11 @@ export default function Map() {
     return null; // Kein sichtbares Element
   }
 
+  const isKategorieVisible = (a: AktivitaetModel): boolean => {
+    if (!a.kategorie) return true; // undefiniert ⇒ anzeigen
+    return kategorieFilter[a.kategorie];
+  };
+
   const handleClose = () => setShow(false);
   const toggleShow = () => setShow((s) => !s);
 
@@ -658,69 +681,67 @@ export default function Map() {
                       })}
                     />
                   ))}
-                {filter.alleOrganisationen &&
-                  filteredAlleOrganisationen.map((feature, index) => (
-                    <GeoJSON
-                      key={`alleOrganisationen-${index}`}
-                      data={feature.shape!}
-                      pointToLayer={(feature, latlng) => {
-                        return L.marker(latlng, { icon: orgIcon });
-                      }}
-                      onEachFeature={(f, layer) => {
-                        layer.bindPopup(feature.name ?? "Organisation");
-                        layer.on("click", handleRoutingClick);
-                      }}
-                      style={() => ({
-                        opacity: toolsRef.current.umkreis ? 0.5 : 1,
-                      })}
-                    />
-                  ))}
-                {filter.alleAktivitaeten &&
-                  filteredAlleAktivitaeten.map((feature, index) => (
-                    <GeoJSON
-                      key={`alleAktivitaeten-${index}`}
-                      data={feature.shape!}
-                      pointToLayer={(feature, latlng) => {
-                        return L.marker(latlng, { icon: aktivitaetIcon });
-                      }}
-                      style={() => ({
-                        color: "#007bff",
-                        weight: 2,
-                        fillOpacity: 0.3,
-                        opacity: toolsRef.current.umkreis ? 0.5 : 1,
-                      })}
-                      onEachFeature={(f, layer) => {
-                        layer.bindPopup(
-                          feature.name
-                            ? feature.name +
-                                `<div style="font-size: 12px;fontStyle: italic;">${feature.organisation?.name}</div>`
-                            : "Aktivität"
-                        );
-                        layer.on("click", handleRoutingClick);
-                      }}
-                    />
-                  ))}
-                {filter.alleFreiwilligen &&
-                  filteredAlleFreiwilligen.map((feature, index) => (
-                    <GeoJSON
-                      key={`alleFreiwilligen-${index}`}
-                      data={feature.shape!}
-                      pointToLayer={(f, latlng) =>
-                        L.marker(latlng, { icon: freiwilligeIcon })
-                      }
-                      onEachFeature={(f, layer) => {
-                        layer.bindPopup(
-                          feature.vorname + " " + feature.nachname
-                        );
-                        layer.on("click", handleRoutingClick);
-                      }}
-                      style={() => ({
-                        opacity: toolsRef.current.umkreis ? 0.5 : 1,
-                      })}
-                    />
-                  ))}
               </>
             )}
+            {filter.alleOrganisationen &&
+              filteredAlleOrganisationen.map((feature, index) => (
+                <GeoJSON
+                  key={`alleOrganisationen-${index}`}
+                  data={feature.shape!}
+                  pointToLayer={(feature, latlng) => {
+                    return L.marker(latlng, { icon: orgIcon });
+                  }}
+                  onEachFeature={(f, layer) => {
+                    layer.bindPopup(feature.name ?? "Organisation");
+                    layer.on("click", handleRoutingClick);
+                  }}
+                  style={() => ({
+                    opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                  })}
+                />
+              ))}
+            {filter.alleAktivitaeten &&
+              filteredAlleAktivitaeten.map((feature, index) => (
+                <GeoJSON
+                  key={`alleAktivitaeten-${index}`}
+                  data={feature.shape!}
+                  pointToLayer={(feature, latlng) => {
+                    return L.marker(latlng, { icon: aktivitaetIcon });
+                  }}
+                  style={() => ({
+                    color: "#007bff",
+                    weight: 2,
+                    fillOpacity: 0.3,
+                    opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                  })}
+                  onEachFeature={(f, layer) => {
+                    layer.bindPopup(
+                      feature.name
+                        ? feature.name +
+                            `<div style="font-size: 12px;fontStyle: italic;">${feature.organisation?.name}</div>`
+                        : "Aktivität"
+                    );
+                    layer.on("click", handleRoutingClick);
+                  }}
+                />
+              ))}
+            {filter.alleFreiwilligen &&
+              filteredAlleFreiwilligen.map((feature, index) => (
+                <GeoJSON
+                  key={`alleFreiwilligen-${index}`}
+                  data={feature.shape!}
+                  pointToLayer={(f, latlng) =>
+                    L.marker(latlng, { icon: freiwilligeIcon })
+                  }
+                  onEachFeature={(f, layer) => {
+                    layer.bindPopup(feature.vorname + " " + feature.nachname);
+                    layer.on("click", handleRoutingClick);
+                  }}
+                  style={() => ({
+                    opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                  })}
+                />
+              ))}
           </FeatureGroup>
           {(tools.routenplaner || tools.distanzberechnung) &&
             selectedPoints.length >= 2 && (
@@ -858,7 +879,6 @@ export default function Map() {
                         style={{ marginBottom: "5px" }}
                       />
                     </div>
-                    <DropdownDivider />
                     <div style={{ padding: "10px" }}>
                       <div style={{ marginBottom: "10px" }}>
                         <h1 className="map-dropdown_title">
@@ -1064,6 +1084,66 @@ export default function Map() {
                             </div>
                           )}
                       </div>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <h1 className="map-dropdown_title" style={{ margin: 0 }}>
+                        {t("map.filter.kategorie.title")}
+                      </h1>
+                      <div style={{ marginBottom: "10px" }}>
+                        <Button
+                          size="sm"
+                          variant="outline-secondary"
+                          onClick={() =>
+                            setKategorieFilter(
+                              Object.values(Kategorie).reduce((acc, k) => {
+                                acc[k] = true;
+                                return acc;
+                              }, {} as { [key in Kategorie]: boolean })
+                            )
+                          }
+                        >
+                          {t("map.filter.kategorie.button.alle")}
+                        </Button>{" "}
+                        <Button
+                          size="sm"
+                          variant="outline-secondary"
+                          onClick={() =>
+                            setKategorieFilter(
+                              Object.values(Kategorie).reduce((acc, k) => {
+                                acc[k] = false;
+                                return acc;
+                              }, {} as { [key in Kategorie]: boolean })
+                            )
+                          }
+                        >
+                          {t("map.filter.kategorie.button.keine")}
+                        </Button>
+                      </div>
+                    </div>
+                    <div style={{ marginLeft: "10px" }}>
+                      {Object.values(Kategorie).map((k) => (
+                        <Form.Check
+                          key={k}
+                          type="checkbox"
+                          id={`kategorie-${k}`}
+                          label={KategorieLabels[k]}
+                          checked={kategorieFilter[k]}
+                          onChange={() =>
+                            setKategorieFilter((prev) => ({
+                              ...prev,
+                              [k]: !prev[k],
+                            }))
+                          }
+                          style={{ marginBottom: "5px" }}
+                        />
+                      ))}
                     </div>
                   </>
                 )}
