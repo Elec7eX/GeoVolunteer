@@ -349,6 +349,14 @@ public class Benutzer {
 		}
 	}
 
+	public boolean isFreiwillige() {
+		return Rolle.FREIWILLIGE.equals(getRolle());
+	}
+
+	public boolean isOrganisation() {
+		return Rolle.ORGANISATION.equals(getRolle());
+	}
+
 	@Override
 	public String toString() {
 		return "[id='" + getId().toString() + "'; " + "rolle='" + getRolle() + "'"

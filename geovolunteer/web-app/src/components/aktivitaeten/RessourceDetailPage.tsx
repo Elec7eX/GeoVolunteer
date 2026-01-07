@@ -60,11 +60,27 @@ export default function RessourceDetailPage() {
                     })
                   }
                 >
+                  <img
+                    src={require("../../icons/heart-rate_1.png")}
+                    alt="Aktivität"
+                    width={20}
+                    height={20}
+                    style={{ marginRight: "2px" }}
+                  />
                   {t("footer.icon.aktivitaet")}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link href="#first">{t("ressourcen.card.link")}</Nav.Link>
+                <Nav.Link href="#first">
+                  <img
+                    src={require("../../icons/box.png")}
+                    alt="Ressource"
+                    width={20}
+                    height={20}
+                    style={{ marginRight: "5px" }}
+                  />
+                  {t("ressourcen.card.link")}
+                </Nav.Link>
               </Nav.Item>
             </Nav>
           </Card.Header>
@@ -75,16 +91,13 @@ export default function RessourceDetailPage() {
               </Col>
               <Col>
                 <Card.Title>{ressource.name}</Card.Title>
-                <Card.Text>
-                  <div>{aktivitaet.organisation?.name}</div>
-                  <div>
-                    {aktivitaet.organisation?.strasse}{" "}
-                    {aktivitaet.organisation?.hausnummer}
-                    {", "}
-                    {aktivitaet.organisation?.plz}{" "}
-                    {aktivitaet.organisation?.ort}
-                  </div>
-                </Card.Text>
+                <div>{aktivitaet.organisation?.name}</div>
+                <div>
+                  {aktivitaet.organisation?.strasse}{" "}
+                  {aktivitaet.organisation?.hausnummer}
+                  {", "}
+                  {aktivitaet.organisation?.plz} {aktivitaet.organisation?.ort}
+                </div>
               </Col>
             </Row>
           </Card.Body>

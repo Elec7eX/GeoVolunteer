@@ -18,7 +18,7 @@ export default function Freiwillige() {
 
   useEffect(() => {
     aktivitaetService
-      .getErstellteAktivitaeten()
+      .getLaufendeUndBevorstehendeAktivitaeten()
       .then((resp) => {
         setAktivitaet(resp.data);
       })
@@ -52,9 +52,9 @@ export default function Freiwillige() {
     <>
       <Header title={t("freiwillige.header.title")} />
       <div className="body">
-        <h3 style={{ marginTop: 30 }}>
+        <h4 style={{ marginTop: 30 }}>
           {t("map.filter.organisation.teilnehmer")}
-        </h3>
+        </h4>
         {aktivitaet.map((aktivitaet) =>
           aktivitaet.teilnehmer!.map((user) => {
             return (
@@ -64,7 +64,7 @@ export default function Freiwillige() {
                 onClick={() => navigateToDetail(user)}
                 style={{ marginBottom: 10 }}
               >
-                <CardHeader className="custom-cardheader">
+                <CardHeader className="custom-cardheader--available">
                   <Col sm={1}>
                     <IoPersonOutline size={27} style={{ marginRight: 15 }} />
                   </Col>
@@ -91,7 +91,7 @@ export default function Freiwillige() {
             );
           })
         )}
-        <h3 style={{ marginTop: 30 }}>{t("freiwillige.header.title")}</h3>
+        <h4 style={{ marginTop: 30 }}>{t("freiwillige.header.title")}</h4>
         {freiwillige.length > 0 &&
           freiwillige.map((user) => (
             <Card
@@ -100,7 +100,7 @@ export default function Freiwillige() {
               onClick={() => navigateToDetail(user)}
               style={{ marginBottom: 10 }}
             >
-              <CardHeader className="custom-cardheader">
+              <CardHeader className="custom-cardheader--available">
                 <IoPersonOutline size={27} style={{ marginRight: 15 }} />
                 <div className="custom-cardheader_text">
                   {user.vorname} {user.nachname}

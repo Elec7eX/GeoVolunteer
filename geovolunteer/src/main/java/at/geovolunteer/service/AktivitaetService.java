@@ -1,9 +1,12 @@
 package at.geovolunteer.service;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,14 +38,40 @@ public class AktivitaetService {
 		return repository.save(entity);
 	}
 
-	public List<Aktivitaet> getErstellteAktivitaeten() {
-		return benutzerService.getActive().getErstellteAktivitaeten();
+	public List<Aktivitaet> getLaufendeAktivitaeten() {
+		return getFilteredAktivitaeten(this::isAktivitaetLaufend);
+	}
+
+	public List<Aktivitaet> getBevorstehendeAktivitaeten() {
+		return getFilteredAktivitaeten(this::istAktivitaetBevorstehend);
+	}
+
+	public List<Aktivitaet> getAbgeschlosseneAktivitaeten() {
+		return getFilteredAktivitaeten(this::istAktivitaetAbgeschlossen);
+	}
+
+	public List<Aktivitaet> getFilteredAktivitaeten(Predicate<Aktivitaet> filter) {
+		Benutzer benutzer = benutzerService.getActive();
+
+		if (benutzer.isOrganisation()) {
+			return benutzer.getErstellteAktivitaeten().stream().filter(filter).collect(Collectors.toList());
+		} else if (benutzer.isFreiwillige()) {
+			return benutzer.getTeilnahmen().stream().filter(filter).collect(Collectors.toList());
+		} else {
+			throw new IllegalArgumentException("Not implemented!");
+		}
 	}
 
 	public List<Aktivitaet> getAktivitaeten() {
 		return benutzerService.getOrganisationen().stream().flatMap(e -> e.getErstellteAktivitaeten().stream())
+				.filter(e -> !istAktivitaetAbgeschlossen(e))
 				.filter(e -> e.getTeilnehmer().size() <= e.getTeilnehmeranzahl()).filter(e -> e.getTeilnehmer().stream()
 						.noneMatch(b -> b.getId() == benutzerService.getActive().getId()))
+				.collect(Collectors.toList());
+	}
+
+	public List<Aktivitaet> getLaufendeUndBevorstehendeAktivitaeten() {
+		return Stream.concat(getLaufendeAktivitaeten().stream(), getBevorstehendeAktivitaeten().stream())
 				.collect(Collectors.toList());
 	}
 
@@ -50,8 +79,35 @@ public class AktivitaetService {
 		return repository.findAll();
 	}
 
-	public List<Aktivitaet> geAngemeldeteAktivitaeten() {
-		return benutzerService.getActive().getTeilnahmen();
+	public boolean isAktivitaetLaufend(Aktivitaet akt) {
+		return !istAktivitaetBevorstehend(akt) && !istAktivitaetAbgeschlossen(akt);
+	}
+
+	public boolean istAktivitaetAbgeschlossen(Aktivitaet akt) {
+		Calendar jetzt = getJetztZeitpunkt();
+		Calendar endZeitpunkt = getZeitpunkt(akt.getEndDatum(), akt.getEndZeit());
+		return jetzt.after(endZeitpunkt);
+	}
+
+	public boolean istAktivitaetBevorstehend(Aktivitaet akt) {
+		Calendar jetzt = getJetztZeitpunkt();
+		Calendar startZeitpunkt = getZeitpunkt(akt.getStartDatum(), akt.getStartZeit());
+		return jetzt.before(startZeitpunkt);
+	}
+
+	private Calendar getZeitpunkt(Calendar datum, Calendar zeit) {
+		Calendar c = (Calendar) datum.clone();
+		c.set(Calendar.HOUR_OF_DAY, zeit.get(Calendar.HOUR_OF_DAY));
+		c.set(Calendar.MINUTE, zeit.get(Calendar.MINUTE));
+		c.set(Calendar.SECOND, zeit.get(Calendar.SECOND));
+		c.set(Calendar.MILLISECOND, 0);
+		return c;
+	}
+
+	private Calendar getJetztZeitpunkt() {
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.MILLISECOND, 0);
+		return c;
 	}
 
 	public Optional<Aktivitaet> getById(Long id) {
@@ -121,6 +177,9 @@ public class AktivitaetService {
 		entity.setTransport(model.getTransport());
 		entity.setVerpflegung(model.getVerpflegung());
 		entity.setKategorie(model.getKategorie());
+		if (!isStartZeitpunktBeforeEndZeitpunkt(model)) {
+			throw new IllegalArgumentException("Start-Zeitpunkt ist nach End-Zeitpunkt");
+		}
 		entity.setStartDatum(model.getStartDatum());
 		entity.setEndDatum(model.getEndDatum());
 		entity.setStartZeit(model.getStartZeit());
@@ -153,6 +212,12 @@ public class AktivitaetService {
 		entity.setNachname(model.getNachname());
 		entity.setEmail(model.getEmail());
 		entity.setTelefon(model.getTelefon());
+	}
+
+	private boolean isStartZeitpunktBeforeEndZeitpunkt(Aktivitaet model) {
+		Calendar startZeitpunkt = getZeitpunkt(model.getStartDatum(), model.getStartZeit());
+		Calendar endZeitpunkt = getZeitpunkt(model.getEndDatum(), model.getEndZeit());
+		return startZeitpunkt.before(endZeitpunkt);
 	}
 
 }

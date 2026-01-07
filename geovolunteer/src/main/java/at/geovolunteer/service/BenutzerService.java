@@ -64,7 +64,7 @@ public class BenutzerService {
 	}
 
 	public List<Benutzer> getAllTeilnehmer() {
-		return aktivitaetService.getErstellteAktivitaeten().stream()
+		return aktivitaetService.getLaufendeUndBevorstehendeAktivitaeten().stream()
 				.flatMap(e -> e.getTeilnehmer().stream().sorted(Comparator.comparing(Benutzer::getVorname)))
 				.collect(Collectors.toList());
 	}

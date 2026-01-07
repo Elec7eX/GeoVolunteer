@@ -51,10 +51,12 @@ public class DataInitializer implements CommandLineRunner {
 	@Override
 	@Transactional
 	public void run(String... args) throws Exception {
-//		setKategorien();
 //		createOrganisationen();
 //		createAktivitaeten();
 //		createFreiwillige();
+
+//		setKategorien();
+
 		System.out.println("GEO_VOLUNTEER_APP wurde gestartet!");
 	}
 

@@ -15,7 +15,12 @@ export const aktivitaetIcon = new Icon({
   iconSize: [40, 40],
 });
 
-export const freiwilligeIcon = new Icon({
+export const meineFreiwilligeIcon = new Icon({
   iconUrl: require("../../icons/user.png"),
+  iconSize: [30, 30],
+});
+
+export const alleFreiwilligeIcon = new Icon({
+  iconUrl: require("../../icons/user_add.png"),
   iconSize: [30, 30],
 });

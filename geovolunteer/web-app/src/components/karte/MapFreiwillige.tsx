@@ -25,9 +25,9 @@ import {
   KategorieLabels,
   UserModel,
 } from "../../types/Types";
-import { Button, DropdownDivider, Form, Nav, Offcanvas } from "react-bootstrap";
+import { Button, Form, Nav, Offcanvas } from "react-bootstrap";
 import { FaFilter, FaRoute } from "react-icons/fa";
-import { RoutingMachine } from "../karte/RoutingMachine";
+import { RoutingMachine } from "./RoutingMachine";
 import * as turf from "@turf/turf";
 import { useMapEvents } from "react-leaflet";
 import type { Feature, GeoJsonProperties, Point, Polygon } from "geojson";
@@ -35,8 +35,10 @@ import {
   orgIcon,
   aktivitaetIcon,
   markerIcon,
-  freiwilligeIcon,
+  meineFreiwilligeIcon,
 } from "./MapIcons";
+import { useNavigate } from "react-router-dom";
+import { MapPopup } from "./MapPopup";
 
 interface FilterType {
   meineOrganisation: boolean;
@@ -60,8 +62,9 @@ interface AktivitaetFilterType {
   teilnehmer: { [id: string]: boolean };
 }
 
-export default function Map() {
+export default function MapOrganisation() {
   const [user] = useLocalStorage("user", null);
+  const navigate = useNavigate();
   const initialized = useRef(false);
   const drawnItemsRef = useRef(null);
 
@@ -156,7 +159,7 @@ export default function Map() {
             if (resp.status === 200) {
               setMeineOrganisation(org as UserModel);
               aktivitaetService
-                .getErstellteAktivitaeten()
+                .getAktuelleAktivitaeten()
                 .then((res) => {
                   if (res.status === 200) {
                     const aktivitaetenArray: AktivitaetModel[] = res.data.map(
@@ -606,18 +609,14 @@ export default function Map() {
                           L.marker(latlng, { icon: aktivitaetIcon })
                         }
                         onEachFeature={(f, layer) => {
-                          layer.bindPopup(
-                            feature.name
-                              ? feature.name +
-                                  `<div style="font-size: 12px;fontStyle: italic;">${feature.organisation?.name}</div>`
-                              : "Aktivität"
-                          );
                           layer.on("click", handleRoutingClick);
                         }}
                         style={() => ({
                           opacity: toolsRef.current.umkreis ? 0.5 : 1,
                         })}
-                      />
+                      >
+                        <MapPopup aktivitaet={feature} />
+                      </GeoJSON>
                     );
 
                     // Ressource
@@ -630,15 +629,14 @@ export default function Map() {
                             L.marker(latlng, { icon: markerIcon })
                           }
                           onEachFeature={(f, layer) => {
-                            layer.bindPopup(
-                              feature.ressource?.name ?? "Ressource"
-                            );
                             layer.on("click", handleRoutingClick);
                           }}
                           style={() => ({
                             opacity: toolsRef.current.umkreis ? 0.5 : 1,
                           })}
-                        />
+                        >
+                          <MapPopup aktivitaet={feature} isRessource />
+                        </GeoJSON>
                       ) : null;
 
                     // Freiwillige (Liste)
@@ -650,18 +648,17 @@ export default function Map() {
                             key={`teilnehmer-${t.id}`}
                             data={t.shape}
                             pointToLayer={(f, latlng) =>
-                              L.marker(latlng, { icon: freiwilligeIcon })
+                              L.marker(latlng, { icon: meineFreiwilligeIcon })
                             }
                             onEachFeature={(f, layer) => {
-                              layer.bindPopup(
-                                (t.vorname ?? "") + " " + (t.nachname ?? "")
-                              );
                               layer.on("click", handleRoutingClick);
                             }}
                             style={() => ({
                               opacity: toolsRef.current.umkreis ? 0.5 : 1,
                             })}
-                          />
+                          >
+                            <MapPopup user={t} />
+                          </GeoJSON>
                         )) ?? [];
 
                     return [layer, ressourceLayer, ...teilnehmerLayer];
@@ -671,15 +668,12 @@ export default function Map() {
                     <GeoJSON
                       key={`freiwillige-${index}`}
                       data={feature!.shape!}
-                      onEachFeature={(f, layer) => {
-                        layer.bindPopup(
-                          feature.vorname + " " + feature.nachname
-                        );
-                      }}
                       style={() => ({
                         opacity: toolsRef.current.umkreis ? 0.5 : 1,
                       })}
-                    />
+                    >
+                      <MapPopup user={feature} />
+                    </GeoJSON>
                   ))}
               </>
             )}
@@ -715,15 +709,11 @@ export default function Map() {
                     opacity: toolsRef.current.umkreis ? 0.5 : 1,
                   })}
                   onEachFeature={(f, layer) => {
-                    layer.bindPopup(
-                      feature.name
-                        ? feature.name +
-                            `<div style="font-size: 12px;fontStyle: italic;">${feature.organisation?.name}</div>`
-                        : "Aktivität"
-                    );
                     layer.on("click", handleRoutingClick);
                   }}
-                />
+                >
+                  <MapPopup aktivitaet={feature} />
+                </GeoJSON>
               ))}
             {filter.alleFreiwilligen &&
               filteredAlleFreiwilligen.map((feature, index) => (
@@ -731,16 +721,17 @@ export default function Map() {
                   key={`alleFreiwilligen-${index}`}
                   data={feature.shape!}
                   pointToLayer={(f, latlng) =>
-                    L.marker(latlng, { icon: freiwilligeIcon })
+                    L.marker(latlng, { icon: meineFreiwilligeIcon })
                   }
                   onEachFeature={(f, layer) => {
-                    layer.bindPopup(feature.vorname + " " + feature.nachname);
                     layer.on("click", handleRoutingClick);
                   }}
                   style={() => ({
                     opacity: toolsRef.current.umkreis ? 0.5 : 1,
                   })}
-                />
+                >
+                  <MapPopup user={feature} />
+                </GeoJSON>
               ))}
           </FeatureGroup>
           {(tools.routenplaner || tools.distanzberechnung) &&

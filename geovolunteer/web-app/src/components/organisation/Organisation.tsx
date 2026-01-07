@@ -56,7 +56,7 @@ export default function Organisation() {
                 onClick={() => navigateToDetail(user)}
                 style={{ marginBottom: 10 }}
               >
-                <CardHeader className="custom-cardheader">
+                <CardHeader className="custom-cardheader--available">
                   <IoPersonOutline size={27} style={{ marginRight: 15 }} />
                   <div className="custom-cardheader_text">{user.name}</div>
                 </CardHeader>

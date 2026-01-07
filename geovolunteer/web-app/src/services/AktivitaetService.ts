@@ -8,18 +8,28 @@ const update = (data: AktivitaetModel) => {
   return http.post<AktivitaetModel>(BASE_URL + "/update", data);
 };
 
-const getErstellteAktivitaeten = () => {
-  return http.get<Array<AktivitaetModel>>(BASE_URL + "/erstellteAktivitaeten");
+const getLaufendeAktivitaeten = () => {
+  return http.get<Array<AktivitaetModel>>(BASE_URL + "/laufendeAktivitaeten");
+};
+
+const getBevorstehendeAktivitaeten = () => {
+  return http.get<Array<AktivitaetModel>>(BASE_URL + "/bevorstehendeAktivitaeten");
+};
+
+const getLaufendeUndBevorstehendeAktivitaeten = () => {
+  return http.get<Array<AktivitaetModel>>(BASE_URL + "/laufendeUndBevorstehendeAktivitaeten");
+};
+
+const getAbgeschlosseneAktivitaeten = () => {
+  return http.get<Array<AktivitaetModel>>(BASE_URL + "/abgeschlosseneAktivitaeten");
 };
 
 const getAll = () => {
   return http.get<Array<AktivitaetModel>>(BASE_URL + "/aktivitaeten");
 };
-
-const getAngemeldete = () => {
-  return http.get<Array<AktivitaetModel>>(BASE_URL + "/angemeldete/aktivitaeten");
+const getAktuelleAktivitaeten = () => {
+  return http.get<Array<AktivitaetModel>>(BASE_URL + "/aktuelleAktivitaeten");
 };
-
 const getById = (id: string) => {
   return http.get<AktivitaetModel>(BASE_URL + `/${id}`);
 }
@@ -38,9 +48,12 @@ const removeTeilnehmer = (id: string) => {
 
 const aktivitaetService = {
   update,
-  getErstellteAktivitaeten,
+  getLaufendeAktivitaeten,
+  getBevorstehendeAktivitaeten,
+  getLaufendeUndBevorstehendeAktivitaeten,
+  getAbgeschlosseneAktivitaeten,
   getAll,
-  getAngemeldete,
+  getAktuelleAktivitaeten,
   getById,
   deleteById,
   addTeilnehmer,

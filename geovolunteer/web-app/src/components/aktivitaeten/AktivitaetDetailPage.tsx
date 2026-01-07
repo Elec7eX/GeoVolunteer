@@ -6,7 +6,7 @@ import { Button, Card, Col, Modal, Nav, Row } from "react-bootstrap";
 import { useEffect, useRef, useState } from "react";
 import { AktivitaetModel, KategorieLabels } from "../../types/Types";
 import aktivitaetService from "../../services/AktivitaetService";
-import { VerticalDivider } from "../../utils/Utils";
+import StatusIndicator, { VerticalDivider } from "../../utils/Utils";
 import { PiMapPinArea } from "react-icons/pi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FiEdit } from "react-icons/fi";
@@ -17,12 +17,13 @@ import { Feature, Geometry } from "geojson";
 import MapComponent from "../karte/MapComponent";
 
 export default function AktivitaetDetailPage() {
+  const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const location = useLocation();
   const [user] = useLocalStorage("user", null);
 
-  const { aktivitaetFromState, isTeilnehmer } = location.state;
+  const { aktivitaetFromState = null, isTeilnehmer = false } =
+    location.state || {};
   const mapRef = useRef<HTMLDivElement | null>(null);
 
   const [aktivitaet, setAktivitaet] = useState<AktivitaetModel | null>(null);
@@ -68,7 +69,16 @@ export default function AktivitaetDetailPage() {
           <Card.Header>
             <Nav variant="tabs" defaultActiveKey="#first">
               <Nav.Item>
-                <Nav.Link href="#first">{t("footer.icon.aktivitaet")}</Nav.Link>
+                <Nav.Link href="#first">
+                  <img
+                    src={require("../../icons/heart-rate_1.png")}
+                    alt="Aktivität"
+                    width={20}
+                    height={20}
+                    style={{ marginRight: "2px" }}
+                  />
+                  {t("footer.icon.aktivitaet")}
+                </Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link
@@ -78,6 +88,13 @@ export default function AktivitaetDetailPage() {
                     })
                   }
                 >
+                  <img
+                    src={require("../../icons/box.png")}
+                    alt="Ressource"
+                    width={20}
+                    height={20}
+                    style={{ marginRight: "5px" }}
+                  />
                   {t("ressourcen.card.link")}
                 </Nav.Link>
               </Nav.Item>
@@ -92,22 +109,26 @@ export default function AktivitaetDetailPage() {
                 <Card.Title>{aktivitaet.name}</Card.Title>
                 {user.rolle === UserType.FREIWILLIGE && (
                   <>
-                    <Card.Text>
-                      <div>{aktivitaet.organisation?.name}</div>
-                      <div>
-                        {aktivitaet.organisation?.strasse}{" "}
-                        {aktivitaet.organisation?.hausnummer}
-                      </div>
-                      <div>
-                        {aktivitaet.organisation?.plz}{" "}
-                        {aktivitaet.organisation?.ort}
-                      </div>
-                    </Card.Text>
+                    <div>{aktivitaet.organisation?.name}</div>
+                    <div>
+                      {aktivitaet.organisation?.strasse}{" "}
+                      {aktivitaet.organisation?.hausnummer}
+                      {", "}
+                      {aktivitaet.organisation?.plz}{" "}
+                      {aktivitaet.organisation?.ort}
+                    </div>
                   </>
                 )}
                 {user.rolle === UserType.ORGANISATION && (
                   <>
-                    <Card.Text>{aktivitaet.organisation?.name}</Card.Text>
+                    <div>{aktivitaet.organisation?.name}</div>
+                    <div>
+                      {aktivitaet.organisation?.strasse}{" "}
+                      {aktivitaet.organisation?.hausnummer}
+                      {", "}
+                      {aktivitaet.organisation?.plz}{" "}
+                      {aktivitaet.organisation?.ort}
+                    </div>
                     <Row style={{ textAlign: "end" }}>
                       <Col>
                         {id !== undefined && (
@@ -135,10 +156,12 @@ export default function AktivitaetDetailPage() {
                 )}
               </Col>
             </Row>
-            {aktivitaet.teilnehmer &&
-              aktivitaet.teilnehmer.length < aktivitaet.teilnehmeranzahl && (
-                <>
-                  {!isTeilnehmer && user.rolle === UserType.FREIWILLIGE && (
+            {aktivitaet.teilnehmer && (
+              <>
+                {!isTeilnehmer &&
+                  user.rolle === UserType.FREIWILLIGE &&
+                  aktivitaet.teilnehmer.length <
+                    aktivitaet.teilnehmeranzahl && (
                     <Button
                       className="btn custom-button_teilnehmen"
                       onClick={() =>
@@ -152,22 +175,22 @@ export default function AktivitaetDetailPage() {
                       </div>
                     </Button>
                   )}
-                  {isTeilnehmer && user.rolle === UserType.FREIWILLIGE && (
-                    <Button
-                      className="btn custom-button_nichtTeilnehmen"
-                      onClick={() =>
-                        aktivitaetService
-                          .removeTeilnehmer(id!)
-                          .then(() => navigate("/aktivitäten"))
-                      }
-                    >
-                      <div className="text-white">
-                        {t("aktivitaeten.detail.button.nichtTeilnehmen")}
-                      </div>
-                    </Button>
-                  )}
-                </>
-              )}
+                {isTeilnehmer && user.rolle === UserType.FREIWILLIGE && (
+                  <Button
+                    className="btn custom-button_nichtTeilnehmen"
+                    onClick={() =>
+                      aktivitaetService
+                        .removeTeilnehmer(id!)
+                        .then(() => navigate("/aktivitäten"))
+                    }
+                  >
+                    <div className="text-white">
+                      {t("aktivitaeten.detail.button.nichtTeilnehmen")}
+                    </div>
+                  </Button>
+                )}
+              </>
+            )}
           </Card.Body>
         </Card>
         <Card style={{ marginTop: 10, height: "auto" }}>
@@ -221,11 +244,12 @@ export default function AktivitaetDetailPage() {
                   <VerticalDivider />
                 </Col>
                 <Col>
-                  <div>
-                    {aktivitaet.teilnehmer !== undefined && (
-                      <>{aktivitaet.teilnehmer.length}/</>
-                    )}
-                    {aktivitaet.teilnehmeranzahl}
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    <StatusIndicator aktivitaet={aktivitaet} />
+                    <span>
+                      ({aktivitaet.teilnehmer?.length ?? 0}/
+                      {aktivitaet.teilnehmeranzahl})
+                    </span>
                   </div>
                 </Col>
               </Row>
@@ -252,12 +276,19 @@ export default function AktivitaetDetailPage() {
                 <VerticalDivider height="70px" />
               </Col>
               <Col>
-                <div>
-                  {aktivitaet.strasse} {aktivitaet.hausnummer}
-                </div>
-                <div>
-                  {aktivitaet.plz} {aktivitaet.ort}
-                </div>
+                {aktivitaet.strasse &&
+                  aktivitaet.hausnummer &&
+                  aktivitaet.plz &&
+                  aktivitaet.ort && (
+                    <>
+                      <div>
+                        {aktivitaet.strasse} {aktivitaet.hausnummer}
+                      </div>
+                      <div>
+                        {aktivitaet.plz} {aktivitaet.ort}
+                      </div>
+                    </>
+                  )}
                 <div>
                   <PiMapPinArea
                     style={{ marginLeft: 100, color: "#00e7ff" }}

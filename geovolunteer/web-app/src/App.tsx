@@ -6,7 +6,7 @@ import HomePage from "./components/HomePage";
 import { Login } from "./login/Login";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedRoute } from "./roots/ProtectedRoute";
-import Map from "./components/karte/Map";
+import MapOrganisation from "./components/karte/MapOrganisation";
 import Organisaiton from "./components/organisation/Organisation";
 import AktivitaetenOverview from "./components/aktivitaeten/AktivitaetenOverview";
 import AktivitaetDetailPage from "./components/aktivitaeten/AktivitaetDetailPage";
@@ -16,6 +16,7 @@ import Profil from "./components/profil/Profil";
 import Freiwillige from "./components/freiwillige/Freiwillige";
 import FreiwilligeDetailPage from "./components/freiwillige/FreiwilligeDetailPage";
 import OrganisationDetailPage from "./components/organisation/OrganisationDetailPage";
+import MapFreiwillige from "./components/karte/MapFreiwillige";
 
 const App: React.FC = () => {
   return (
@@ -75,10 +76,18 @@ const App: React.FC = () => {
               }
             />
             <Route
-              path="/map"
+              path="/karte_organisation"
               element={
                 <ProtectedRoute>
-                  <Map />
+                  <MapOrganisation />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/karte_freiwillige"
+              element={
+                <ProtectedRoute>
+                  <MapFreiwillige />
                 </ProtectedRoute>
               }
             />

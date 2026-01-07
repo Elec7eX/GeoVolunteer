@@ -31,10 +31,10 @@ public class AktivitaetRessource {
 	@Autowired
 	private GeoService geoService;
 
-	@GetMapping(value = "/erstellteAktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Aktivitaet>> getErstellteAktivitaeten() {
+	@GetMapping(value = "/laufendeAktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Aktivitaet>> getLaufendeAktivitaeten() {
 		try {
-			List<Aktivitaet> list = service.getErstellteAktivitaeten();
+			List<Aktivitaet> list = service.getLaufendeAktivitaeten();
 			if (CollectionUtils.isEmpty(list)) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			}
@@ -44,10 +44,36 @@ public class AktivitaetRessource {
 		}
 	}
 
-	@GetMapping(value = "/angemeldete/aktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<Aktivitaet>> getAngemeldeteAktivitaten() {
+	@GetMapping(value = "/bevorstehendeAktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Aktivitaet>> getBevorstehendeAktivitaeten() {
 		try {
-			List<Aktivitaet> list = service.geAngemeldeteAktivitaeten();
+			List<Aktivitaet> list = service.getBevorstehendeAktivitaeten();
+			if (CollectionUtils.isEmpty(list)) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(list, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/laufendeUndBevorstehendeAktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Aktivitaet>> getLaufendeUndBevorstehendeAktivitaeten() {
+		try {
+			List<Aktivitaet> list = service.getLaufendeUndBevorstehendeAktivitaeten();
+			if (CollectionUtils.isEmpty(list)) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(list, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/abgeschlosseneAktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Aktivitaet>> getAbgeschlosseneAktivitaeten() {
+		try {
+			List<Aktivitaet> list = service.getAbgeschlosseneAktivitaeten();
 			if (CollectionUtils.isEmpty(list)) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			}
@@ -61,6 +87,19 @@ public class AktivitaetRessource {
 	public ResponseEntity<List<Aktivitaet>> getAktivitaten() {
 		try {
 			List<Aktivitaet> list = service.getAktivitaeten();
+			if (CollectionUtils.isEmpty(list)) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(list, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/aktuelleAktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Aktivitaet>> getAktuelleAktivitaeten() {
+		try {
+			List<Aktivitaet> list = service.getLaufendeUndBevorstehendeAktivitaeten();
 			if (CollectionUtils.isEmpty(list)) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			}

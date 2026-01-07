@@ -2,7 +2,7 @@ import { t } from "i18next";
 import { Footer } from "../footer/Footer";
 import { Header } from "../header/Header";
 import { Card, Col, Row } from "react-bootstrap";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { UserModel, UserType } from "../../types/Types";
 import { IoPersonOutline } from "react-icons/io5";
@@ -17,6 +17,8 @@ import { Feature, Geometry } from "geojson";
 export default function FreiwilligeDetailPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+
   const freiwilligeFromState = location.state?.user;
   const mapRef = useRef<HTMLDivElement | null>(null);
 
@@ -32,6 +34,10 @@ export default function FreiwilligeDetailPage() {
       setFreiwillige(freiwilligeFromState);
       setFreiwilligeShape(freiwilligeFromState.shape);
     } else {
+      userService.get(id).then((e) => {
+        setFreiwillige(e.data);
+        setFreiwilligeShape(e.data.shape!);
+      });
     }
   }, [freiwilligeFromState]);
 

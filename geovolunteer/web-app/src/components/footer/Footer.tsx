@@ -63,7 +63,13 @@ export const Footer = (props: Props) => {
                 <div>
                   <GrMapLocation
                     className="text-white custom-icon"
-                    onClick={() => navigate("/map")}
+                    onClick={() =>
+                      navigate(
+                        user.rolle === UserType.ORGANISATION
+                          ? "/karte_organisation"
+                          : "/karte_freiwillige"
+                      )
+                    }
                   />
                   <div className="text-white">{t("footer.icon.map")}</div>
                 </div>
