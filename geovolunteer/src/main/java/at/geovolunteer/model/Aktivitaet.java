@@ -64,7 +64,7 @@ public class Aktivitaet extends AbstractAktivitaet {
 	// Der Ersteller der Aktivität (Organisation)
 	@ManyToOne
 	@JoinColumn(name = "organisation_id")
-	@JsonIgnoreProperties({ "password", "teilnahmen", "erstellteAktivitaeten", "shape", "radius" })
+	@JsonIgnoreProperties({ "password", "teilnahmen", "erstellteAktivitaeten", "radius" })
 	private Benutzer organisation;
 
 	// Teilnehmer (Freiwillige)

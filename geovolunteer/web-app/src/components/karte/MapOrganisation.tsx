@@ -33,10 +33,11 @@ import { useMapEvents } from "react-leaflet";
 import type { Feature, GeoJsonProperties, Point, Polygon } from "geojson";
 import {
   orgIcon,
-  aktivitaetIcon,
+  meineAktivitaetIcon,
   markerIcon,
   meineFreiwilligeIcon,
   alleFreiwilligeIcon,
+  alleAktivitaetIcon2,
 } from "./MapIcons";
 import { useNavigate } from "react-router-dom";
 import { MapPopup } from "./MapPopup";
@@ -607,7 +608,7 @@ export default function MapOrganisation() {
                         key={`aktivitaet-${id}`}
                         data={feature.shape!}
                         pointToLayer={(f, latlng) =>
-                          L.marker(latlng, { icon: aktivitaetIcon })
+                          L.marker(latlng, { icon: meineAktivitaetIcon })
                         }
                         onEachFeature={(f, layer) => {
                           layer.on("click", handleRoutingClick);
@@ -658,7 +659,7 @@ export default function MapOrganisation() {
                               opacity: toolsRef.current.umkreis ? 0.5 : 1,
                             })}
                           >
-                            <MapPopup user={t} />
+                            <MapPopup selectedUser={t} />
                           </GeoJSON>
                         )) ?? [];
 
@@ -673,7 +674,7 @@ export default function MapOrganisation() {
                         opacity: toolsRef.current.umkreis ? 0.5 : 1,
                       })}
                     >
-                      <MapPopup user={feature} />
+                      <MapPopup selectedUser={feature} />
                     </GeoJSON>
                   ))}
               </>
@@ -701,13 +702,12 @@ export default function MapOrganisation() {
                   key={`alleAktivitaeten-${index}`}
                   data={feature.shape!}
                   pointToLayer={(feature, latlng) => {
-                    return L.marker(latlng, { icon: aktivitaetIcon });
+                    return L.marker(latlng, { icon: alleAktivitaetIcon2 });
                   }}
                   style={() => ({
-                    color: "#007bff",
+                    color: "#c300ff",
                     weight: 2,
                     fillOpacity: 0.3,
-                    opacity: toolsRef.current.umkreis ? 0.5 : 1,
                   })}
                   onEachFeature={(f, layer) => {
                     layer.on("click", handleRoutingClick);
@@ -731,7 +731,7 @@ export default function MapOrganisation() {
                     opacity: toolsRef.current.umkreis ? 0.5 : 1,
                   })}
                 >
-                  <MapPopup user={feature} />
+                  <MapPopup selectedUser={feature} />
                 </GeoJSON>
               ))}
           </FeatureGroup>

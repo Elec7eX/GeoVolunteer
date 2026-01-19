@@ -33,20 +33,18 @@ import { useMapEvents } from "react-leaflet";
 import type { Feature, GeoJsonProperties, Point, Polygon } from "geojson";
 import {
   orgIcon,
-  aktivitaetIcon,
+  meineAktivitaetIcon,
   markerIcon,
-  meineFreiwilligeIcon,
+  alleAktivitaetIcon,
+  meinStandortIcon,
 } from "./MapIcons";
-import { useNavigate } from "react-router-dom";
 import { MapPopup } from "./MapPopup";
+import React from "react";
 
 interface FilterType {
-  meineOrganisation: boolean;
   meineAktivitaeten: boolean;
-  meineFreiwilligen: boolean;
   alleOrganisationen: boolean;
   alleAktivitaeten: boolean;
-  alleFreiwilligen: boolean;
 }
 
 interface ToolsType {
@@ -59,12 +57,11 @@ interface AktivitaetFilterType {
   visible: boolean;
   expanded: boolean;
   ressource: boolean;
-  teilnehmer: { [id: string]: boolean };
+  organisation: boolean;
 }
 
 export default function MapOrganisation() {
   const [user] = useLocalStorage("user", null);
-  const navigate = useNavigate();
   const initialized = useRef(false);
   const drawnItemsRef = useRef(null);
 
@@ -72,12 +69,9 @@ export default function MapOrganisation() {
   const [show, setShow] = useState(false);
 
   const [filter, setFilter] = useState<FilterType>({
-    meineOrganisation: true,
     meineAktivitaeten: true,
-    meineFreiwilligen: false,
     alleOrganisationen: false,
     alleAktivitaeten: false,
-    alleFreiwilligen: false,
   });
 
   const [kategorieFilter, setKategorieFilter] = useState<{
@@ -93,17 +87,14 @@ export default function MapOrganisation() {
     [id: string]: AktivitaetFilterType;
   }>({});
 
-  const [meineOrganistaion, setMeineOrganisation] = useState<UserModel>();
+  const [meinStandort, setMeinStandort] = useState<UserModel>();
   const [meineAktivitaeten, setMeineAktivitaeten] = useState<AktivitaetModel[]>(
     []
   );
-  const [meineFreiwilligen, setMeineFreiwilligen] = useState<UserModel[]>([]);
-
   const [alleOrganistaionen, setAlleOrganisationen] = useState<UserModel[]>([]);
   const [alleAktivitaeten, setAlleAktivitaeten] = useState<AktivitaetModel[]>(
     []
   );
-  const [alleFreiwilligen, setAlleFreiwilligen] = useState<UserModel[]>([]);
 
   const [activeTab, setActiveTab] = useState("filter");
   const [tools, setTools] = useState<ToolsType>({
@@ -122,17 +113,11 @@ export default function MapOrganisation() {
   const [filteredMeineAktivitaeten, setFilteredMeineAktivitaeten] = useState<
     AktivitaetModel[]
   >([]);
-  const [filteredMeineFreiwilligen, setFilteredMeineFreiwilligen] = useState<
-    UserModel[]
-  >([]);
   const [filteredAlleOrganisationen, setFilteredAlleOrganisationen] = useState<
     UserModel[]
   >([]);
   const [filteredAlleAktivitaeten, setFilteredAlleAktivitaeten] = useState<
     AktivitaetModel[]
-  >([]);
-  const [filteredAlleFreiwilligen, setFilteredAlleFreiwilligen] = useState<
-    UserModel[]
   >([]);
 
   const toolsRef = useRef(tools);
@@ -150,71 +135,45 @@ export default function MapOrganisation() {
 
   useEffect(() => {
     if (!initialized.current) {
-      if (UserType.ORGANISATION === user.rolle) {
+      if (UserType.FREIWILLIGE === user.rolle) {
         initialized.current = true;
         userService
           .get(user.id)
-          .then((resp) => {
-            var org = resp.data;
-            if (resp.status === 200) {
-              setMeineOrganisation(org as UserModel);
-              aktivitaetService
-                .getAktuelleAktivitaeten()
-                .then((res) => {
-                  if (res.status === 200) {
-                    const aktivitaetenArray: AktivitaetModel[] = res.data.map(
-                      (aktivitaet: AktivitaetModel) => aktivitaet
-                    );
-                    setMeineAktivitaeten(aktivitaetenArray);
-                    const aktivitaetenMap: {
-                      [id: string]: AktivitaetFilterType;
-                    } = {};
-
-                    res.data.forEach((aktivitaet: AktivitaetModel) => {
-                      const teilnehmerMap: { [id: string]: boolean } = {};
-                      aktivitaet.teilnehmer?.forEach((t: UserModel) => {
-                        teilnehmerMap[t.id!] = true;
-                      });
-
-                      aktivitaetenMap[aktivitaet.id!] = {
-                        visible: true,
-                        expanded: false,
-                        ressource: true,
-                        teilnehmer: teilnehmerMap,
-                      };
-                    });
-                    setAktivitaetenFilter(aktivitaetenMap);
-
-                    const teilnehmerData: UserModel[] = res.data.flatMap(
-                      (aktivitaet: AktivitaetModel) => aktivitaet.teilnehmer!
-                    );
-                    if (teilnehmerData.length > 0) {
-                      const teilnehmer: UserModel[] = teilnehmerData.map(
-                        (t: UserModel) => t
-                      );
-                      setMeineFreiwilligen(teilnehmer);
-                    }
-                  } else {
-                    console.log(
-                      "'Meine Aktivitäten konnte nicht geladen werden: Status - " +
-                        res.status
-                    );
-                  }
-                })
-                .catch((error) => {
-                  console.log(error);
-                  alert("'Meine Aktivitäten' konnte nicht geladen werden!");
-                });
-            } else {
-              console.log(
-                "'Meine Organisation konnte nicht geladen werden: Status - " +
-                  resp.status
-              );
+          .then((res) => {
+            if (res.data !== undefined) {
+              setMeinStandort(res.data);
             }
           })
-          .catch((error) => {
-            console.log(error);
-            alert("'Meine Organisation' konnte nicht geladen werden!");
+          .then(() => {
+            aktivitaetService
+              .getAktuelleAktivitaeten()
+              .then((res) => {
+                if (res.status === 200) {
+                  const aktivitaetenArray: AktivitaetModel[] = res.data.map(
+                    (aktivitaet: AktivitaetModel) => aktivitaet
+                  );
+                  setMeineAktivitaeten(aktivitaetenArray);
+                  const aktivitaetenMap: {
+                    [id: string]: AktivitaetFilterType;
+                  } = {};
+
+                  res.data.forEach((aktivitaet: AktivitaetModel) => {
+                    aktivitaetenMap[aktivitaet.id!] = {
+                      visible: true,
+                      expanded: false,
+                      ressource: true,
+                      organisation: true,
+                    };
+                  });
+                  setAktivitaetenFilter(aktivitaetenMap);
+                } else {
+                  console.log(
+                    "'Meine Aktivitäten konnte nicht geladen werden: Status - " +
+                      res.status
+                  );
+                }
+              })
+              .catch((error) => console.log(error));
           });
       }
     }
@@ -223,6 +182,56 @@ export default function MapOrganisation() {
       setContainer(el);
     }
   }, [user.id, user.rolle]);
+
+  useEffect(() => {
+    if (!toolsRef.current.umkreis || !meinStandort?.shape) {
+      setCircleCenter(null);
+      return;
+    }
+
+    // Mittelpunkt aus GeoJSON bestimmen
+    const geom = meinStandort.shape.geometry;
+
+    if (geom.type === "Point") {
+      setCircleCenter(L.latLng(geom.coordinates[1], geom.coordinates[0]));
+    } else {
+      // Polygon / MultiPolygon → Turf centroid
+      const center = turf.centroid(meinStandort.shape);
+      setCircleCenter(
+        L.latLng(center.geometry.coordinates[1], center.geometry.coordinates[0])
+      );
+    }
+  }, [toolsRef.current.umkreis, meinStandort]);
+
+  useEffect(() => {
+    const map = (drawnItemsRef.current as any)?._map as L.Map | undefined;
+    if (!map) return;
+
+    // Kreis entfernen, wenn Tool aus
+    if (!toolsRef.current.umkreis || !circleCenter) {
+      if (circle) {
+        circle.remove();
+        setCircle(null);
+      }
+      return;
+    }
+
+    // Alten Kreis entfernen
+    if (circle) {
+      circle.remove();
+    }
+
+    // Neuen Kreis zeichnen
+    const newCircle = L.circle(circleCenter, {
+      radius,
+      color: "#007bff",
+      weight: 2,
+      fillColor: "#007bff",
+      fillOpacity: 0.15,
+    }).addTo(map);
+
+    setCircle(newCircle);
+  }, [circleCenter, radius, toolsRef.current.umkreis]);
 
   useEffect(() => {
     const map = (drawnItemsRef.current as any)?._map as L.Map | undefined;
@@ -296,43 +305,6 @@ export default function MapOrganisation() {
   }, [selectedPoints, toolsRef.current.distanzberechnung]);
 
   useEffect(() => {
-    const map = (drawnItemsRef.current as any)?._map as L.Map | undefined;
-    if (!map) return;
-
-    if (!toolsRef.current.umkreis) {
-      if (circle) {
-        circle.remove();
-        setCircle(null);
-      }
-      return;
-    }
-
-    // Wenn ein Zentrum gewählt wurde
-    if (circleCenter) {
-      if (circle) circle.remove();
-      const newCircle = L.circle(circleCenter, {
-        radius,
-        color: "blue",
-        weight: 2,
-        fillOpacity: 0.15,
-      }).addTo(map);
-
-      setCircle(newCircle);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [circleCenter, radius, toolsRef.current.umkreis]);
-
-  useEffect(() => {
-    const applyFilter = (a: AktivitaetModel) => {
-      // Kategorie
-      if (!isKategorieVisible(a)) return false;
-
-      // Umkreis
-      if (!toolsRef.current.umkreis || !circleCenter) return true;
-
-      return isInside(a.shape);
-    };
-
     var circle: Feature<Polygon, GeoJsonProperties>;
     if (circleCenter) {
       circle = turf.circle(
@@ -370,27 +342,25 @@ export default function MapOrganisation() {
         return turf.booleanPointInPolygon(pt, circle);
       });
     };
-
-    setFilteredMeineAktivitaeten(meineAktivitaeten.filter(applyFilter));
-    setFilteredMeineFreiwilligen(
-      meineFreiwilligen.filter((f) => isInside(f.shape))
+    setFilteredMeineAktivitaeten(
+      meineAktivitaeten.filter((e) => isKategorieVisible(e))
     );
     setFilteredAlleOrganisationen(
-      alleOrganistaionen.filter((o) => isInside(o.shape))
+      alleOrganistaionen.filter((e) => isInside(e.shape))
     );
-    setFilteredAlleAktivitaeten(alleAktivitaeten.filter(applyFilter));
-    setFilteredAlleFreiwilligen(
-      alleFreiwilligen.filter((f) => isInside(f.shape))
+    setFilteredAlleAktivitaeten(
+      tools.umkreis && circleCenter
+        ? alleAktivitaeten.filter((e) => isInside(e.shape))
+        : alleAktivitaeten
     );
   }, [
     circleCenter,
     radius,
     toolsRef.current.umkreis,
+    meinStandort,
     meineAktivitaeten,
-    meineFreiwilligen,
     alleOrganistaionen,
     alleAktivitaeten,
-    alleFreiwilligen,
     kategorieFilter,
   ]);
 
@@ -408,14 +378,6 @@ export default function MapOrganisation() {
         if (resp.status === 200) {
           const aktivitaetenShapes: AktivitaetModel[] = resp.data;
           setAlleAktivitaeten(aktivitaetenShapes);
-        }
-      });
-    }
-    if (filterName === "alleFreiwilligen" && alleFreiwilligen.length < 1) {
-      userService.getFreiwillige().then((resp) => {
-        if (resp.status === 200) {
-          const freiwilligenShapes: UserModel[] = resp.data;
-          setAlleFreiwilligen(freiwilligenShapes);
         }
       });
     }
@@ -499,10 +461,6 @@ export default function MapOrganisation() {
     const layer = e.target;
     const latlng = getPolygonCenter(layer);
 
-    if (toolsRef.current.umkreis) {
-      setCircleCenter(latlng);
-      return; // Kein Routing ausführen
-    }
     if (!toolsRef.current.routenplaner && !toolsRef.current.distanzberechnung)
       return;
 
@@ -535,19 +493,6 @@ export default function MapOrganisation() {
     });
   };
 
-  function MapClickHandler() {
-    useMapEvents({
-      click(e) {
-        // Prüfen, ob das Umkreis-Tool aktiv ist
-        if (toolsRef.current.umkreis) {
-          setCircleCenter(e.latlng);
-        }
-      },
-    });
-
-    return null; // Kein sichtbares Element
-  }
-
   const isKategorieVisible = (a: AktivitaetModel): boolean => {
     if (!a.kategorie) return true; // undefiniert ⇒ anzeigen
     return kategorieFilter[a.kategorie];
@@ -573,31 +518,32 @@ export default function MapOrganisation() {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           <ZoomControl position="topright" />
-          <MapClickHandler />
           <FeatureGroup ref={drawnItemsRef}>
-            {UserType.ORGANISATION === user.rolle && (
+            {UserType.FREIWILLIGE === user.rolle && (
               <>
-                {filter.meineOrganisation && meineOrganistaion && (
+                {meinStandort && (
                   <GeoJSON
-                    key={"meineOrganisation"}
-                    data={meineOrganistaion.shape!}
+                    key={`meinStandort`}
+                    data={meinStandort.shape!}
                     pointToLayer={(feature, latlng) => {
-                      return L.marker(latlng, { icon: orgIcon });
+                      return L.marker(latlng, { icon: meinStandortIcon });
                     }}
                     onEachFeature={(f, layer) => {
-                      layer.bindPopup(
-                        meineOrganistaion?.name ?? "Organisation"
-                      );
                       layer.on("click", handleRoutingClick);
                     }}
                     style={() => ({
-                      opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                      color: "#007bff",
+                      weight: 2,
+                      fillOpacity: 0.3,
                     })}
-                  />
+                  >
+                    <MapPopup selectedUser={meinStandort} />
+                  </GeoJSON>
                 )}
                 {filter.meineAktivitaeten &&
                   filteredMeineAktivitaeten.map((feature, index) => {
                     const id = feature.id ?? index;
+                    const organisationId = feature.organisation?.id ?? index;
                     const aFilter = aktivitaetenFilter[id];
                     if (!aFilter?.visible) return null;
                     // Aktivität
@@ -606,13 +552,15 @@ export default function MapOrganisation() {
                         key={`aktivitaet-${id}`}
                         data={feature.shape!}
                         pointToLayer={(f, latlng) =>
-                          L.marker(latlng, { icon: aktivitaetIcon })
+                          L.marker(latlng, { icon: meineAktivitaetIcon })
                         }
                         onEachFeature={(f, layer) => {
                           layer.on("click", handleRoutingClick);
                         }}
                         style={() => ({
-                          opacity: toolsRef.current.umkreis ? 0.5 : 1,
+                          color: "#007bff",
+                          weight: 2,
+                          fillOpacity: 0.3,
                         })}
                       >
                         <MapPopup aktivitaet={feature} />
@@ -631,50 +579,29 @@ export default function MapOrganisation() {
                           onEachFeature={(f, layer) => {
                             layer.on("click", handleRoutingClick);
                           }}
-                          style={() => ({
-                            opacity: toolsRef.current.umkreis ? 0.5 : 1,
-                          })}
                         >
                           <MapPopup aktivitaet={feature} isRessource />
                         </GeoJSON>
                       ) : null;
+                    // Organisation
+                    const organisationLayer =
+                      aFilter.organisation && feature?.organisation?.shape ? (
+                        <GeoJSON
+                          key={`organisation-${feature.id}-${organisationId}`}
+                          data={feature.organisation.shape!}
+                          pointToLayer={(f, latlng) =>
+                            L.marker(latlng, { icon: orgIcon })
+                          }
+                          onEachFeature={(f, layer) => {
+                            layer.on("click", handleRoutingClick);
+                          }}
+                        >
+                          <MapPopup selectedUser={feature.organisation} />
+                        </GeoJSON>
+                      ) : null;
 
-                    // Freiwillige (Liste)
-                    const teilnehmerLayer =
-                      feature?.teilnehmer
-                        ?.filter((t: any) => aFilter.teilnehmer[t.id])
-                        .map((t: any) => (
-                          <GeoJSON
-                            key={`teilnehmer-${t.id}`}
-                            data={t.shape}
-                            pointToLayer={(f, latlng) =>
-                              L.marker(latlng, { icon: meineFreiwilligeIcon })
-                            }
-                            onEachFeature={(f, layer) => {
-                              layer.on("click", handleRoutingClick);
-                            }}
-                            style={() => ({
-                              opacity: toolsRef.current.umkreis ? 0.5 : 1,
-                            })}
-                          >
-                            <MapPopup user={t} />
-                          </GeoJSON>
-                        )) ?? [];
-
-                    return [layer, ressourceLayer, ...teilnehmerLayer];
+                    return [layer, ressourceLayer, organisationLayer];
                   })}
-                {filter.meineFreiwilligen &&
-                  filteredMeineFreiwilligen.map((feature, index) => (
-                    <GeoJSON
-                      key={`freiwillige-${index}`}
-                      data={feature!.shape!}
-                      style={() => ({
-                        opacity: toolsRef.current.umkreis ? 0.5 : 1,
-                      })}
-                    >
-                      <MapPopup user={feature} />
-                    </GeoJSON>
-                  ))}
               </>
             )}
             {filter.alleOrganisationen &&
@@ -689,9 +616,6 @@ export default function MapOrganisation() {
                     layer.bindPopup(feature.name ?? "Organisation");
                     layer.on("click", handleRoutingClick);
                   }}
-                  style={() => ({
-                    opacity: toolsRef.current.umkreis ? 0.5 : 1,
-                  })}
                 />
               ))}
             {filter.alleAktivitaeten &&
@@ -700,37 +624,18 @@ export default function MapOrganisation() {
                   key={`alleAktivitaeten-${index}`}
                   data={feature.shape!}
                   pointToLayer={(feature, latlng) => {
-                    return L.marker(latlng, { icon: aktivitaetIcon });
+                    return L.marker(latlng, { icon: alleAktivitaetIcon });
                   }}
                   style={() => ({
-                    color: "#007bff",
+                    color: "#c300ff",
                     weight: 2,
                     fillOpacity: 0.3,
-                    opacity: toolsRef.current.umkreis ? 0.5 : 1,
                   })}
                   onEachFeature={(f, layer) => {
                     layer.on("click", handleRoutingClick);
                   }}
                 >
                   <MapPopup aktivitaet={feature} />
-                </GeoJSON>
-              ))}
-            {filter.alleFreiwilligen &&
-              filteredAlleFreiwilligen.map((feature, index) => (
-                <GeoJSON
-                  key={`alleFreiwilligen-${index}`}
-                  data={feature.shape!}
-                  pointToLayer={(f, latlng) =>
-                    L.marker(latlng, { icon: meineFreiwilligeIcon })
-                  }
-                  onEachFeature={(f, layer) => {
-                    layer.on("click", handleRoutingClick);
-                  }}
-                  style={() => ({
-                    opacity: toolsRef.current.umkreis ? 0.5 : 1,
-                  })}
-                >
-                  <MapPopup user={feature} />
                 </GeoJSON>
               ))}
           </FeatureGroup>
@@ -851,37 +756,12 @@ export default function MapOrganisation() {
                         checked={filter.alleAktivitaeten}
                         onChange={() => updateFilter("alleAktivitaeten")}
                       />
-                      <Form.Check
-                        type="checkbox"
-                        id="alleFreiwilligen"
-                        label={
-                          t("map.filter.organisation.alle.freiwillige") +
-                          (alleFreiwilligen.length > 0
-                            ? " (" + alleFreiwilligen.length + ")"
-                            : "")
-                        }
-                        checked={filter.alleFreiwilligen}
-                        onChange={() =>
-                          updateFilter("alleFreiwilligen") +
-                          " (" +
-                          alleFreiwilligen.length +
-                          ")"
-                        }
-                        style={{ marginBottom: "5px" }}
-                      />
                     </div>
                     <div style={{ padding: "10px" }}>
                       <div style={{ marginBottom: "10px" }}>
                         <h1 className="map-dropdown_title">
                           {t("map.filter.organisation.eigene.title")}
                         </h1>
-                        <Form.Check
-                          type="checkbox"
-                          id="meineOrganisation"
-                          label={t("map.filter.organisation.eigene")}
-                          checked={filter.meineOrganisation}
-                          onChange={() => updateFilter("meineOrganisation")}
-                        />
                         <Form.Check
                           type="checkbox"
                           id="meineAktivitaeten"
@@ -901,6 +781,8 @@ export default function MapOrganisation() {
                             >
                               {meineAktivitaeten.map((feature, index) => {
                                 const id = feature?.id ?? index;
+                                const organisationId =
+                                  feature.organisation?.id ?? `${id}-org`;
                                 const name = feature?.name ?? +` ${index + 1}`;
                                 const aFilter = aktivitaetenFilter[id];
 
@@ -999,74 +881,44 @@ export default function MapOrganisation() {
                                           }
                                         />
 
-                                        {/* Teilnehmer */}
-                                        {Object.entries(aFilter.teilnehmer)
-                                          .length > 0 && (
-                                          <>
-                                            {aFilter.visible ? (
-                                              <strong
-                                                style={{ fontSize: "0.9rem" }}
-                                              >
-                                                {t(
-                                                  "map.filter.organisation.teilnehmer"
-                                                ) +
-                                                  " (" +
-                                                  Object.entries(
-                                                    aFilter.teilnehmer
-                                                  ).length +
-                                                  ")"}
-                                              </strong>
-                                            ) : (
-                                              <strong
-                                                style={{
-                                                  fontSize: "0.9rem",
-                                                  cursor: "default",
-                                                  opacity: 0.5,
-                                                }}
-                                              >
-                                                {t(
-                                                  "map.filter.organisation.teilnehmer"
-                                                )}
-                                              </strong>
-                                            )}
-                                          </>
+                                        {/* Organisation */}
+                                        {aFilter.visible ? (
+                                          <strong
+                                            style={{ fontSize: "0.9rem" }}
+                                          >
+                                            {t("organisation.overview.title")}
+                                          </strong>
+                                        ) : (
+                                          <strong
+                                            style={{
+                                              fontSize: "0.9rem",
+                                              cursor: "default",
+                                              opacity: 0.5,
+                                            }}
+                                          >
+                                            {t("organisation.overview.title")}
+                                          </strong>
                                         )}
-                                        {Object.entries(aFilter.teilnehmer).map(
-                                          ([tid, visible]) => (
-                                            <Form.Check
-                                              key={tid}
-                                              type="checkbox"
-                                              id={`teilnehmer-${tid}`}
-                                              disabled={!aFilter.visible}
-                                              label={feature.teilnehmer
-                                                ?.filter(
-                                                  (t) => String(t.id) === tid
-                                                )
-                                                .map(
-                                                  (t) =>
-                                                    t.vorname + " " + t.nachname
-                                                )}
-                                              checked={
-                                                aFilter.visible && visible
-                                              }
-                                              onChange={() =>
-                                                setAktivitaetenFilter(
-                                                  (prev) => ({
-                                                    ...prev,
-                                                    [id]: {
-                                                      ...prev[id],
-                                                      teilnehmer: {
-                                                        ...prev[id].teilnehmer,
-                                                        [tid]: !visible,
-                                                      },
-                                                    },
-                                                  })
-                                                )
-                                              }
-                                              style={{ marginLeft: "10px" }}
-                                            />
-                                          )
-                                        )}
+                                        <Form.Check
+                                          type="checkbox"
+                                          id={`organisation-${organisationId}`}
+                                          label={feature.organisation!.name}
+                                          disabled={!aFilter.visible}
+                                          checked={
+                                            aFilter.visible &&
+                                            aFilter.organisation
+                                          }
+                                          onChange={() =>
+                                            setAktivitaetenFilter((prev) => ({
+                                              ...prev,
+                                              [id]: {
+                                                ...prev[id],
+                                                organisation:
+                                                  !prev[id].organisation,
+                                              },
+                                            }))
+                                          }
+                                        />
                                       </div>
                                     )}
                                   </div>

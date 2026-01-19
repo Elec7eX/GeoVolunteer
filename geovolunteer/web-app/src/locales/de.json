@@ -67,6 +67,7 @@
   "label.login.passwort": "Passwort",
   "map.overview.title": "Karte",
   "map.filter.header.title": "Filter",
+  "map.filter.freiwillige.standort": "Mein Standort",
   "map.filter.organisation.eigene.title": "Eigene Inhalte",
   "map.filter.organisation.eigene": "Meine Organisation",
   "map.filter.organisation.eigene.aktivitaeten": "Aktivitäten",

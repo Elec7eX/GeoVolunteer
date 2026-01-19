@@ -101,3 +101,8 @@ export interface AktivitaetModel {
     organisation?: UserModel,
     teilnehmer?: UserModel[]
 }
+
+export interface AktivitaetenByKategorienStatistik {
+  kategorie: Kategorie;
+  count: number;
+}
