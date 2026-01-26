@@ -106,3 +106,36 @@ export interface AktivitaetenByKategorienStatistik {
   kategorie: Kategorie;
   count: number;
 }
+
+export interface RadiusStats {
+  avg: number;
+  max: number;
+  median: number;
+}
+
+export interface AktionsradiusVerlauf {
+  name: string;
+  distanz: number;
+}
+
+export interface Organisation {
+  id: number;
+  name: string;
+  distance: number;
+}
+
+export interface OrganisationenDistanz {
+  organisationen: Organisation[];
+  durchschnittsDistanz: number;
+}
+
+export interface FreiwilligenDistanzType {
+  aUnter5: number;
+  bZwischen5und10: number;
+  cUeber10: number;
+}
+
+export interface FreiwilligenAktivitaetenType {
+  distanz: string,
+  count: number
+}

@@ -35,7 +35,6 @@ export default function AktivitaetenOverview() {
   >([]);
   const [aktivitaeten, setAktivitaeten] = useState<AktivitaetModel[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!initialized.current) {
@@ -91,7 +90,7 @@ export default function AktivitaetenOverview() {
 
   const navigateToDetail = (
     aktivitaet: AktivitaetModel,
-    isTeilnehmer: boolean
+    isTeilnehmer: boolean,
   ) => {
     return navigate(`/aktivitäten/detail/${aktivitaet.id}`, {
       state: { aktivitaet, isTeilnehmer },

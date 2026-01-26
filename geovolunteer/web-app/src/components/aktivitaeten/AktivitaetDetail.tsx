@@ -93,12 +93,12 @@ export default function AktivitaetDetail() {
       getCoordinatesByPoint(
         aktivitaetFromState.shape,
         setLatitude,
-        setLongitude
+        setLongitude,
       );
       getCoordinatesByPoint(
         aktivitaetFromState.ressource.shape,
         setRessourceLatitude,
-        setRessourceLongitude
+        setRessourceLongitude,
       );
     } else {
       const model: AktivitaetModel = {
@@ -147,7 +147,7 @@ export default function AktivitaetDetail() {
   const getCoordinatesByPoint = (
     shape: GeoJsonFeature,
     setLat: (value: SetStateAction<number>) => void,
-    setLng: (value: SetStateAction<number>) => void
+    setLng: (value: SetStateAction<number>) => void,
   ) => {
     if (shape?.geometry.type === "Point") {
       const [lng, lat] = shape.geometry.coordinates;
@@ -161,8 +161,8 @@ export default function AktivitaetDetail() {
     setFieldValue: (
       field: string,
       value: any,
-      shouldValidate?: boolean | undefined
-    ) => Promise<void | FormikErrors<AktivitaetModel>>
+      shouldValidate?: boolean | undefined,
+    ) => Promise<void | FormikErrors<AktivitaetModel>>,
   ) => {
     setAktivitaetenShape(aktivitaetenShape);
     if (aktivitaetenShape?.properties?.data) {
@@ -172,7 +172,7 @@ export default function AktivitaetDetail() {
           setFieldValue("strasse", data.address.road);
           setFieldValue("hausnummer", data.address.house_number);
           setFieldValue("plz", data.address.postcode);
-          setFieldValue("ort", data.address.city);
+          setFieldValue("ort", data.address.city ?? data.address.town);
           getCoordinatesByPoint(aktivitaetenShape, setLatitude, setLongitude);
         }
       }
@@ -191,8 +191,8 @@ export default function AktivitaetDetail() {
     setFieldValue: (
       field: string,
       value: any,
-      shouldValidate?: boolean | undefined
-    ) => Promise<void | FormikErrors<AktivitaetModel>>
+      shouldValidate?: boolean | undefined,
+    ) => Promise<void | FormikErrors<AktivitaetModel>>,
   ) => {
     setRessourceShape(ressourceShape);
     if (ressourceShape?.properties?.data) {
@@ -202,11 +202,14 @@ export default function AktivitaetDetail() {
           setFieldValue("ressource.strasse", data.address.road);
           setFieldValue("ressource.hausnummer", data.address.house_number);
           setFieldValue("ressource.plz", data.address.postcode);
-          setFieldValue("ressource.ort", data.address.city);
+          setFieldValue(
+            "ressource.ort",
+            data.address.city ?? data.address.town,
+          );
           getCoordinatesByPoint(
             ressourceShape,
             setRessourceLatitude,
-            setRessourceLongitude
+            setRessourceLongitude,
           );
         }
       }
@@ -225,7 +228,7 @@ export default function AktivitaetDetail() {
     hausnummer: string,
     plz: string,
     ort: string,
-    isAktivitaetShape: boolean
+    isAktivitaetShape: boolean,
   ) => {
     if (strasse !== "" && hausnummer !== "" && plz !== "" && ort !== "") {
       const address = `${strasse} ${hausnummer}, ${plz} ${ort}`;
@@ -238,7 +241,7 @@ export default function AktivitaetDetail() {
               format: "json",
               addressdetails: 1,
             },
-          }
+          },
         );
 
         if (response.data.length > 0) {
@@ -288,7 +291,7 @@ export default function AktivitaetDetail() {
     strasse: string,
     hausnummer: string,
     plz: string,
-    ort: string
+    ort: string,
   ) => {
     await getCoordinatesBySetter(strasse, hausnummer, plz, ort, true);
   };
@@ -297,7 +300,7 @@ export default function AktivitaetDetail() {
     strasse: string,
     hausnummer: string,
     plz: string,
-    ort: string
+    ort: string,
   ) => {
     await getCoordinatesBySetter(strasse, hausnummer, plz, ort, false);
   };
@@ -344,8 +347,8 @@ export default function AktivitaetDetail() {
                   ? t("aktivitaeten.edit.title")
                   : t("aktivitaeten.create.title")
                 : aktivitaetFromState
-                ? t("ressourcen.edit.title")
-                : t("ressourcen.create.title")
+                  ? t("ressourcen.edit.title")
+                  : t("ressourcen.create.title")
             }
           />
           <div className="body">
@@ -442,7 +445,7 @@ export default function AktivitaetDetail() {
                                 onChange={(e) =>
                                   setFieldValue(
                                     "addresseInput",
-                                    e.target.value as AdressInputEnum
+                                    e.target.value as AdressInputEnum,
                                   )
                                 }
                                 className="me-3"
@@ -459,7 +462,7 @@ export default function AktivitaetDetail() {
                                 onChange={async (e) => {
                                   setFieldValue(
                                     "addresseInput",
-                                    e.target.value as AdressInputEnum
+                                    e.target.value as AdressInputEnum,
                                   );
                                   if (
                                     values.strasse &&
@@ -471,7 +474,7 @@ export default function AktivitaetDetail() {
                                       values.strasse,
                                       values.hausnummer,
                                       values.plz,
-                                      values.ort
+                                      values.ort,
                                     );
                                   }
                                   setTimeout(() => {
@@ -511,7 +514,7 @@ export default function AktivitaetDetail() {
                                   <Form.Group className="mb-3">
                                     <Form.Label>
                                       {t(
-                                        "aktivitaeten.detail.adress.hausnummer"
+                                        "aktivitaeten.detail.adress.hausnummer",
                                       )}
                                     </Form.Label>
                                     <Form.Control
@@ -616,7 +619,7 @@ export default function AktivitaetDetail() {
                                         values.strasse,
                                         values.hausnummer,
                                         values.plz,
-                                        values.ort
+                                        values.ort,
                                       );
                                     }}
                                   >
@@ -635,7 +638,7 @@ export default function AktivitaetDetail() {
                                   onShapeChange={(geoJson) =>
                                     handleAktivitaetenShape(
                                       geoJson,
-                                      setFieldValue
+                                      setFieldValue,
                                     )
                                   }
                                 />
@@ -879,7 +882,7 @@ export default function AktivitaetDetail() {
                                 onChange={(e) =>
                                   setFieldValue(
                                     "ressource.addresseInput",
-                                    e.target.value as AdressInputEnum
+                                    e.target.value as AdressInputEnum,
                                   )
                                 }
                                 className="me-3"
@@ -897,7 +900,7 @@ export default function AktivitaetDetail() {
                                 onChange={async (e) => {
                                   setFieldValue(
                                     "ressource.addresseInput",
-                                    e.target.value as AdressInputEnum
+                                    e.target.value as AdressInputEnum,
                                   );
                                   if (
                                     values.strasse &&
@@ -909,7 +912,7 @@ export default function AktivitaetDetail() {
                                       values.strasse,
                                       values.hausnummer,
                                       values.plz,
-                                      values.ort
+                                      values.ort,
                                     );
                                   }
                                 }}
@@ -1022,19 +1025,19 @@ export default function AktivitaetDetail() {
                                       e.preventDefault();
                                       setFieldValue(
                                         "ressource.strasse",
-                                        values.strasse
+                                        values.strasse,
                                       );
                                       setFieldValue(
                                         "ressource.hausnummer",
-                                        values.hausnummer
+                                        values.hausnummer,
                                       );
                                       setFieldValue(
                                         "ressource.plz",
-                                        values.plz
+                                        values.plz,
                                       );
                                       setFieldValue(
                                         "ressource.ort",
-                                        values.ort
+                                        values.ort,
                                       );
                                       setRessourceLatitude(latitude);
                                       setRessourceLongitude(longitude);
@@ -1083,7 +1086,7 @@ export default function AktivitaetDetail() {
                                         res.strasse,
                                         res.hausnummer,
                                         res.plz,
-                                        res.ort
+                                        res.ort,
                                       );
                                     }}
                                   >
@@ -1123,7 +1126,7 @@ export default function AktivitaetDetail() {
                             <Form.Group className="mb-3">
                               <Form.Label>
                                 {t(
-                                  "ressourcen.detail.sicherheitsanforderungen"
+                                  "ressourcen.detail.sicherheitsanforderungen",
                                 )}
                               </Form.Label>
                               <Form.Control
@@ -1226,16 +1229,16 @@ export default function AktivitaetDetail() {
                               e.preventDefault();
                               setFieldValue(
                                 "ressource.vorname",
-                                values.vorname
+                                values.vorname,
                               );
                               setFieldValue(
                                 "ressource.nachname",
-                                values.nachname
+                                values.nachname,
                               );
                               setFieldValue("ressource.email", values.email);
                               setFieldValue(
                                 "ressource.telefon",
-                                values.telefon
+                                values.telefon,
                               );
                             }}
                           >

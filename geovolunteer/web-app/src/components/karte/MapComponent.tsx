@@ -104,7 +104,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         const latlng = layer.getLatLng();
         try {
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=json&addressdetails=1`
+            `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=json&addressdetails=1`,
           );
           const data = await response.json();
           geoJson.properties = { ...geoJson.properties, data };
@@ -120,7 +120,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         onShapeChange?.(geoJson);
       }
     },
-    [onShapeChange]
+    [onShapeChange],
   );
 
   const onEdited = useCallback(
@@ -141,7 +141,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
           const latlng = layer.getLatLng();
           try {
             const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=json&addressdetails=1`
+              `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=json&addressdetails=1`,
             );
             const data = await response.json();
             geoJson.properties = { ...geoJson.properties, data };
@@ -160,7 +160,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
         console.log("Shape edited:", geoJson);
       });
     },
-    [onShapeChange]
+    [onShapeChange],
   );
 
   const onDeleted = (e: any) => {
@@ -200,14 +200,16 @@ const MapComponent: React.FC<MapComponentProps> = ({
             <div>
               Address:{" "}
               {geoJsonData.properties.data.address.road +
-                " " +
-                (geoJsonData.properties.data.address.house_number
-                  ? geoJsonData.properties.data.address.house_number
-                  : "") +
-                ", " +
-                geoJsonData.properties.data.address.postcode +
-                " " +
-                geoJsonData.properties.data.address.city}
+              " " +
+              (geoJsonData.properties.data.address.house_number
+                ? geoJsonData.properties.data.address.house_number
+                : "") +
+              ", " +
+              geoJsonData.properties.data.address.postcode +
+              " " +
+              geoJsonData.properties.data.address.city
+                ? geoJsonData.properties.data.address.city
+                : geoJsonData.properties.data.address.town}
             </div>
           </Form.Text>
         </Form.Group>

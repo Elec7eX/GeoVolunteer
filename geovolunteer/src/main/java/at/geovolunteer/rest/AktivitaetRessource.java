@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import at.geovolunteer.model.Aktivitaet;
 import at.geovolunteer.service.AktivitaetService;
-import at.geovolunteer.service.GeoService;
 
 @RestController
 @RequestMapping("/geo/aktivitaet")
@@ -27,9 +26,6 @@ public class AktivitaetRessource {
 
 	@Autowired
 	private AktivitaetService service;
-
-	@Autowired
-	private GeoService geoService;
 
 	@GetMapping(value = "/laufendeAktivitaeten", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Aktivitaet>> getLaufendeAktivitaeten() {

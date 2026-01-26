@@ -91,8 +91,8 @@ export default function Profil() {
     setFieldValue: (
       field: string,
       value: any,
-      shouldValidate?: boolean | undefined
-    ) => Promise<void | FormikErrors<UserModel>>
+      shouldValidate?: boolean | undefined,
+    ) => Promise<void | FormikErrors<UserModel>>,
   ) => {
     setUserShape(userShape);
     if (userShape?.properties?.data) {
@@ -102,7 +102,7 @@ export default function Profil() {
           setFieldValue("strasse", data.address.road);
           setFieldValue("hausnummer", data.address.house_number);
           setFieldValue("plz", data.address.postcode);
-          setFieldValue("ort", data.address.city);
+          setFieldValue("ort", data.address.city ?? data.address.town);
           if (userShape.geometry.type === "Point") {
             const [lng, lat] = userShape.geometry.coordinates;
             setLatitude(lat);
@@ -124,7 +124,7 @@ export default function Profil() {
     strasse: string,
     hausnummer: string,
     plz: string,
-    ort: string
+    ort: string,
   ) => {
     if (strasse !== "" && hausnummer !== "" && plz !== "" && ort !== "") {
       const address = `${strasse} ${hausnummer}, ${plz} ${ort}`;
@@ -137,7 +137,7 @@ export default function Profil() {
               format: "json",
               addressdetails: 1,
             },
-          }
+          },
         );
 
         if (response.data.length > 0) {
@@ -218,7 +218,7 @@ export default function Profil() {
                             setEdit(!edit);
                             setFieldValue(
                               "addresseInput",
-                              AdressInputEnum.Manual
+                              AdressInputEnum.Manual,
                             );
                           }}
                         >
@@ -410,7 +410,7 @@ export default function Profil() {
                                 onChange={(e) =>
                                   setFieldValue(
                                     "addresseInput",
-                                    e.target.value as AdressInputEnum
+                                    e.target.value as AdressInputEnum,
                                   )
                                 }
                                 className="me-3"
@@ -427,7 +427,7 @@ export default function Profil() {
                                 onChange={async (e) => {
                                   setFieldValue(
                                     "addresseInput",
-                                    e.target.value as AdressInputEnum
+                                    e.target.value as AdressInputEnum,
                                   );
                                   if (
                                     values.strasse &&
@@ -439,7 +439,7 @@ export default function Profil() {
                                       values.strasse,
                                       values.hausnummer,
                                       values.plz,
-                                      values.ort
+                                      values.ort,
                                     );
                                   }
                                   setTimeout(() => {
@@ -564,7 +564,7 @@ export default function Profil() {
                                         values.strasse!,
                                         values.hausnummer!,
                                         values.plz!,
-                                        values.ort!
+                                        values.ort!,
                                       );
                                     }}
                                   >
@@ -644,7 +644,7 @@ export default function Profil() {
                                           e.preventDefault();
                                           setFieldValue(
                                             "einheit",
-                                            e.target.value
+                                            e.target.value,
                                           );
                                           setFieldValue("radius", 0);
                                         }}
