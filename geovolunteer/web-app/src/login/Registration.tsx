@@ -18,7 +18,7 @@ interface FormularResult {
 }
 
 export function Registration(props: Props) {
-  const { handleBack } = props; 
+  const { handleBack } = props;
   const { t } = useTranslation();
   const { _login }: any = useAuth();
   const [initialValues, setInitialValues] = useState<UserModel>();
@@ -99,7 +99,7 @@ export function Registration(props: Props) {
                       <Form.Control
                         id="vorname"
                         name="vorname"
-                        placeholder={t("placeholder.login.login")}
+                        placeholder={t("placeholder.login.vorname")}
                         type="text"
                         onChange={handleChange}
                         onBlur={handleBlur}
@@ -118,7 +118,7 @@ export function Registration(props: Props) {
                       <Form.Control
                         id="nachname"
                         name="nachname"
-                        placeholder={t("placeholder.login.login")}
+                        placeholder={t("placeholder.login.nachname")}
                         type="text"
                         onChange={handleChange}
                         onBlur={handleBlur}

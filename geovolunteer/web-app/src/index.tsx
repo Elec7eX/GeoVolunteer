@@ -5,15 +5,15 @@ import "./index.css";
 import "./leaflet-setup";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter } from "react-router-dom";
+import { HashRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.css";
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 root.render(
   <React.StrictMode>
-    <BrowserRouter
+    <HashRouter
       basename="/geoVolunteer"
       future={{
         v7_startTransition: true,
@@ -21,8 +21,8 @@ root.render(
       }}
     >
       <App />
-    </BrowserRouter>
-  </React.StrictMode>
+    </HashRouter>
+  </React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function

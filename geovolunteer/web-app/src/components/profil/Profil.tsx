@@ -16,7 +16,7 @@ import {
 } from "formik";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import MapComponent from "../karte/MapComponent";
+import MapEditComponent from "../karte/MapEditComponent";
 
 interface FormularResult {
   values: UserModel;
@@ -581,8 +581,7 @@ export default function Profil() {
                           values.addresseInput === AdressInputEnum.Map && (
                             <div ref={mapRef}>
                               {isFreiwillige() && (
-                                <MapComponent
-                                  editable
+                                <MapEditComponent
                                   markerWithRadiusMode
                                   radius={
                                     values.einheit === "KM"
@@ -596,8 +595,7 @@ export default function Profil() {
                                 />
                               )}
                               {isOrganisation() && (
-                                <MapComponent
-                                  editable
+                                <MapEditComponent
                                   drawMarkerOnly
                                   geoJsonData={userShape}
                                   onShapeChange={(geoJson) =>

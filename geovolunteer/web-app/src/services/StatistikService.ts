@@ -39,13 +39,20 @@ const getFreiwilligenAktivitaetenDistanz = () => {
   );
 };
 
+const getFreiwilligenRadiusAktivitaetenDistanz = () => {
+  return http.get<FreiwilligenAktivitaetenType>(
+    BASE_URL + "/organisation/freiwilligenRadiusAktivitaetenDistanz"
+  );
+};
+
 const statistikService = {
   getAktivitaetenByKategorien,
   getAktionsradius,
   getAktionsradiusVerlauf,
   getOrganisationenDistanz,
   getFreiwilligenDistanz,
-  getFreiwilligenAktivitaetenDistanz
+  getFreiwilligenAktivitaetenDistanz,
+  getFreiwilligenRadiusAktivitaetenDistanz
 };
 
 export default statistikService;

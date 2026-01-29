@@ -1,48 +1,39 @@
-import { useEffect, useRef } from "react";
-import { useMap, GeoJSON } from "react-leaflet";
+import { useEffect } from "react";
+import { useMap } from "react-leaflet";
 import L from "leaflet";
-import { Feature, Geometry } from "geojson";
+import { GeoJsonFeature } from "../../types/Types";
 
 interface FitBoundsOnShapeProps {
-  geoJson?: Feature<Geometry, any> | null;
+  geoJsonData?: GeoJsonFeature;
+  zoom?: number;
 }
 
-const FitBoundsOnShape: React.FC<FitBoundsOnShapeProps> = ({ geoJson }) => {
+const FitBoundsOnShape: React.FC<FitBoundsOnShapeProps> = ({
+  geoJsonData,
+  zoom,
+}) => {
   const map = useMap();
-  const geoJsonLayerRef = useRef<L.GeoJSON<any>>(null);
 
   useEffect(() => {
-    if (!geoJson) return;
-
-    const layer = geoJsonLayerRef.current;
-    if (!layer) return;
+    if (!geoJsonData) return;
 
     setTimeout(() => {
-      const bounds = layer.getBounds();
-      if (bounds.isValid()) {
-        map.fitBounds(bounds, { padding: [20, 20] });
+      map.invalidateSize();
+
+      if (geoJsonData.geometry.type === "Point") {
+        const [lng, lat] = geoJsonData.geometry.coordinates as number[];
+        map.setView([lat, lng], zoom || 15, { animate: false });
+      } else {
+        const layer = L.geoJSON(geoJsonData as any);
+        map.fitBounds(layer.getBounds(), {
+          padding: [40, 40],
+          animate: false,
+        });
       }
-    }, 100);
-  }, [geoJson, map]);
+    }, 50);
+  }, [geoJsonData, map, zoom]);
 
-  if (!geoJson) return null;
-
-  return (
-    <GeoJSON
-      data={geoJson as any}
-      ref={geoJsonLayerRef}
-      pointToLayer={(feature, latlng) => {
-        if (feature.properties?.radius) {
-          return L.circle(latlng, {
-            radius: feature.properties.radius,
-            color: "red",
-          });
-        }
-        return L.marker(latlng);
-      }}
-      style={{ color: "blue" }}
-    />
-  );
+  return null;
 };
 
 export default FitBoundsOnShape;

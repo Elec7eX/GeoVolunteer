@@ -92,6 +92,8 @@
   "placeholder.login.login": "Login eingeben",
   "placeholder.login.email": "Email eingeben",
   "placeholder.login.passwort": "Passwort eingeben",
+  "placeholder.login.vorname": "Vorname eingeben",
+  "placeholder.login.nachname": "Nachname eingeben",
   "profil.overview.title": "Profil",
   "profil.logindaten.title": "Anmeldedaten",
   "profil.persoenlichedaten.title": "Persönliche Daten",
@@ -153,7 +155,9 @@
   "stat.organisation.distanz.freiwillige.durchschnittsdistanz": "Ø Distanz",
   "stat.organisation.distanz.freiwillige.topfive": "Top 5 nächste Organisationen",
   "stat.organisation.freiwillige.entfernung.title": "Erreichbarkeit der Freiwilligen",
-  "stat.organisation.freiwillige.entfernung.beschreibung": "Zeigt, wie viele Freiwillige sich im Umkreis von 5 km, 5–10 km und darüber hinaus von Ihrer Organisation befinden.",
-  "stat.organisation.freiwilligeAktivitaeten.distanz.title": "Durchschnittliche Anreise-Distanz der Freiwilligen",
-  "stat.organisation.freiwilligeAktivitaeten.distanz.beschreibung": "Dieses Histogramm zeigt, wie weit Freiwillige zu den Aktivitäten der Organisation anreisen, und gibt Aufschluss darüber, ob die Organisation lokal oder überregional wirkt."
+  "stat.organisation.freiwillige.entfernung.beschreibung": "Zeigt, wie viele Freiwillige sich im Umkreis von 5 km, 5–10 km und darüber hinaus von deiner Organisation befinden.",
+  "stat.organisation.freiwilligeAktivitaeten.distanz.title": "Entfernung der Freiwilligen zu Aktivitäten",
+  "stat.organisation.freiwilligeAktivitaeten.distanz.beschreibung": "Dieses Histogramm zeigt, wie weit Freiwillige im Schnitt von meinen Aktivitäten entfernt sind – egal, ob sie bereit wären, diese Strecke zu fahren.",
+  "stat.organisation.freiwilligeRadiusAktivitaeten.distanz.title": "Erreichbare Entfernung der Freiwilligen zu Aktivitäten",
+  "stat.organisation.freiwilligeRadiusAktivitaeten.distanz.beschreibung": "Dieses Histogramm zeigt, wie weit Freiwillige wohnen, die Ihre Aktivitäten auch wirklich erreichen würden – also alle, die innerhalb ihres angegebenen Radius liegen."
 }

@@ -5,21 +5,12 @@ import {
   Cell,
   Tooltip,
   Legend,
-  Bar,
-  BarChart,
   ResponsiveContainer,
-  XAxis,
-  YAxis,
 } from "recharts";
-import {
-  FreiwilligenDistanzType,
-  Kategorie,
-  KategorieLabels,
-} from "../../types/Types";
+import { FreiwilligenDistanzType } from "../../types/Types";
 import statistikService from "../../services/StatistikService";
 import { t } from "i18next";
-import { Card, Collapse } from "react-bootstrap";
-import { KategorieColors } from "./AktivitaetenByKategorien";
+import { Card, Collapse, OverlayTrigger, Popover } from "react-bootstrap";
 
 const COLORS = ["#4CAF50", "#FFC107", "#F44336"];
 
@@ -57,22 +48,40 @@ export default function FreiwilligenDistanz() {
             <span className="custom-cardheader_text" style={{ color: "white" }}>
               {t("stat.organisation.freiwillige.entfernung.title")}
             </span>
-            <span
-              style={{
-                fontSize: "19px",
-                transition: "transform 0.2s ease",
-                transform: show ? "rotate(180deg)" : "rotate(0deg)",
-              }}
-            >
-              ▼
-            </span>
+            <div className="d-flex align-items-center gap-2">
+              <OverlayTrigger
+                trigger="click"
+                placement="left"
+                rootClose
+                overlay={
+                  <Popover id="info-popover">
+                    <Popover.Body>
+                      {t(
+                        "stat.organisation.freiwillige.entfernung.beschreibung",
+                      )}
+                    </Popover.Body>
+                  </Popover>
+                }
+              >
+                <i
+                  className="bi bi-info-circle info-icon"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </OverlayTrigger>
+              <span
+                style={{
+                  fontSize: "19px",
+                  transition: "transform 0.2s ease",
+                  transform: show ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+              >
+                ▼
+              </span>
+            </div>
           </Card.Header>
           <Collapse in={show}>
             <div id="aktivitaeten-collapse">
               <Card.Body>
-                <Card.Text>
-                  {t("stat.organisation.freiwillige.entfernung.beschreibung")}
-                </Card.Text>
                 <ResponsiveContainer width="100%" height={350}>
                   <PieChart width={350} height={300}>
                     <Pie

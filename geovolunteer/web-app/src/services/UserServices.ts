@@ -15,12 +15,16 @@ const create = (data: UserModel) => {
   return http.post<UserModel>(BASE_URL +"/create", data);
 };
 
-const getAll = () => {
+const getAllBenutzer = () => {
   return http.get<Array<UserModel>>("/benutzer"); 
 };
 
 const getFreiwillige = () => {
   return http.get<Array<UserModel>>(BASE_URL + "/freiwillige");
+}
+
+const getAllFreiwillige = () => {
+  return http.get<Array<UserModel>>(BASE_URL + "/allFreiwillige");
 }
 
 const getOrganisationen = () => {
@@ -50,8 +54,9 @@ const findByTitle = (title: string) => {
 const userService = {
   login,
   logout,
-  getAll,
+  getAllBenutzer,
   getFreiwillige,
+  getAllFreiwillige,
   getOrganisationen,
   get,
   create,

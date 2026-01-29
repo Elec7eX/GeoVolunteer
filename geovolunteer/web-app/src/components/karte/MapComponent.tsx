@@ -1,37 +1,22 @@
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useEffect, useRef } from "react";
 import {
   MapContainer,
   TileLayer,
-  Circle,
   FeatureGroup,
   ZoomControl,
   GeoJSON,
 } from "react-leaflet";
-import { EditControl } from "react-leaflet-draw";
 import L, { Icon } from "leaflet";
 import { Form } from "react-bootstrap";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import { GeoJsonFeature } from "../../types/Types";
-import { Feature, Geometry } from "geojson";
 import FitBoundsOnShape from "./FitBoundsOnShapeProps";
 
 interface MapComponentProps {
-  address?: string | null;
   position?: [number, number] | null;
   zoom?: number | null;
   geoJsonData?: GeoJsonFeature;
-  onShapeChange?: (geoJson: GeoJsonFeature | null) => void;
-  editable?: boolean;
-  drawMarkerOnly?: boolean;
-  markerWithRadiusMode?: boolean;
-  radius?: number;
 }
 
 const customIcon = new Icon({
@@ -43,18 +28,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
   position,
   zoom,
   geoJsonData,
-  onShapeChange,
-  editable,
-  drawMarkerOnly,
-  markerWithRadiusMode,
-  radius,
 }) => {
   const drawnItemsRef = useRef<L.FeatureGroup>(null);
-  const [shapeDrawn, setShapeDrawn] = useState(false);
-  const [effectiveRadius, setEffectiveRadius] = useState<number>(0);
 
   useEffect(() => {
-    if (!geoJsonData || !editable) return;
+    if (!geoJsonData) return;
 
     const timeout = setTimeout(() => {
       if (!drawnItemsRef.current) return;
@@ -73,124 +51,10 @@ const MapComponent: React.FC<MapComponentProps> = ({
       });
 
       layer.eachLayer((l) => drawnItemsRef.current?.addLayer(l));
-      if (geoJsonData && geoJsonData.type === "Feature") {
-        setEffectiveRadius(radius ?? geoJsonData.properties?.radius ?? 0);
-      }
     }, 0);
 
     return () => clearTimeout(timeout);
-  }, [geoJsonData, editable, radius]);
-
-  const onCreated = useCallback(
-    async (e: any) => {
-      const layer = e.layer;
-      const geoJson: Feature<Geometry, any> = layer.toGeoJSON();
-
-      if (e.layerType === "circle" && layer.getRadius) {
-        geoJson.properties = {
-          ...geoJson.properties,
-          radius: layer.getRadius(),
-        };
-      }
-
-      if (drawnItemsRef.current) {
-        drawnItemsRef.current.addLayer(layer);
-      }
-
-      setShapeDrawn(true);
-      console.log("Shape created:", geoJson);
-
-      if (e.layerType === "marker") {
-        const latlng = layer.getLatLng();
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=json&addressdetails=1`,
-          );
-          const data = await response.json();
-          geoJson.properties = { ...geoJson.properties, data };
-          onShapeChange?.({
-            ...geoJson,
-            properties: { ...geoJson.properties, data },
-          });
-        } catch (err) {
-          console.error("Reverse geocoding failed:", err);
-          onShapeChange?.(geoJson);
-        }
-      } else {
-        onShapeChange?.(geoJson);
-      }
-    },
-    [onShapeChange],
-  );
-
-  const onEdited = useCallback(
-    async (e: any) => {
-      e.layers.eachLayer(async (layer: any) => {
-        const geoJson: Feature<Geometry, any> = layer.toGeoJSON();
-
-        if (layer instanceof L.Circle) {
-          geoJson.properties = {
-            ...geoJson.properties,
-            radius: layer.getRadius(),
-          };
-          onShapeChange?.(geoJson);
-          return;
-        }
-
-        if (layer instanceof L.Marker) {
-          const latlng = layer.getLatLng();
-          try {
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${latlng.lat}&lon=${latlng.lng}&format=json&addressdetails=1`,
-            );
-            const data = await response.json();
-            geoJson.properties = { ...geoJson.properties, data };
-            onShapeChange?.({
-              ...geoJson,
-              properties: { ...geoJson.properties, data },
-            });
-          } catch (err) {
-            console.error("Reverse geocoding failed on edit:", err);
-            onShapeChange?.(geoJson);
-          }
-        } else {
-          onShapeChange?.(geoJson);
-        }
-
-        console.log("Shape edited:", geoJson);
-      });
-    },
-    [onShapeChange],
-  );
-
-  const onDeleted = (e: any) => {
-    e.layers.eachLayer(() => {
-      setShapeDrawn(false);
-      console.log("Shape deleted");
-      onShapeChange?.(null);
-    });
-  };
-
-  const drawOptions = useMemo(() => {
-    if (drawMarkerOnly || markerWithRadiusMode) {
-      return {
-        rectangle: false,
-        polygon: false,
-        circle: false,
-        marker: !shapeDrawn ? { icon: customIcon } : false,
-        circlemarker: false,
-        polyline: false,
-      };
-    }
-    return {
-      rectangle: !shapeDrawn,
-      polygon: !shapeDrawn,
-      circle: !shapeDrawn,
-      marker: !shapeDrawn ? { icon: customIcon } : false,
-      circlemarker: false,
-      polyline: false,
-    };
-  }, [shapeDrawn, drawMarkerOnly, markerWithRadiusMode]);
+  }, [geoJsonData]);
 
   return (
     <>
@@ -230,23 +94,11 @@ const MapComponent: React.FC<MapComponentProps> = ({
         <ZoomControl position="topright" />
 
         <FeatureGroup ref={drawnItemsRef}>
-          {editable && (
-            <EditControl
-              position="topleft"
-              onCreated={onCreated}
-              onEdited={onEdited}
-              onDeleted={onDeleted}
-              edit={{
-                moveMarkers: true,
-              }}
-              draw={drawOptions}
-            />
-          )}
           {geoJsonData && (
             <>
               <GeoJSON
                 data={geoJsonData as any}
-                style={{ color: "red" }}
+                style={{ color: "blue" }}
                 pointToLayer={(feature, latlng) => {
                   return L.marker(latlng, { icon: customIcon });
                 }}
@@ -258,25 +110,9 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   }
                 }}
               />
-              {markerWithRadiusMode &&
-                geoJsonData &&
-                geoJsonData.type === "Feature" &&
-                geoJsonData.geometry.type === "Point" && (
-                  <Circle
-                    key={`radius-${effectiveRadius}`} // zwingt Leaflet zum Neurendern bei Radiusänderung
-                    center={[
-                      (geoJsonData.geometry.coordinates as number[])[1],
-                      (geoJsonData.geometry.coordinates as number[])[0],
-                    ]}
-                    radius={radius || 0}
-                    pathOptions={{ color: "blue", fillOpacity: 0.1 }}
-                  />
-                )}
             </>
           )}
-          {geoJsonData && !editable && (
-            <FitBoundsOnShape geoJson={geoJsonData} />
-          )}
+          {geoJsonData && <FitBoundsOnShape geoJsonData={geoJsonData} />}
         </FeatureGroup>
       </MapContainer>
     </>

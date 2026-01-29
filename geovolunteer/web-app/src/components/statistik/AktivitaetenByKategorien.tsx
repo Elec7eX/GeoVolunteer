@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { Card, Collapse } from "react-bootstrap";
+import { Card, Collapse, OverlayTrigger, Popover } from "react-bootstrap";
 import {
   AktivitaetenByKategorienStatistik,
   Kategorie,
@@ -16,7 +16,6 @@ import {
 } from "../../types/Types";
 import statistikService from "../../services/StatistikService";
 import { t } from "i18next";
-import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 export const KategorieColors: Record<Kategorie, string> = {
   [Kategorie.SOZIALES]: "#0d6efd",
@@ -29,7 +28,6 @@ export const KategorieColors: Record<Kategorie, string> = {
 };
 
 export default function AktivitaetenByKategorien() {
-  const [user] = useLocalStorage("user", null);
   const [data, setData] = useState<AktivitaetenByKategorienStatistik[]>([]);
   const [statistik1, setStatistik1] = useState(false);
 
@@ -64,22 +62,39 @@ export default function AktivitaetenByKategorien() {
           <span className="custom-cardheader_text" style={{ color: "white" }}>
             {t("stat.aktivitaet.kategorie.title")}
           </span>
-          <span
-            style={{
-              fontSize: "19px",
-              transition: "transform 0.2s ease",
-              transform: statistik1 ? "rotate(180deg)" : "rotate(0deg)",
-            }}
-          >
-            ▼
-          </span>
+          <div className="d-flex align-items-center gap-2">
+            <OverlayTrigger
+              trigger="click"
+              placement="left"
+              rootClose
+              overlay={
+                <Popover id="info-popover">
+                  <Popover.Body>
+                    {t("stat.aktivitaet.kategorie.freiwillige.beschreibung")}
+                  </Popover.Body>
+                </Popover>
+              }
+            >
+              <i
+                className="bi bi-info-circle info-icon"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </OverlayTrigger>
+            <span
+              style={{
+                fontSize: "19px",
+                transition: "transform 0.2s ease",
+                transform: statistik1 ? "rotate(180deg)" : "rotate(0deg)",
+              }}
+            >
+              ▼
+            </span>
+          </div>
         </Card.Header>
         <Collapse in={statistik1}>
           <div id="aktivitaeten-collapse">
             <Card.Body>
-              <Card.Text>
-                {t("stat.aktivitaet.kategorie.freiwillige.beschreibung")}
-              </Card.Text>
+              <Card.Text></Card.Text>
 
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart

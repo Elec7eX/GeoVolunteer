@@ -25,9 +25,11 @@ export default function HomePage() {
   >([]);
 
   useEffect(() => {
-    aktivitaetService.getLaufendeAktivitaeten().then((response) => {
-      setLaufendeAktivitaeten(response.data);
-    });
+    if (user.rolle !== UserType.ADMIN) {
+      aktivitaetService.getLaufendeAktivitaeten().then((response) => {
+        setLaufendeAktivitaeten(response.data);
+      });
+    }
   }, []);
 
   const navigateToDetail = (
@@ -42,72 +44,81 @@ export default function HomePage() {
   return (
     <>
       <Header title={t("home.title")} />
-      <div className="body">
-        <h5 style={{ marginTop: 30 }}>
-          {t("aktivitaeten.overview.created.title")}
-        </h5>
-        <div>
-          {laufendeAktivitaeten &&
-            laufendeAktivitaeten.length > 0 &&
-            laufendeAktivitaeten.map((aktivitaet) => (
-              <Card
-                key={`laufend-${aktivitaet.id}`}
-                className="custom-card"
-                onClick={() => navigateToDetail(aktivitaet, true)}
-                style={{ marginBottom: 10 }}
-              >
-                {user.rolle === UserType.ORGANISATION && (
-                  <CardHeader
-                    className={aktivitaetStatus(aktivitaet).className}
+      {user.rolle !== UserType.ADMIN ? (
+        <>
+          <div className="body">
+            <h5 style={{ marginTop: 30 }}>
+              {t("aktivitaeten.overview.created.title")}
+            </h5>
+            <div>
+              {laufendeAktivitaeten &&
+                laufendeAktivitaeten.length > 0 &&
+                laufendeAktivitaeten.map((aktivitaet) => (
+                  <Card
+                    key={`laufend-${aktivitaet.id}`}
+                    className="custom-card"
+                    onClick={() => navigateToDetail(aktivitaet, true)}
+                    style={{ marginBottom: 10 }}
                   >
-                    <BsHeartPulse size={30} style={{ marginRight: 15 }} />
-                    <div className="custom-cardheader_text">
-                      {aktivitaet.name}
-                    </div>
-                  </CardHeader>
-                )}
-                {user.rolle === UserType.FREIWILLIGE && (
-                  <CardHeader
-                    className={aktivitaetStatus(aktivitaet).className}
-                  >
-                    <Col sm={1}>
-                      <BsHeartPulse size={30} style={{ marginRight: 15 }} />
-                    </Col>
-                    <Col>
-                      {user.rolle === UserType.FREIWILLIGE && (
-                        <>
-                          <div className="custom-cardheader_text">
-                            {aktivitaet.name}
-                          </div>
-                          <div>{aktivitaet.organisation?.name}</div>
-                        </>
+                    {user.rolle === UserType.ORGANISATION && (
+                      <CardHeader
+                        className={aktivitaetStatus(aktivitaet).className}
+                      >
+                        <BsHeartPulse size={30} style={{ marginRight: 15 }} />
+                        <div className="custom-cardheader_text">
+                          {aktivitaet.name}
+                        </div>
+                      </CardHeader>
+                    )}
+                    {user.rolle === UserType.FREIWILLIGE && (
+                      <CardHeader className="custom-cardheader--available">
+                        <Col sm={1}>
+                          <BsHeartPulse size={30} style={{ marginRight: 15 }} />
+                        </Col>
+                        <Col>
+                          {user.rolle === UserType.FREIWILLIGE && (
+                            <>
+                              <div className="custom-cardheader_text">
+                                {aktivitaet.name}
+                              </div>
+                              <div>{aktivitaet.organisation?.name}</div>
+                            </>
+                          )}
+                        </Col>
+                      </CardHeader>
+                    )}
+                    <CardBody>
+                      <Card.Text>{aktivitaet.beschreibung}</Card.Text>
+                      {user.rolle === UserType.ORGANISATION && (
+                        <StatusIndicator aktivitaet={aktivitaet} />
                       )}
-                    </Col>
-                  </CardHeader>
-                )}
-                <CardBody>
-                  <Card.Text>{aktivitaet.beschreibung}</Card.Text>
-                  <StatusIndicator aktivitaet={aktivitaet} />
-                </CardBody>
-              </Card>
-            ))}
-        </div>
-        <hr style={{ marginTop: 30 }} />
-        <h5 style={{ marginTop: 30 }}>{t("stat.title")}</h5>
-        <AktivitaetenByKategorien />
-        {user.rolle === UserType.FREIWILLIGE && (
-          <>
-            <AktionsRadius />
-            <OrganisationenDistanz />
-          </>
-        )}
-        {user.rolle === UserType.ORGANISATION && (
-          <>
-            <FreiwilligenDistanz />
-            <FreiwilligenAktivitaetenDistanz />
-          </>
-        )}
-      </div>
+                    </CardBody>
+                  </Card>
+                ))}
+            </div>
+            <hr style={{ marginTop: 30 }} />
+            <h5 style={{ marginTop: 30 }}>{t("stat.title")}</h5>
+            <AktivitaetenByKategorien />
+            {user.rolle === UserType.FREIWILLIGE && (
+              <>
+                <AktionsRadius />
+                <OrganisationenDistanz />
+              </>
+            )}
+            {user.rolle === UserType.ORGANISATION && (
+              <>
+                <FreiwilligenDistanz />
+                <FreiwilligenAktivitaetenDistanz />
+              </>
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="body">Startseite</div>
+        </>
+      )}
+
       <Footer />
     </>
   );

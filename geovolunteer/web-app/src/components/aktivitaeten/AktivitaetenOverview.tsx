@@ -124,9 +124,7 @@ export default function AktivitaetenOverview() {
                   </CardHeader>
                 )}
                 {user.rolle === UserType.FREIWILLIGE && (
-                  <CardHeader
-                    className={aktivitaetStatus(aktivitaet).className}
-                  >
+                  <CardHeader className="custom-cardheader--available">
                     <Col sm={1}>
                       <BsHeartPulse size={30} style={{ marginRight: 15 }} />
                     </Col>
@@ -144,7 +142,9 @@ export default function AktivitaetenOverview() {
                 )}
                 <CardBody>
                   <Card.Text>{aktivitaet.beschreibung}</Card.Text>
-                  <StatusIndicator aktivitaet={aktivitaet} />
+                  {user.rolle === UserType.ORGANISATION && (
+                    <StatusIndicator aktivitaet={aktivitaet} />
+                  )}
                 </CardBody>
               </Card>
             ))}

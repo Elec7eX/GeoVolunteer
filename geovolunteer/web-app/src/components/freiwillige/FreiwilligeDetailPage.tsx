@@ -39,7 +39,7 @@ export default function FreiwilligeDetailPage() {
         setFreiwilligeShape(e.data.shape!);
       });
     }
-  }, [freiwilligeFromState]);
+  }, [freiwilligeFromState, id]);
 
   if (!freiwillige) return <div>Lädt...</div>;
 
@@ -152,11 +152,7 @@ export default function FreiwilligeDetailPage() {
             </Row>
             <Row style={{ padding: 10, marginTop: 40 }} ref={mapRef}>
               {isShowMap && (
-                <MapComponent
-                  geoJsonData={freiwilligeShape}
-                  zoom={17}
-                  markerWithRadiusMode
-                />
+                <MapComponent geoJsonData={freiwilligeShape} zoom={17} />
               )}
             </Row>
           </Card.Body>

@@ -37,7 +37,7 @@ export default function OrganisationDetailPage() {
         setOrganisationShape(e.data.shape!);
       });
     }
-  }, [organisationFromState]);
+  }, [organisationFromState, id]);
 
   if (!organisation) return <div>Lädt...</div>;
 
@@ -68,7 +68,7 @@ export default function OrganisationDetailPage() {
                         onClick={() =>
                           userService
                             .remove(organisation.id)
-                            .then(() => navigate("/freiwillige"))
+                            .then(() => navigate("/organisation"))
                         }
                       />
                     </Col>

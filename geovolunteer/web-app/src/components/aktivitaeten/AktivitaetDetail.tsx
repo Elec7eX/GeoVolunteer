@@ -21,7 +21,7 @@ import "leaflet/dist/leaflet.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import aktivitaetService from "../../services/AktivitaetService";
-import MapComponent from "../karte/MapComponent";
+import MapEditComponent from "../karte/MapEditComponent";
 
 interface FormularResult {
   values: AktivitaetModel;
@@ -632,9 +632,9 @@ export default function AktivitaetDetail() {
                           {values.addresseInput === AdressInputEnum.Map && (
                             <>
                               <div ref={mapRef}>
-                                <MapComponent
+                                <MapEditComponent
                                   geoJsonData={aktivitaetenShape}
-                                  editable={true}
+                                  fitBoundsOnShape={aktivitaetFromState}
                                   onShapeChange={(geoJson) =>
                                     handleAktivitaetenShape(
                                       geoJson,
@@ -1098,10 +1098,10 @@ export default function AktivitaetDetail() {
                           )}
                           {values.ressource.addresseInput ===
                             AdressInputEnum.Map && (
-                            <MapComponent
+                            <MapEditComponent
                               geoJsonData={ressourceShape}
-                              editable={true}
                               drawMarkerOnly={true}
+                              fitBoundsOnShape={aktivitaetFromState}
                               onShapeChange={(geoJson) =>
                                 handleRessourceShape(geoJson, setFieldValue)
                               }

@@ -1,8 +1,14 @@
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import statistikService from "../../services/StatistikService";
-import { Card, Collapse, Row, Col } from "react-bootstrap";
+import {
+  Card,
+  Collapse,
+  Row,
+  Col,
+  OverlayTrigger,
+  Popover,
+} from "react-bootstrap";
 import { t } from "i18next";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AA66CC"];
@@ -29,23 +35,38 @@ export default function OrganisationenDistanz() {
         <span className="custom-cardheader_text" style={{ color: "white" }}>
           {t("stat.organisation.distanz.freiwillige.title")}
         </span>
-        <span
-          style={{
-            fontSize: "19px",
-            transition: "transform 0.2s ease",
-            transform: showStatistik ? "rotate(180deg)" : "rotate(0deg)",
-          }}
-        >
-          ▼
-        </span>
+        <div className="d-flex align-items-center gap-2">
+          <OverlayTrigger
+            trigger="click"
+            placement="left"
+            rootClose
+            overlay={
+              <Popover id="info-popover">
+                <Popover.Body>
+                  {t("stat.organisation.distanz.freiwillige.beschreibung")}
+                </Popover.Body>
+              </Popover>
+            }
+          >
+            <i
+              className="bi bi-info-circle info-icon"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </OverlayTrigger>
+          <span
+            style={{
+              fontSize: "19px",
+              transition: "transform 0.2s ease",
+              transform: showStatistik ? "rotate(180deg)" : "rotate(0deg)",
+            }}
+          >
+            ▼
+          </span>
+        </div>
       </Card.Header>
-
       <Collapse in={showStatistik}>
         <div>
           <Card.Body>
-            <Card.Text>
-              {t("stat.organisation.distanz.freiwillige.beschreibung")}
-            </Card.Text>
             <Row>
               <Col>
                 <PieChart width={340} height={300}>

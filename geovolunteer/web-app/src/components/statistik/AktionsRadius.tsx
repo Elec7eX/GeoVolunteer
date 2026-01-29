@@ -7,7 +7,14 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Card, Col, Collapse, Row } from "react-bootstrap";
+import {
+  Card,
+  Col,
+  Collapse,
+  OverlayTrigger,
+  Row,
+  Popover,
+} from "react-bootstrap";
 import statistikService from "../../services/StatistikService";
 import { AktionsradiusVerlauf, RadiusStats } from "../../types/Types";
 import { t } from "i18next";
@@ -49,24 +56,40 @@ export default function AktionsRadius() {
           <span className="custom-cardheader_text" style={{ color: "white" }}>
             {t("stat.aktivitaet.aktionsradius.title")}
           </span>
-          <span
-            style={{
-              fontSize: "19px",
-              transition: "transform 0.2s ease",
-              transform: showRadius ? "rotate(180deg)" : "rotate(0deg)",
-            }}
-          >
-            ▼
-          </span>
+          <div className="d-flex align-items-center gap-2">
+            <OverlayTrigger
+              trigger="click"
+              placement="left"
+              rootClose
+              overlay={
+                <Popover id="info-popover">
+                  <Popover.Body>
+                    {t(
+                      "stat.aktivitaet.aktionsradius.freiwillige.beschreibung",
+                    )}
+                  </Popover.Body>
+                </Popover>
+              }
+            >
+              <i
+                className="bi bi-info-circle info-icon"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </OverlayTrigger>
+            <span
+              style={{
+                fontSize: "19px",
+                transition: "transform 0.2s ease",
+                transform: showRadius ? "rotate(180deg)" : "rotate(0deg)",
+              }}
+            >
+              ▼
+            </span>
+          </div>
         </Card.Header>
-
         <Collapse in={showRadius}>
           <div>
             <Card.Body>
-              <Card.Text>
-                {t("stat.aktivitaet.aktionsradius.freiwillige.beschreibung")}
-              </Card.Text>
-
               <Row>
                 <Col>
                   <Card className="text-center">
@@ -122,23 +145,38 @@ export default function AktionsRadius() {
           <span className="custom-cardheader_text" style={{ color: "white" }}>
             {t("stat.aktivitaet.distanzverlauf.title")}
           </span>
-          <span
-            style={{
-              fontSize: "19px",
-              transition: "transform 0.2s ease",
-              transform: showVerlauf ? "rotate(180deg)" : "rotate(0deg)",
-            }}
-          >
-            ▼
-          </span>
+          <div className="d-flex align-items-center gap-2">
+            <OverlayTrigger
+              trigger="click"
+              placement="left"
+              rootClose
+              overlay={
+                <Popover id="info-popover">
+                  <Popover.Body>
+                    {t("stat.aktivitaet.distanzverlauf.beschreibung")}
+                  </Popover.Body>
+                </Popover>
+              }
+            >
+              <i
+                className="bi bi-info-circle info-icon"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </OverlayTrigger>
+            <span
+              style={{
+                fontSize: "19px",
+                transition: "transform 0.2s ease",
+                transform: showVerlauf ? "rotate(180deg)" : "rotate(0deg)",
+              }}
+            >
+              ▼
+            </span>
+          </div>
         </Card.Header>
         <Collapse in={showVerlauf}>
           <div>
             <Card.Body>
-              <Card.Text>
-                {t("stat.aktivitaet.distanzverlauf.beschreibung")}
-              </Card.Text>
-
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={verlaufStats}>
                   <XAxis

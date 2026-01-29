@@ -2,7 +2,7 @@
   "name": "web-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://localhost:3000/geoVolunteer",
+  "homepage": "https://github.com/Elec7eX/GeoVolunteer",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.8.0",
@@ -14,6 +14,7 @@
     "axios": "^1.11.0",
     "bootstrap": "^5.3.8",
     "formik": "^2.4.6",
+    "gh-pages": "^6.3.0",
     "i18next": "^25.4.2",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
@@ -29,6 +30,7 @@
     "react-leaflet-draw": "^0.20.6",
     "react-router-dom": "^6.30.1",
     "react-scripts": "5.0.1",
+    "recharts": "^3.6.0",
     "typescript": "^5.9.2",
     "web-vitals": "^5.1.0",
     "yup": "^1.7.0"
@@ -37,7 +39,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
