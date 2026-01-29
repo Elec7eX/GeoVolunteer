@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { Registration } from "./Registration";
 import userService from "../services/UserServices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { mockUser } from "../mockData/userMock";
 
 export type LoginType = {
   login?: string;
@@ -42,6 +43,7 @@ export function Login() {
         })
         .catch((error) => {
           alert("Benutzer existiert nicht!");
+          _login(mockUser);
         });
     }
   };

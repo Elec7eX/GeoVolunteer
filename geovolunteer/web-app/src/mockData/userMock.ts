@@ -1,0 +1,33 @@
+export const mockUser = {
+  active: true,
+  beschreibung: "Hilfsbereite, offene Person, die gerne Verantwortung übernimmt.",
+  einheit: "M",
+  email: "maya.ertl@example.com",
+  freiwillige: true,
+  geburtsDatum: "1994-09-27",
+  hausnummer: "13",
+  id: 30,
+  land: null,
+  login: "Maya",
+  nachname: "Ertl",
+  name: null,
+  organisation: false,
+  ort: "Linz",
+  password: "aaa",
+  plz: "4020",
+  radius: 1112,
+  rolle: "FREIWILLIGE",
+  shape: {
+    type: "Feature",
+    geometry: { type: "Point", coordinates: [14.2844671, 48.2942764] },
+    properties: {}
+  },
+  strasse: "Kellergasse",
+  telefon: "06765553311",
+  verfuegbarBisDatum: "2026-04-07",
+  verfuegbarBisZeit: "11:30",
+  verfuegbarVonDatum: "2025-04-07",
+  verfuegbarVonZeit: "07:00",
+  vorname: "Maya",
+  webseite: null
+};
