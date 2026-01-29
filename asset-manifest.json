@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/Elec7eX/GeoVolunteer/static/css/main.c1e74b0a.css",
-    "main.js": "/Elec7eX/GeoVolunteer/static/js/main.cf251631.js",
-    "static/js/488.d4a9a2b7.chunk.js": "/Elec7eX/GeoVolunteer/static/js/488.d4a9a2b7.chunk.js",
-    "static/media/user_add.png": "/Elec7eX/GeoVolunteer/static/media/user_add.89737b6c5bfe1f98828c.png",
-    "static/media/location.png": "/Elec7eX/GeoVolunteer/static/media/location.9b0209c714f0454010b5.png",
-    "static/media/box.png": "/Elec7eX/GeoVolunteer/static/media/box.3da3dbd1225a91fae797.png",
-    "static/media/building.png": "/Elec7eX/GeoVolunteer/static/media/building.3b81a98b3be3130a7c92.png",
-    "static/media/activity_add.png": "/Elec7eX/GeoVolunteer/static/media/activity_add.f24c87e66d02e1aec17e.png",
-    "static/media/heart-rate-monitor.png": "/Elec7eX/GeoVolunteer/static/media/heart-rate-monitor.eaf727f4239e003fc7ba.png",
-    "static/media/heart-rate_1.png": "/Elec7eX/GeoVolunteer/static/media/heart-rate_1.d3126690e92b2990ffc5.png",
-    "static/media/marker-icon.png": "/Elec7eX/GeoVolunteer/static/media/marker-icon.20207e7b481bf71369d8.png",
-    "static/media/user.png": "/Elec7eX/GeoVolunteer/static/media/user.fa9b71e2d74ef9247be4.png",
-    "static/media/spritesheet.svg": "/Elec7eX/GeoVolunteer/static/media/spritesheet.a4e0eb7ad904a4858361.svg",
-    "index.html": "/Elec7eX/GeoVolunteer/index.html",
-    "main.c1e74b0a.css.map": "/Elec7eX/GeoVolunteer/static/css/main.c1e74b0a.css.map",
-    "main.cf251631.js.map": "/Elec7eX/GeoVolunteer/static/js/main.cf251631.js.map",
-    "488.d4a9a2b7.chunk.js.map": "/Elec7eX/GeoVolunteer/static/js/488.d4a9a2b7.chunk.js.map"
+    "main.css": "/GeoVolunteer/static/css/main.d5074eaf.css",
+    "main.js": "/GeoVolunteer/static/js/main.25e098be.js",
+    "static/js/488.d4a9a2b7.chunk.js": "/GeoVolunteer/static/js/488.d4a9a2b7.chunk.js",
+    "static/media/user_add.png": "/GeoVolunteer/static/media/user_add.89737b6c5bfe1f98828c.png",
+    "static/media/location.png": "/GeoVolunteer/static/media/location.9b0209c714f0454010b5.png",
+    "static/media/box.png": "/GeoVolunteer/static/media/box.3da3dbd1225a91fae797.png",
+    "static/media/building.png": "/GeoVolunteer/static/media/building.3b81a98b3be3130a7c92.png",
+    "static/media/activity_add.png": "/GeoVolunteer/static/media/activity_add.f24c87e66d02e1aec17e.png",
+    "static/media/heart-rate-monitor.png": "/GeoVolunteer/static/media/heart-rate-monitor.eaf727f4239e003fc7ba.png",
+    "static/media/heart-rate_1.png": "/GeoVolunteer/static/media/heart-rate_1.d3126690e92b2990ffc5.png",
+    "static/media/marker-icon.png": "/GeoVolunteer/static/media/marker-icon.20207e7b481bf71369d8.png",
+    "static/media/user.png": "/GeoVolunteer/static/media/user.fa9b71e2d74ef9247be4.png",
+    "static/media/spritesheet.svg": "/GeoVolunteer/static/media/spritesheet.a4e0eb7ad904a4858361.svg",
+    "index.html": "/GeoVolunteer/index.html",
+    "main.d5074eaf.css.map": "/GeoVolunteer/static/css/main.d5074eaf.css.map",
+    "main.25e098be.js.map": "/GeoVolunteer/static/js/main.25e098be.js.map",
+    "488.d4a9a2b7.chunk.js.map": "/GeoVolunteer/static/js/488.d4a9a2b7.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c1e74b0a.css",
-    "static/js/main.cf251631.js"
+    "static/css/main.d5074eaf.css",
+    "static/js/main.25e098be.js"
   ]
 }
