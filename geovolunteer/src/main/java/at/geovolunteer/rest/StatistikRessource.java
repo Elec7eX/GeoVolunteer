@@ -56,4 +56,9 @@ public class StatistikRessource {
 		return statistikService.getFreiwilligenAktivitaetenDistance();
 	}
 
+	@GetMapping("/organisation/freiwilligenRadiusAktivitaetenDistanz")
+	public Map<String, Long> getFreiwilligenRadiusAktivitaetenDistanz() {
+		return statistikService.getFreiwilligenRadiusAktivitaetenDistance();
+	}
+
 }

@@ -82,6 +82,19 @@ public class BenutzerResource {
 		}
 	}
 
+	@GetMapping(value = "/allFreiwillige", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<Benutzer>> getAllFreiwillige() {
+		try {
+			List<Benutzer> freiwillige = service.getAllFreiwillige();
+			if (freiwillige.isEmpty()) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			}
+			return new ResponseEntity<>(freiwillige, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@GetMapping(value = "/organisation", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Benutzer>> getOrganisationen() {
 		try {

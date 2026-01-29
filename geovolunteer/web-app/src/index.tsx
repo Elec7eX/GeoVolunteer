@@ -5,7 +5,7 @@ import "./index.css";
 import "./leaflet-setup";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { HashRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.css";
 
 const root = ReactDOM.createRoot(
@@ -13,7 +13,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <HashRouter
+    <BrowserRouter
       basename="/geoVolunteer"
       future={{
         v7_startTransition: true,
@@ -21,7 +21,7 @@ root.render(
       }}
     >
       <App />
-    </HashRouter>
+    </BrowserRouter>
   </React.StrictMode>,
 );
 

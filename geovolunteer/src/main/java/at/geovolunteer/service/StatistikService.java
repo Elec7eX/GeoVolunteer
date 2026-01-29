@@ -99,6 +99,10 @@ public class StatistikService {
 		Benutzer benutzer = benutzerService.getActive();
 		Geometry freiwilligePoint = benutzer.getShape();
 
+		if (freiwilligePoint == null) {
+			System.out.println("Freiwilligen Shape darf nicht leer sein!");
+			return List.of();
+		}
 		return benutzerService.findAll().stream().filter(b -> Rolle.ORGANISATION.equals(b.getRolle()))
 				.filter(b -> b.getShape() != null).map(b -> {
 					double distanceKm = freiwilligePoint.distance(b.getShape()) * 111.0;
@@ -120,6 +124,11 @@ public class StatistikService {
 	public Map<String, Long> getFreiwilligenDistanz() {
 		Benutzer benutzer = benutzerService.getActive();
 		Geometry orgPoint = benutzer.getShape();
+
+		if (orgPoint == null) {
+			System.out.println("Freiwilligen Shape darf nicht leer sein!");
+			return Map.of();
+		}
 
 		List<Benutzer> freiwillige = benutzerService.getAllFreiwillige();
 
@@ -149,20 +158,83 @@ public class StatistikService {
 
 	public Map<String, Long> getFreiwilligenAktivitaetenDistance() {
 		List<Aktivitaet> aktivitaeten = benutzerService.getActive().getErstellteAktivitaeten();
+		List<Benutzer> freiwillige = benutzerService.getAllFreiwillige();
+
 		List<Double> distancesKm = new ArrayList<>();
 
-		for (Aktivitaet aktivitaet : aktivitaeten) {
-			Geometry aktivitaetShape = aktivitaet.getShape();
-			for (Benutzer v : aktivitaet.getTeilnehmer()) {
-				Geometry freiwilligeShape = v.getShape();
+		for (Benutzer v : freiwillige) {
+			Geometry freiwilligeShape = v.getShape();
+			if (freiwilligeShape == null) {
+				continue;
+			}
+
+			double minDistance = Double.MAX_VALUE;
+
+			for (Aktivitaet aktivitaet : aktivitaeten) {
+				Geometry aktivitaetShape = aktivitaet.getShape();
+				if (aktivitaetShape == null) {
+					continue;
+				}
+
 				double distanceKm = GeoUtil.haversineKm(freiwilligeShape.getCoordinate().getY(),
 						freiwilligeShape.getCoordinate().getX(), aktivitaetShape.getCoordinate().getY(),
 						aktivitaetShape.getCoordinate().getX());
-				distancesKm.add(distanceKm);
+
+				if (distanceKm < minDistance) {
+					minDistance = distanceKm;
+				}
+			}
+
+			if (minDistance != Double.MAX_VALUE) {
+				distancesKm.add(minDistance);
 			}
 		}
 
-		// 3. Histogramm berechnen
+		Map<String, Long> histogram = new LinkedHashMap<>();
+		histogram.put("0-1 km", distancesKm.stream().filter(d -> d <= 1).count());
+		histogram.put("1-3 km", distancesKm.stream().filter(d -> d > 1 && d <= 3).count());
+		histogram.put("3-5 km", distancesKm.stream().filter(d -> d > 3 && d <= 5).count());
+		histogram.put("5-10 km", distancesKm.stream().filter(d -> d > 5 && d <= 10).count());
+		histogram.put(">10 km", distancesKm.stream().filter(d -> d > 10).count());
+
+		return histogram;
+	}
+
+	public Map<String, Long> getFreiwilligenRadiusAktivitaetenDistance() {
+		List<Aktivitaet> aktivitaeten = benutzerService.getActive().getErstellteAktivitaeten();
+		List<Benutzer> freiwillige = benutzerService.getAllFreiwillige();
+
+		List<Double> distancesKm = new ArrayList<>();
+
+		for (Benutzer v : freiwillige) {
+			Geometry freiwilligeShape = v.getShape();
+			if (freiwilligeShape == null) {
+				continue;
+			}
+
+			double minDistance = Double.MAX_VALUE;
+
+			for (Aktivitaet aktivitaet : aktivitaeten) {
+				Geometry aktivitaetShape = aktivitaet.getShape();
+				if (aktivitaetShape == null) {
+					continue;
+				}
+
+				double distanceKm = GeoUtil.haversineKm(freiwilligeShape.getCoordinate().getY(),
+						freiwilligeShape.getCoordinate().getX(), aktivitaetShape.getCoordinate().getY(),
+						aktivitaetShape.getCoordinate().getX());
+
+				if (distanceKm < minDistance) {
+					minDistance = distanceKm;
+				}
+			}
+
+			double radiusKm = v.getRadius() / 1000.0;
+			if (minDistance != Double.MAX_VALUE && minDistance <= radiusKm) {
+				distancesKm.add(minDistance);
+			}
+		}
+
 		Map<String, Long> histogram = new LinkedHashMap<>();
 		histogram.put("0-1 km", distancesKm.stream().filter(d -> d <= 1).count());
 		histogram.put("1-3 km", distancesKm.stream().filter(d -> d > 1 && d <= 3).count());
