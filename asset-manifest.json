@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/Elec7eX/GeoVolunteer/static/css/main.c1e74b0a.css",
-    "main.js": "/Elec7eX/GeoVolunteer/static/js/main.9fe0d322.js",
+    "main.js": "/Elec7eX/GeoVolunteer/static/js/main.cf251631.js",
     "static/js/488.d4a9a2b7.chunk.js": "/Elec7eX/GeoVolunteer/static/js/488.d4a9a2b7.chunk.js",
     "static/media/user_add.png": "/Elec7eX/GeoVolunteer/static/media/user_add.89737b6c5bfe1f98828c.png",
     "static/media/location.png": "/Elec7eX/GeoVolunteer/static/media/location.9b0209c714f0454010b5.png",
@@ -15,11 +15,11 @@
     "static/media/spritesheet.svg": "/Elec7eX/GeoVolunteer/static/media/spritesheet.a4e0eb7ad904a4858361.svg",
     "index.html": "/Elec7eX/GeoVolunteer/index.html",
     "main.c1e74b0a.css.map": "/Elec7eX/GeoVolunteer/static/css/main.c1e74b0a.css.map",
-    "main.9fe0d322.js.map": "/Elec7eX/GeoVolunteer/static/js/main.9fe0d322.js.map",
+    "main.cf251631.js.map": "/Elec7eX/GeoVolunteer/static/js/main.cf251631.js.map",
     "488.d4a9a2b7.chunk.js.map": "/Elec7eX/GeoVolunteer/static/js/488.d4a9a2b7.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.c1e74b0a.css",
-    "static/js/main.9fe0d322.js"
+    "static/js/main.cf251631.js"
   ]
 }
