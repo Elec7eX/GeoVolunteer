@@ -76,7 +76,7 @@ export default function Freiwillige() {
                     onClick={() => navigateToDetail(user)}
                     style={{ marginBottom: 10 }}
                   >
-                    <CardHeader className="custom-cardheader--available">
+                    <CardHeader className="custom-cardheader--default">
                       <Col sm={1}>
                         <IoPersonOutline
                           size={27}
@@ -117,7 +117,7 @@ export default function Freiwillige() {
               onClick={() => navigateToDetail(user)}
               style={{ marginBottom: 10 }}
             >
-              <CardHeader className="custom-cardheader--available">
+              <CardHeader className="custom-cardheader--default">
                 <IoPersonOutline size={27} style={{ marginRight: 15 }} />
                 <div className="custom-cardheader_text">
                   {user.vorname} {user.nachname}

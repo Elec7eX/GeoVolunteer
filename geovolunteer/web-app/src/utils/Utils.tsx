@@ -16,17 +16,17 @@ export const VerticalDivider = ({ height = "50px" }) => {
 const STATUS_CONFIG = {
   available: {
     label: "Plätze verfügbar",
-    color: "rgb(0, 160, 0)",
+    color: "#00d30b",
     className: "custom-cardheader--available",
   },
   limited: {
     label: "Wenige Plätze verfügbar",
-    color: "rgb(160, 120, 0)",
+    color: "#ff9900",
     className: "custom-cardheader--limited",
   },
   full: {
     label: "Ausgebucht",
-    color: "rgb(160, 0, 0)",
+    color: "#fa0000",
     className: "custom-cardheader--full",
   },
 } as const;

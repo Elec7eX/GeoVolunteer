@@ -28,7 +28,7 @@ export default function OrganisationenDistanz() {
   return (
     <Card className="custom-card mb-3">
       <Card.Header
-        className="custom-cardheader--available d-flex align-items-center justify-content-between"
+        className="custom-cardheader--default d-flex align-items-center justify-content-between"
         style={{ cursor: "pointer" }}
         onClick={() => setShowStatistik(!showStatistik)}
       >

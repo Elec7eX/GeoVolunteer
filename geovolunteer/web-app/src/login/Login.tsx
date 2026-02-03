@@ -8,6 +8,7 @@ import { Registration } from "./Registration";
 import userService from "../services/UserServices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { mockUser } from "../mockData/userMock";
+import { center } from "@turf/turf";
 
 export type LoginType = {
   login?: string;
@@ -42,7 +43,7 @@ export function Login() {
           _login(response.data);
         })
         .catch((error) => {
-          alert("Benutzer existiert nicht!");
+          alert("Benutzer existiert nicht! Statische Benutzer wird verwendet.");
           _login(mockUser);
         });
     }
@@ -63,101 +64,104 @@ export function Login() {
     <>
       {initialValues && (
         <div className="login">
-          <h1>{t("home.title")}</h1>
-          {!isRegistrationPage && (
-            <Formik
-              initialValues={initialValues}
-              onSubmit={(values, formikBag) =>
-                handleSubmit({ values, formikBag })
-              }
-              enableReinitialize
-              validationSchema={validationLogin}
-            >
-              {({
-                errors,
-                touched,
-                handleChange,
-                handleBlur,
-                isSubmitting,
-              }) => (
-                <FormikForm className="rounded p-4">
-                  <Form.Group className="mb-3">
-                    <Form.Label>{t("label.login.login")}</Form.Label>
-                    <Form.Control
-                      id="login"
-                      name="login"
-                      placeholder={t("placeholder.login.login")}
-                      type="text"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className={
-                        errors.login && touched.login
-                          ? "text-input error"
-                          : "text-input"
-                      }
-                    />
-                    <Form.Text className="text-muted"></Form.Text>
-                  </Form.Group>
-                  <Form.Group className="mb-3">
-                    <InputGroup>
+          <div className="login-card">
+            <h1 style={{ textAlign: "center" }}>{t("home.title")}</h1>
+            {!isRegistrationPage && (
+              <Formik
+                initialValues={initialValues}
+                onSubmit={(values, formikBag) =>
+                  handleSubmit({ values, formikBag })
+                }
+                enableReinitialize
+                validationSchema={validationLogin}
+              >
+                {({
+                  errors,
+                  touched,
+                  handleChange,
+                  handleBlur,
+                  isSubmitting,
+                }) => (
+                  <FormikForm className="rounded p-4">
+                    <Form.Group className="mb-3">
+                      <Form.Label>{t("label.login.login")}</Form.Label>
                       <Form.Control
-                        id="password"
-                        name="password"
-                        placeholder={t("placeholder.login.passwort")}
-                        type={showPassword ? "text" : "password"}
+                        id="login"
+                        name="login"
+                        placeholder={t("placeholder.login.login")}
+                        type="text"
                         onChange={handleChange}
+                        onBlur={handleBlur}
                         className={
-                          errors.password && touched.password
+                          errors.login && touched.login
                             ? "text-input error"
                             : "text-input"
                         }
                       />
-                      <Button
-                        variant="secondary"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <FaEyeSlash /> : <FaEye />}
-                      </Button>
-                    </InputGroup>
-                    <Form.Text className="text-muted"></Form.Text>
-                    {errors.password && touched.password && (
-                      <div className="input-feedback">{errors.password}</div>
-                    )}
-                  </Form.Group>
-                  <Col>
-                    <Row className="mb-3">
-                      <Button
-                        className="shadow"
-                        id="save"
-                        variant="primary"
-                        type="submit"
-                        disabled={isSubmitting}
-                      >
-                        {t("button.login")}
-                      </Button>
-                    </Row>
-                  </Col>
-                  <Col>
-                    <Row>
-                      <Button
-                        className="shadow"
-                        id="neuAnmelden"
-                        variant="dark"
-                        type="button"
-                        disabled={isSubmitting}
-                        onClick={() => setIsRegistrationPage(true)}
-                      >
-                        {t("button.anmelden")}
-                      </Button>
-                    </Row>
-                  </Col>
-                </FormikForm>
-              )}
-            </Formik>
-          )}
-          {isRegistrationPage && (
-            <Registration handleBack={() => setIsRegistrationPage(false)} />
-          )}
+                      <Form.Text className="text-muted"></Form.Text>
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                      <Form.Label>{t("label.login.passwort")}</Form.Label>
+                      <InputGroup>
+                        <Form.Control
+                          id="password"
+                          name="password"
+                          placeholder={t("placeholder.login.passwort")}
+                          type={showPassword ? "text" : "password"}
+                          onChange={handleChange}
+                          className={
+                            errors.password && touched.password
+                              ? "text-input error"
+                              : "text-input"
+                          }
+                        />
+                        <Button
+                          variant="secondary"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </Button>
+                      </InputGroup>
+                      <Form.Text className="text-muted"></Form.Text>
+                      {errors.password && touched.password && (
+                        <div className="input-feedback">{errors.password}</div>
+                      )}
+                    </Form.Group>
+                    <Col>
+                      <Row className="mb-3">
+                        <Button
+                          className="shadow"
+                          id="save"
+                          variant="primary"
+                          type="submit"
+                          disabled={isSubmitting}
+                        >
+                          {t("button.login")}
+                        </Button>
+                      </Row>
+                    </Col>
+                    <Col>
+                      <Row>
+                        <Button
+                          className="shadow"
+                          id="neuAnmelden"
+                          variant="dark"
+                          type="button"
+                          disabled={isSubmitting}
+                          onClick={() => setIsRegistrationPage(true)}
+                        >
+                          {t("button.anmelden")}
+                        </Button>
+                      </Row>
+                    </Col>
+                  </FormikForm>
+                )}
+              </Formik>
+            )}
+            {isRegistrationPage && (
+              <Registration handleBack={() => setIsRegistrationPage(false)} />
+            )}
+          </div>
         </div>
       )}
     </>

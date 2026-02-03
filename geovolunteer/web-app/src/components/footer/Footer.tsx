@@ -67,7 +67,7 @@ export const Footer = (props: Props) => {
                       navigate(
                         user.rolle === UserType.ORGANISATION
                           ? "/karte_organisation"
-                          : "/karte_freiwillige"
+                          : "/karte_freiwillige",
                       )
                     }
                   />

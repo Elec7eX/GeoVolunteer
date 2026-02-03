@@ -49,7 +49,7 @@ export default function AktionsRadius() {
     <>
       <Card className="custom-card mb-3">
         <Card.Header
-          className="custom-cardheader--available d-flex align-items-center justify-content-between"
+          className="custom-cardheader--default d-flex align-items-center justify-content-between"
           style={{ cursor: "pointer" }}
           onClick={() => setShowRadius(!showRadius)}
         >
@@ -138,7 +138,7 @@ export default function AktionsRadius() {
       </Card>
       <Card className="custom-card mb-3">
         <Card.Header
-          className="custom-cardheader--available d-flex align-items-center justify-content-between"
+          className="custom-cardheader--default d-flex align-items-center justify-content-between"
           style={{ cursor: "pointer" }}
           onClick={() => setShowVerlauf(!showVerlauf)}
         >

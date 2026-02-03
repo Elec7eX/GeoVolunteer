@@ -55,7 +55,7 @@ export default function AktivitaetenByKategorien() {
     <>
       <Card className="custom-card mb-3">
         <Card.Header
-          className="custom-cardheader--available d-flex align-items-center justify-content-between"
+          className="custom-cardheader--default d-flex align-items-center justify-content-between"
           style={{ cursor: "pointer" }}
           onClick={() => setStatistik1(!statistik1)}
         >
@@ -94,8 +94,6 @@ export default function AktivitaetenByKategorien() {
         <Collapse in={statistik1}>
           <div id="aktivitaeten-collapse">
             <Card.Body>
-              <Card.Text></Card.Text>
-
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart
                   data={data}

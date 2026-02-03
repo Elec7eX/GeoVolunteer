@@ -114,9 +114,7 @@ export default function AktivitaetenOverview() {
                 style={{ marginBottom: 10 }}
               >
                 {user.rolle === UserType.ORGANISATION && (
-                  <CardHeader
-                    className={aktivitaetStatus(aktivitaet).className}
-                  >
+                  <CardHeader className="custom-cardheader--default">
                     <BsHeartPulse size={30} style={{ marginRight: 15 }} />
                     <div className="custom-cardheader_text">
                       {aktivitaet.name}
@@ -124,7 +122,7 @@ export default function AktivitaetenOverview() {
                   </CardHeader>
                 )}
                 {user.rolle === UserType.FREIWILLIGE && (
-                  <CardHeader className="custom-cardheader--available">
+                  <CardHeader className="custom-cardheader--default">
                     <Col sm={1}>
                       <BsHeartPulse size={30} style={{ marginRight: 15 }} />
                     </Col>
@@ -163,9 +161,7 @@ export default function AktivitaetenOverview() {
                 style={{ marginBottom: 10 }}
               >
                 {user.rolle === UserType.ORGANISATION && (
-                  <CardHeader
-                    className={aktivitaetStatus(aktivitaet).className}
-                  >
+                  <CardHeader className="custom-cardheader--default">
                     <BsHeartPulse size={30} style={{ marginRight: 15 }} />
                     <div className="custom-cardheader_text">
                       {aktivitaet.name}
@@ -173,9 +169,7 @@ export default function AktivitaetenOverview() {
                   </CardHeader>
                 )}
                 {user.rolle === UserType.FREIWILLIGE && (
-                  <CardHeader
-                    className={aktivitaetStatus(aktivitaet).className}
-                  >
+                  <CardHeader className="custom-cardheader--default">
                     <Col sm={1}>
                       <BsHeartPulse size={30} style={{ marginRight: 15 }} />
                     </Col>
@@ -246,9 +240,7 @@ export default function AktivitaetenOverview() {
                     onClick={() => navigateToDetail(aktivitaet, false)}
                     style={{ marginBottom: 10 }}
                   >
-                    <CardHeader
-                      className={aktivitaetStatus(aktivitaet).className}
-                    >
+                    <CardHeader className="custom-cardheader--default">
                       <Col sm={1}>
                         <BsHeartPulse size={30} style={{ marginRight: 15 }} />
                       </Col>
