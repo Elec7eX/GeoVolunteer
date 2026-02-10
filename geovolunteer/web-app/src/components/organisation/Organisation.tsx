@@ -5,14 +5,18 @@ import { Card, CardHeader, CardBody, Spinner, Alert } from "react-bootstrap";
 import { IoPersonOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { UserModel } from "../../types/Types";
+import { GeoJsonFeature, UserModel } from "../../types/Types";
 import userService from "../../services/UserServices";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { mockOrganisation } from "../../mockData/userMock";
+import { AdressInputEnum } from "../../enums/Enums";
 
 export default function Organisation() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<UserModel[]>([]);
+  const [user] = useLocalStorage("user", null);
+
+  const [organisationen, setOrganisationen] = useState<UserModel[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
 
   const navigateToDetail = (user: UserModel) => {
     return navigate(`/organisation/detail/${user.id}`, {
@@ -21,25 +25,52 @@ export default function Organisation() {
   };
 
   useEffect(() => {
-    userService
-      .getOrganisationen()
-      .then((response) => {
-        setUser(response.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Fehler beim Laden der Daten:", error);
-        setError("Fehler beim Laden der Daten");
-        setLoading(false);
-      });
+    if (user.id !== 3000) {
+      userService
+        .getOrganisationen()
+        .then((response) => {
+          setOrganisationen(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          setLoading(false);
+        });
+    } else {
+      const shape: GeoJsonFeature = {
+        geometry: {
+          coordinates: mockOrganisation.shape.geometry.coordinates,
+          type: "Point",
+        },
+        type: "Feature",
+        properties: {},
+      };
+      setOrganisationen([
+        {
+          id: mockOrganisation.id,
+          rolle: mockOrganisation.rolle,
+          login: mockOrganisation.login,
+          email: mockOrganisation.email,
+          password: mockOrganisation.password,
+          name: mockOrganisation.name,
+          telefon: mockOrganisation.telefon,
+          webseite: mockOrganisation.webseite,
+          addresseInput: AdressInputEnum.Manual,
+          strasse: mockOrganisation.strasse,
+          hausnummer: mockOrganisation.hausnummer,
+          plz: mockOrganisation.plz,
+          ort: mockOrganisation.ort,
+          shape: shape,
+          radius:
+            mockOrganisation.radius === null ? 0 : mockOrganisation.radius,
+          beschreibung: mockOrganisation.beschreibung,
+        },
+      ]);
+      setLoading(false);
+    }
   }, []);
 
   if (loading) {
     return <Spinner animation="border" />;
-  }
-
-  if (error) {
-    return <Alert variant="danger">{error}</Alert>;
   }
 
   return (
@@ -48,8 +79,8 @@ export default function Organisation() {
       <div className="body">
         <h5 style={{ marginTop: 30 }}>{t("organisation.overview.title")}</h5>
         <div>
-          {user.length > 0 &&
-            user.map((user) => (
+          {organisationen.length > 0 &&
+            organisationen.map((user) => (
               <Card
                 key={user.id}
                 className="custom-card"

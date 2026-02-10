@@ -146,9 +146,14 @@ export default function RessourceDetailPage() {
                   {ressource.plz} {ressource.ort}
                 </div>
                 <div>
-                  <PiMapPinArea
-                    style={{ marginLeft: 100, color: "#00e7ff" }}
-                    size={30}
+                  <img
+                    src={require("../../icons/marker-icon.png")}
+                    alt="Ressource"
+                    className="map-marker"
+                    width={30}
+                    height={30}
+                    title={t("button.karte.anzeigen")}
+                    style={{ marginLeft: 100, cursor: "pointer" }}
                     onClick={() => {
                       setIsShowMap(!isShowMap);
                       setTimeout(() => {

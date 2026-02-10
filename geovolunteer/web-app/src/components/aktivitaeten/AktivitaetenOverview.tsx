@@ -1,14 +1,7 @@
 import { t } from "i18next";
 import { Header } from "../header/Header";
 import { Footer } from "../footer/Footer";
-import {
-  Alert,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Spinner,
-} from "react-bootstrap";
+import { Card, CardBody, CardHeader, Col, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { BsHeartPulse } from "react-icons/bs";
 import { useEffect, useRef, useState } from "react";
@@ -16,7 +9,7 @@ import aktivitaetService from "../../services/AktivitaetService";
 import { AktivitaetModel } from "../../types/Types";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
-import StatusIndicator, { aktivitaetStatus } from "../../utils/Utils";
+import StatusIndicator from "../../utils/Utils";
 
 export default function AktivitaetenOverview() {
   const navigate = useNavigate();

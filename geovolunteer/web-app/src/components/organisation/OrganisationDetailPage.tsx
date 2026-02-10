@@ -92,9 +92,14 @@ export default function OrganisationDetailPage() {
                 </div>
                 <div>
                   {organisation.plz} {organisation.ort}{" "}
-                  <PiMapPinArea
-                    style={{ marginLeft: 100, color: "#00e7ff" }}
-                    size={30}
+                  <img
+                    src={require("../../icons/marker-icon.png")}
+                    alt="Organisation"
+                    className="map-marker"
+                    width={30}
+                    height={30}
+                    title={t("button.karte.anzeigen")}
+                    style={{ marginLeft: 100, cursor: "pointer" }}
                     onClick={() => {
                       setIsShowMap(!isShowMap);
                       setTimeout(() => {

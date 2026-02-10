@@ -6,7 +6,7 @@ export const mockUser = {
   freiwillige: true,
   geburtsDatum: "1994-09-27",
   hausnummer: "13",
-  id: 30,
+  id: 3000,
   land: null,
   login: "Maya",
   nachname: "Ertl",
@@ -31,3 +31,38 @@ export const mockUser = {
   vorname: "Maya",
   webseite: null
 };
+
+export const mockOrganisation = {
+  active:true, 
+  beschreibung:"Das Rote Kreuz Oberösterreich engagiert sich im Rettungsdienst, der Sozialarbeit und der Freiwilligenkoordination.",
+  einheit: null,
+  email:"marketing@o.roteskreuz.at",
+  freiwillige: false,
+  geburtsDatum: null,
+  hausnummer: "28",
+  id:2,
+  land:null,
+  login: "kreuz",
+  nachname: null,
+  name: "Österreichisches Rotes Kreuz",
+  organisation: true,
+  ort: "Linz",
+  password: "aaa",
+  plz: "4020",
+  radius: null,
+  rolle: "ORGANISATION",
+  shape: {
+    type: "Feature", 
+    geometry: {
+      type: "Point", 
+      coordinates: [14.2990243, 48.3046134]}, 
+      properties: {}},
+  strasse: "Körnerstraße",
+  telefon: "+43 732 7644",
+  verfuegbarBisDatum: null,
+  verfuegbarBisZeit: null,
+  verfuegbarVonDatum: null,
+  verfuegbarVonZeit: null,
+  vorname: null,
+  webseite: "https://www.roteskreuz.at/oberoesterreich"
+}

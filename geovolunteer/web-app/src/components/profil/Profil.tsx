@@ -17,6 +17,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import MapEditComponent from "../karte/MapEditComponent";
+import { mockUser } from "../../mockData/userMock";
 
 interface FormularResult {
   values: UserModel;
@@ -42,7 +43,7 @@ export default function Profil() {
   ];
 
   useEffect(() => {
-    if (user.id !== undefined) {
+    if (user.id !== undefined && user.id !== 3000) {
       userService.get(user.id).then((response) => {
         var benutzer = response.data;
         setInitialValues({
@@ -81,6 +82,42 @@ export default function Profil() {
           setLatitude(lat);
           setLongitude(lng);
         }
+      });
+    } else {
+      const shape: GeoJsonFeature = {
+        geometry: {
+          coordinates: mockUser.shape.geometry.coordinates,
+          type: "Point",
+        },
+        type: "Feature",
+        properties: {},
+      };
+      setInitialValues({
+        id: mockUser.id,
+        rolle: mockUser.rolle,
+        login: mockUser.login,
+        password: mockUser.password,
+        email: mockUser.email,
+        telefon: mockUser.telefon,
+        addresseInput: AdressInputEnum.Manual,
+        strasse: mockUser.strasse,
+        hausnummer: mockUser.hausnummer,
+        plz: mockUser.plz,
+        ort: mockUser.ort,
+        shape: shape,
+        radius: mockUser.radius === null ? 0 : mockUser.radius,
+        einheit:
+          mockUser.einheit == null
+            ? einheitOptions.find((e) => e.value === "M")?.value
+            : mockUser.einheit,
+        beschreibung: mockUser.beschreibung,
+        vorname: mockUser.vorname,
+        nachname: mockUser.nachname,
+        geburtsDatum: mockUser.geburtsDatum,
+        verfuegbarVonDatum: mockUser.verfuegbarVonDatum,
+        verfuegbarBisDatum: mockUser.verfuegbarBisDatum,
+        verfuegbarVonZeit: mockUser.verfuegbarVonZeit,
+        verfuegbarBisZeit: mockUser.verfuegbarBisZeit,
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

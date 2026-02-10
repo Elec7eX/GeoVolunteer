@@ -375,3 +375,13 @@ input.error {
   opacity: 1;
   color: #93c5fd;
 }
+
+.map-marker {
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.map-marker:hover {
+  transform: scale(1.15);
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.4));
+}

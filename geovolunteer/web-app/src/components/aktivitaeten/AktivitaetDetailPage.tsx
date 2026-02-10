@@ -15,6 +15,7 @@ import { UserType } from "../../enums/Enums";
 import { BsHeartPulse } from "react-icons/bs";
 import { Feature, Geometry } from "geojson";
 import MapComponent from "../karte/MapComponent";
+import { Icon } from "leaflet";
 
 export default function AktivitaetDetailPage() {
   const location = useLocation();
@@ -146,7 +147,7 @@ export default function AktivitaetDetailPage() {
                               `/aktivitäten/bearbeiten/${aktivitaet.id}`,
                               {
                                 state: { aktivitaet },
-                              }
+                              },
                             )
                           }
                         />
@@ -290,9 +291,14 @@ export default function AktivitaetDetailPage() {
                     </>
                   )}
                 <div>
-                  <PiMapPinArea
-                    style={{ marginLeft: 100, color: "#00e7ff" }}
-                    size={30}
+                  <img
+                    src={require("../../icons/marker-icon.png")}
+                    alt="Aktivitaet"
+                    className="map-marker"
+                    width={30}
+                    height={30}
+                    title={t("button.karte.anzeigen")}
+                    style={{ marginLeft: 100, cursor: "pointer" }}
                     onClick={() => {
                       setIsShowMap(!isShowMap);
                       setTimeout(() => {

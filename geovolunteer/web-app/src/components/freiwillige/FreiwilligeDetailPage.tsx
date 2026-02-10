@@ -135,9 +135,14 @@ export default function FreiwilligeDetailPage() {
               <div>
                 {t("profil.verfuegbar.umkreis")} {freiwillige.radius}
                 {freiwillige.einheit === "M" ? "m" : "km"}
-                <PiMapPinArea
-                  style={{ marginLeft: 100, color: "#00e7ff" }}
-                  size={30}
+                <img
+                  src={require("../../icons/marker-icon.png")}
+                  alt="Freiwillige"
+                  className="map-marker"
+                  width={30}
+                  height={30}
+                  title={t("button.karte.anzeigen")}
+                  style={{ marginLeft: 100, cursor: "pointer" }}
                   onClick={() => {
                     setIsShowMap(!isShowMap);
                     setTimeout(() => {

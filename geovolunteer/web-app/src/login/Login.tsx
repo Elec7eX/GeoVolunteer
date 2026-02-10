@@ -8,7 +8,6 @@ import { Registration } from "./Registration";
 import userService from "../services/UserServices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { mockUser } from "../mockData/userMock";
-import { center } from "@turf/turf";
 
 export type LoginType = {
   login?: string;
@@ -64,8 +63,10 @@ export function Login() {
     <>
       {initialValues && (
         <div className="login">
+          <h1 style={{ fontSize: 55, textAlign: "center", marginBottom: 75 }}>
+            {t("home.title")}
+          </h1>
           <div className="login-card">
-            <h1 style={{ textAlign: "center" }}>{t("home.title")}</h1>
             {!isRegistrationPage && (
               <Formik
                 initialValues={initialValues}

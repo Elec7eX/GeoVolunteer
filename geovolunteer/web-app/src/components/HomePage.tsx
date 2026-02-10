@@ -6,8 +6,8 @@ import AktionsRadius from "./statistik/AktionsRadius";
 import OrganisationenDistanz from "./statistik/OrganisationenDistanz";
 import { Card, CardHeader, Col, CardBody } from "react-bootstrap";
 import { BsHeartPulse } from "react-icons/bs";
-import { UserType } from "../enums/Enums";
-import StatusIndicator, { aktivitaetStatus } from "../utils/Utils";
+import { AdressInputEnum, UserType } from "../enums/Enums";
+import StatusIndicator from "../utils/Utils";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocalStorage } from "../hooks/useLocalStorage";
@@ -25,10 +25,13 @@ export default function HomePage() {
   >([]);
 
   useEffect(() => {
-    if (user.rolle !== UserType.ADMIN) {
-      aktivitaetService.getLaufendeAktivitaeten().then((response) => {
-        setLaufendeAktivitaeten(response.data);
-      });
+    if (user.id !== 3000) {
+      aktivitaetService
+        .getLaufendeAktivitaeten()
+        .then((response) => {
+          setLaufendeAktivitaeten(response.data);
+        })
+        .catch((error) => {});
     }
   }, []);
 
