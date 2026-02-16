@@ -18,8 +18,11 @@ import {
 import statistikService from "../../services/StatistikService";
 import { AktionsradiusVerlauf, RadiusStats } from "../../types/Types";
 import { t } from "i18next";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { radiusMock, verlaufMock } from "../../mockData/statistikMock";
 
 export default function AktionsRadius() {
+  const [user] = useLocalStorage("user", null);
   const [showRadius, setShowRadius] = useState(false);
   const [radiusStats, setRadiusStats] = useState<RadiusStats>({
     avg: 0,
@@ -31,19 +34,29 @@ export default function AktionsRadius() {
   const [showVerlauf, setShowVerlauf] = useState(false);
 
   useEffect(() => {
-    statistikService.getAktionsradius().then((resp) => {
-      setRadiusStats(resp.data);
-    });
+    if (user.id !== 3000) {
+      statistikService.getAktionsradius().then((resp) => {
+        setRadiusStats(resp.data);
+      });
 
-    statistikService.getAktionsradiusVerlauf().then((resp) => {
-      const chartData = resp.data.map((d, i) => ({
+      statistikService.getAktionsradiusVerlauf().then((resp) => {
+        const chartData = resp.data.map((d, i) => ({
+          index: i + 1,
+          name: d.name,
+          distanz: d.distanz,
+        }));
+        setVerlaufStats(chartData);
+      });
+    } else {
+      setRadiusStats(radiusMock);
+      const charData = verlaufMock.map((d, i) => ({
         index: i + 1,
         name: d.name,
         distanz: d.distanz,
       }));
-      setVerlaufStats(chartData);
-    });
-  }, []);
+      setVerlaufStats(charData);
+    }
+  }, [user.id]);
 
   return (
     <>

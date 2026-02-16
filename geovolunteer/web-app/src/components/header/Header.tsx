@@ -33,7 +33,11 @@ export const Header = (props: Props) => {
   const [user] = useLocalStorage("user", null);
 
   const handleLogout = () => {
-    userService.logout().then(() => _logout());
+    if (user.id !== 3000) {
+      userService.logout().then(() => _logout());
+    } else {
+      _logout();
+    }
   };
 
   return (

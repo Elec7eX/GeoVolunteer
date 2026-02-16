@@ -121,7 +121,7 @@ export interface AktionsradiusVerlauf {
 export interface Organisation {
   id: number;
   name: string;
-  distance: number;
+  distanz: number;
 }
 
 export interface OrganisationenDistanz {

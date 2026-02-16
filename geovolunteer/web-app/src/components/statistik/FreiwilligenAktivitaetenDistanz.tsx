@@ -12,8 +12,10 @@ import { FreiwilligenAktivitaetenType } from "../../types/Types";
 import statistikService from "../../services/StatistikService";
 import { t } from "i18next";
 import { Card, Collapse } from "react-bootstrap";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 export default function FreiwilligenAktivitaetenDistanz() {
+  const [user] = useLocalStorage("user", null);
   const [data, setData] = useState<FreiwilligenAktivitaetenType[]>([]);
   const [show, setShow] = useState(false);
 
@@ -23,25 +25,29 @@ export default function FreiwilligenAktivitaetenDistanz() {
   const [showRadius, setShowRadius] = useState(false);
 
   useEffect(() => {
-    statistikService.getFreiwilligenAktivitaetenDistanz().then((resp) => {
-      const histogramData = Object.entries(resp.data).map(
-        ([distanz, count]) => ({
-          distanz,
-          count,
-        }),
-      );
-      setData(histogramData);
-    });
-    statistikService.getFreiwilligenRadiusAktivitaetenDistanz().then((resp) => {
-      const histogramData = Object.entries(resp.data).map(
-        ([distanz, count]) => ({
-          distanz,
-          count,
-        }),
-      );
-      setRadiusData(histogramData);
-    });
-  }, []);
+    if (user.id !== 3000) {
+      statistikService.getFreiwilligenAktivitaetenDistanz().then((resp) => {
+        const histogramData = Object.entries(resp.data).map(
+          ([distanz, count]) => ({
+            distanz,
+            count,
+          }),
+        );
+        setData(histogramData);
+      });
+      statistikService
+        .getFreiwilligenRadiusAktivitaetenDistanz()
+        .then((resp) => {
+          const histogramData = Object.entries(resp.data).map(
+            ([distanz, count]) => ({
+              distanz,
+              count,
+            }),
+          );
+          setRadiusData(histogramData);
+        });
+    }
+  }, [user.id]);
   return (
     <>
       <Card className="custom-card mb-3">

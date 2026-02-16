@@ -11,10 +11,12 @@ import { FreiwilligenDistanzType } from "../../types/Types";
 import statistikService from "../../services/StatistikService";
 import { t } from "i18next";
 import { Card, Collapse, OverlayTrigger, Popover } from "react-bootstrap";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 const COLORS = ["#4CAF50", "#FFC107", "#F44336"];
 
 export default function FreiwilligenDistanz() {
+  const [user] = useLocalStorage("user", null);
   const [show, setShow] = useState(false);
   const [stats, setStats] = useState<FreiwilligenDistanzType>({
     aUnter5: 0,
@@ -31,10 +33,12 @@ export default function FreiwilligenDistanz() {
     : [];
 
   useEffect(() => {
-    statistikService
-      .getFreiwilligenDistanz()
-      .then((resp) => setStats(resp.data));
-  }, []);
+    if (user.id !== 3000) {
+      statistikService
+        .getFreiwilligenDistanz()
+        .then((resp) => setStats(resp.data));
+    }
+  }, [user.id]);
 
   return (
     <>

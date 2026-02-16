@@ -5,8 +5,7 @@ import { Card, Col, Row } from "react-bootstrap";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { UserModel, UserType } from "../../types/Types";
-import { VerticalDivider } from "../../utils/Utils";
-import { PiMapPinArea } from "react-icons/pi";
+import { Link, VerticalDivider } from "../../utils/Utils";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CiGlobe } from "react-icons/ci";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
@@ -59,7 +58,9 @@ export default function OrganisationDetailPage() {
               </Col>
               <Col>
                 <Card.Title>{organisation.name}</Card.Title>
-                <Card.Text>{organisation.webseite}</Card.Text>
+                <Card.Text>
+                  <Link link={organisation.webseite} />
+                </Card.Text>
                 {user.rolle === UserType.ADMIN && (
                   <Row style={{ textAlign: "end" }}>
                     <Col>

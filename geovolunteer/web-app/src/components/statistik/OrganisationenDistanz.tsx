@@ -10,20 +10,28 @@ import {
   Popover,
 } from "react-bootstrap";
 import { t } from "i18next";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { organisationDistanzMock } from "../../mockData/statistikMock";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AA66CC"];
 
 export default function OrganisationenDistanz() {
+  const [user] = useLocalStorage("user", null);
   const [data, setData] = useState<any[]>([]);
   const [avg, setAvg] = useState<number>(0);
   const [showStatistik, setShowStatistik] = useState<boolean>(false);
 
   useEffect(() => {
-    statistikService.getOrganisationenDistanz().then((res) => {
-      setData(res.data.organisationen);
-      setAvg(res.data.durchschnittsDistanz);
-    });
-  }, []);
+    if (user.id !== 3000) {
+      statistikService.getOrganisationenDistanz().then((res) => {
+        setData(res.data.organisationen);
+        setAvg(res.data.durchschnittsDistanz);
+      });
+    } else {
+      setData(organisationDistanzMock.organisationen);
+      setAvg(organisationDistanzMock.durchschnittsDistanz);
+    }
+  }, [user.id]);
 
   return (
     <Card className="custom-card mb-3">

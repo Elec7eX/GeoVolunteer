@@ -1,5 +1,17 @@
 import { AktivitaetModel } from "../types/Types";
 
+type LinkType = {
+  link: string | undefined;
+};
+
+export const Link = (props: LinkType) => {
+  return (
+    <a href={props.link} target="_blank" rel="noopener noreferrer">
+      {props.link}
+    </a>
+  );
+};
+
 export const VerticalDivider = ({ height = "50px" }) => {
   return (
     <div

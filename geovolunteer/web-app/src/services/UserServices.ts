@@ -11,6 +11,10 @@ const logout = () => {
   return http.post(BASE_URL + "/logout");
 };
 
+const getPing = () => {
+  return http.get<UserModel>(BASE_URL + "/"); 
+};
+
 const create = (data: UserModel) => {
   return http.post<UserModel>(BASE_URL +"/create", data);
 };
@@ -54,6 +58,7 @@ const findByTitle = (title: string) => {
 const userService = {
   login,
   logout,
+  getPing,
   getAllBenutzer,
   getFreiwillige,
   getAllFreiwillige,

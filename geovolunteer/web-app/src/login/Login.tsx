@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Button, Col, Form, InputGroup, Row } from "react-bootstrap";
 import { Form as FormikForm, Formik, FormikHelpers } from "formik";
@@ -26,26 +26,39 @@ export function Login() {
   const [isRegistrationPage, setIsRegistrationPage] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [serverOnline, setServerOnline] = useState(true);
+
+  const didRun = useRef(false);
+
   useEffect(() => {
+    if (didRun.current) return;
+    didRun.current = true;
+
     setInitialValues({
       login: "",
       password: "",
     });
+
+    userService
+      .getPing()
+      .then(() => setServerOnline(true))
+      .catch(() => {
+        setServerOnline(false);
+        alert(t("alert.demo.login"));
+      });
   }, []);
 
   const handleSubmit = async (result: FormularResult) => {
     const { login, password } = result.values;
     if (login !== undefined && password !== undefined) {
-      await userService
-        .login({ login, password })
-        .then((response) => {
-          _login(response.data);
-        })
-        .catch((error) => {
-          alert("Benutzer existiert nicht! Statische Benutzer wird verwendet.");
-          _login(mockUser);
-        });
+      await userService.login({ login, password }).then((response) => {
+        _login(response.data);
+      });
     }
+  };
+
+  const handleDemoLogin = () => {
+    _login(mockUser);
   };
 
   function validationLogin(): Yup.ObjectSchema<any> {
@@ -130,15 +143,26 @@ export function Login() {
                     </Form.Group>
                     <Col>
                       <Row className="mb-3">
-                        <Button
-                          className="shadow"
-                          id="save"
-                          variant="primary"
-                          type="submit"
-                          disabled={isSubmitting}
-                        >
-                          {t("button.login")}
-                        </Button>
+                        {serverOnline ? (
+                          <Button
+                            className="shadow"
+                            id="save"
+                            variant="primary"
+                            type="submit"
+                            disabled={isSubmitting}
+                          >
+                            {t("button.login")}
+                          </Button>
+                        ) : (
+                          <Button
+                            className="shadow"
+                            id="save"
+                            variant="primary"
+                            onClick={handleDemoLogin}
+                          >
+                            {t("button.login.demo")}
+                          </Button>
+                        )}
                       </Row>
                     </Col>
                     <Col>

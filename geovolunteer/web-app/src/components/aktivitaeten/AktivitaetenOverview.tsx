@@ -10,6 +10,7 @@ import { AktivitaetModel } from "../../types/Types";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
 import StatusIndicator from "../../utils/Utils";
+import { mockLaufendAktivitaet } from "../../mockData/aktivitaetMock";
 
 export default function AktivitaetenOverview() {
   const navigate = useNavigate();
@@ -30,52 +31,57 @@ export default function AktivitaetenOverview() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (!initialized.current) {
-      initialized.current = true;
-      aktivitaetService
-        .getLaufendeAktivitaeten()
-        .then((response) => {
-          setLaufendeAktivitaeten(response.data);
-          setLoading(false);
-          aktivitaetService
-            .getBevorstehendeAktivitaeten()
-            .then((resp) => {
-              setBevorstehendeAktivitaeten(resp.data);
-              setLoading(false);
-              aktivitaetService
-                .getAbgeschlosseneAktivitaeten()
-                .then((resp) => {
-                  setAbgeschlosseneAktivitaeten(resp.data);
-                  setLoading(false);
-                  if (user.rolle === UserType.FREIWILLIGE) {
-                    aktivitaetService
-                      .getAll()
-                      .then((resp) => {
-                        setAktivitaeten(resp.data);
-                        setLoading(false);
-                      })
-                      .catch((error) => {
-                        console.error("Fehler beim Laden der Daten:", error);
-                        setLoading(false);
-                      });
-                  }
-                })
-                .catch((error) => {
-                  console.error("Fehler beim Laden der Daten:", error);
-                  setLoading(false);
-                });
-            })
-            .catch((error) => {
-              console.error("Fehler beim Laden der Daten:", error);
-              setLoading(false);
-            });
-        })
-        .catch((error) => {
-          console.error("Fehler beim Laden der Daten:", error);
-          setLoading(false);
-        });
+    if (user.id !== 3000) {
+      if (!initialized.current) {
+        initialized.current = true;
+        aktivitaetService
+          .getLaufendeAktivitaeten()
+          .then((response) => {
+            setLaufendeAktivitaeten(response.data);
+            setLoading(false);
+            aktivitaetService
+              .getBevorstehendeAktivitaeten()
+              .then((resp) => {
+                setBevorstehendeAktivitaeten(resp.data);
+                setLoading(false);
+                aktivitaetService
+                  .getAbgeschlosseneAktivitaeten()
+                  .then((resp) => {
+                    setAbgeschlosseneAktivitaeten(resp.data);
+                    setLoading(false);
+                    if (user.rolle === UserType.FREIWILLIGE) {
+                      aktivitaetService
+                        .getAll()
+                        .then((resp) => {
+                          setAktivitaeten(resp.data);
+                          setLoading(false);
+                        })
+                        .catch((error) => {
+                          console.error("Fehler beim Laden der Daten:", error);
+                          setLoading(false);
+                        });
+                    }
+                  })
+                  .catch((error) => {
+                    console.error("Fehler beim Laden der Daten:", error);
+                    setLoading(false);
+                  });
+              })
+              .catch((error) => {
+                console.error("Fehler beim Laden der Daten:", error);
+                setLoading(false);
+              });
+          })
+          .catch((error) => {
+            console.error("Fehler beim Laden der Daten:", error);
+            setLoading(false);
+          });
+      }
+    } else {
+      setLaufendeAktivitaeten([mockLaufendAktivitaet]);
+      setLoading(false);
     }
-  }, [user.rolle]);
+  }, [user.id, user.rolle]);
 
   if (loading) {
     return <Spinner animation="border" />;

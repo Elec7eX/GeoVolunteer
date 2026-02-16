@@ -22,7 +22,7 @@ import { GeoJsonFeature } from "../../types/Types";
 import { Feature, Geometry } from "geojson";
 import FitBoundsOnShape from "./FitBoundsOnShapeProps";
 
-interface MapComponentProps {
+interface MapEditComponentAktivitaetProps {
   address?: string | null;
   position?: [number, number] | null;
   zoom?: number | null;
@@ -39,7 +39,7 @@ const customIcon = new Icon({
   iconSize: [38, 38],
 });
 
-const MapComponent: React.FC<MapComponentProps> = ({
+const MapEditComponentAktivitaet: React.FC<MapEditComponentAktivitaetProps> = ({
   position,
   zoom,
   geoJsonData,
@@ -234,10 +234,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
             }}
             draw={drawOptions}
           />
-        </FeatureGroup>
-        {geoJsonData && (
-          <>
-            {!markerWithRadiusMode && (
+          {geoJsonData && (
+            <>
               <GeoJSON
                 data={geoJsonData as any}
                 style={{ color: "red" }}
@@ -252,29 +250,29 @@ const MapComponent: React.FC<MapComponentProps> = ({
                   }
                 }}
               />
-            )}
-            {markerWithRadiusMode &&
-              geoJsonData &&
-              geoJsonData.type === "Feature" &&
-              geoJsonData.geometry.type === "Point" && (
-                <Circle
-                  key={`radius-${effectiveRadius}`} // zwingt Leaflet zum Neurendern bei Radiusänderung
-                  center={[
-                    (geoJsonData.geometry.coordinates as number[])[1],
-                    (geoJsonData.geometry.coordinates as number[])[0],
-                  ]}
-                  radius={radius || 0}
-                  pathOptions={{ color: "blue", fillOpacity: 0.1 }}
-                />
+              {markerWithRadiusMode &&
+                geoJsonData &&
+                geoJsonData.type === "Feature" &&
+                geoJsonData.geometry.type === "Point" && (
+                  <Circle
+                    key={`radius-${effectiveRadius}`} // zwingt Leaflet zum Neurendern bei Radiusänderung
+                    center={[
+                      (geoJsonData.geometry.coordinates as number[])[1],
+                      (geoJsonData.geometry.coordinates as number[])[0],
+                    ]}
+                    radius={radius || 0}
+                    pathOptions={{ color: "blue", fillOpacity: 0.1 }}
+                  />
+                )}
+              {geoJsonData && fitBoundsOnShape && (
+                <FitBoundsOnShape geoJsonData={geoJsonData} />
               )}
-            {geoJsonData && fitBoundsOnShape && (
-              <FitBoundsOnShape geoJsonData={geoJsonData} />
-            )}
-          </>
-        )}
+            </>
+          )}
+        </FeatureGroup>
       </MapContainer>
     </>
   );
 };
 
-export default MapComponent;
+export default MapEditComponentAktivitaet;

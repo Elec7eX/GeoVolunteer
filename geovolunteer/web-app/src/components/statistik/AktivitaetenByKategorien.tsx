@@ -16,6 +16,8 @@ import {
 } from "../../types/Types";
 import statistikService from "../../services/StatistikService";
 import { t } from "i18next";
+import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { statistikKategorieMock } from "../../mockData/statistikMock";
 
 export const KategorieColors: Record<Kategorie, string> = {
   [Kategorie.SOZIALES]: "#0d6efd",
@@ -28,28 +30,37 @@ export const KategorieColors: Record<Kategorie, string> = {
 };
 
 export default function AktivitaetenByKategorien() {
+  const [user] = useLocalStorage("user", null);
   const [data, setData] = useState<AktivitaetenByKategorienStatistik[]>([]);
   const [statistik1, setStatistik1] = useState(false);
 
   const buildCompleteCategoryStatistics = (
     backendData: AktivitaetenByKategorienStatistik[],
   ): AktivitaetenByKategorienStatistik[] => {
-    return Object.values(Kategorie).map((kategorie) => {
-      const found = backendData.find((d) => d.kategorie === kategorie);
+    if (user.id !== 3000) {
+      return Object.values(Kategorie).map((kategorie) => {
+        const found = backendData.find((d) => d.kategorie === kategorie);
 
-      return {
-        kategorie: kategorie,
-        count: found ? found.count : 0,
-      };
-    });
+        return {
+          kategorie: kategorie,
+          count: found ? found.count : 0,
+        };
+      });
+    } else {
+      return statistikKategorieMock;
+    }
   };
 
   useEffect(() => {
-    statistikService.getAktivitaetenByKategorien().then((resp) => {
-      const completedData = buildCompleteCategoryStatistics(resp.data);
-      setData(completedData);
-    });
-  }, []);
+    if (user.id !== 3000) {
+      statistikService.getAktivitaetenByKategorien().then((resp) => {
+        const completedData = buildCompleteCategoryStatistics(resp.data);
+        setData(completedData);
+      });
+    } else {
+      setData(buildCompleteCategoryStatistics);
+    }
+  }, [user.id]);
 
   return (
     <>

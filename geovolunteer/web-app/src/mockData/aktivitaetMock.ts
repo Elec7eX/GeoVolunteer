@@ -1,7 +1,7 @@
 import { AdressInputEnum, UserType } from "../enums/Enums";
-import { Kategorie } from "../types/Types";
+import { AktivitaetModel, Kategorie } from "../types/Types";
 
-export const aktivitaet_baum = [
+export const mockLaufendAktivitaet: AktivitaetModel = 
   {
     id: 7,
     name: "Baumpflanzaktion Frühling",
@@ -16,7 +16,6 @@ export const aktivitaet_baum = [
     teilnehmeranzahl: 15,
     transport: "Öffi",
     verpflegung: "Snacks & Wasser",
-    sicherheitsanforderungen: "Feste Schuhe, Gartenhandschuhe",
     strasse: "Parkstraße",
     hausnummer: "9",
     plz: "4020",
@@ -24,14 +23,12 @@ export const aktivitaet_baum = [
     vorname: "Florian",
     nachname: "Maier",
     telefon: "+43 732 444555",
-
     organisation: {
       id: 3,
       name: "Linzer Baumpatenschaft",
       rolle: UserType.ORGANISATION,
       login: "baum",
       password: "aaa",
-      active: false,
       email: "info@mag.linz.at",
       telefon: "+43 732 70700",
       strasse: "Hauptstraße",
@@ -44,12 +41,11 @@ export const aktivitaet_baum = [
         geometry: {
           type: "Point",
           coordinates: [14.2830434, 48.3097595]
-        }
+        },
+        properties: {}
       }
     },
-
     ressource: {
-      id: 7,
       name: "Pflanzwerkzeug",
       beschreibung: "Werkzeuge für Baumpflanzaktionen.",
       addresseInput: AdressInputEnum.Map,
@@ -67,32 +63,18 @@ export const aktivitaet_baum = [
       shape: {
         geometry: {
           coordinates: [14.2895086, 48.2959758],
-          crs: {
-            propertis: {
-                name: "EPSG:4326"
-            },
-            type: "name"
-          },
           type: "Point",
         },
-        propertis: {},
-        type: "Feature"
+        type: "Feature",
+        properties: {}
       },
     },
-
     shape: {
       geometry: {
         coordinates: [14.2643224, 48.2702525],
-        crs: {
-            propertis: {
-                name: "EPSG:4326"
-            },
-            type: "name"
-        },
         type: "Point",
       },
-      propertis: {},
-      type: "Feature"
+      type: "Feature",
+      properties: {}
     },
-  }
-];
+  };

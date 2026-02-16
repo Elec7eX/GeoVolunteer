@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import { AktivitaetModel, KategorieLabels } from "../../types/Types";
 import aktivitaetService from "../../services/AktivitaetService";
 import StatusIndicator, { VerticalDivider } from "../../utils/Utils";
-import { PiMapPinArea } from "react-icons/pi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FiEdit } from "react-icons/fi";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
@@ -15,7 +14,7 @@ import { UserType } from "../../enums/Enums";
 import { BsHeartPulse } from "react-icons/bs";
 import { Feature, Geometry } from "geojson";
 import MapComponent from "../karte/MapComponent";
-import { Icon } from "leaflet";
+import { mockLaufendAktivitaet } from "../../mockData/aktivitaetMock";
 
 export default function AktivitaetDetailPage() {
   const location = useLocation();
@@ -34,23 +33,28 @@ export default function AktivitaetDetailPage() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (aktivitaetFromState) {
-      setAktivitaet(aktivitaetFromState);
-      if (aktivitaetFromState.shape) {
-        setAktivitaetenShape(aktivitaetFromState.shape);
+    if (user.id !== 3000) {
+      if (aktivitaetFromState) {
+        setAktivitaet(aktivitaetFromState);
+        if (aktivitaetFromState.shape) {
+          setAktivitaetenShape(aktivitaetFromState.shape);
+        }
+      } else {
+        aktivitaetService
+          .getById(id!)
+          .then((resp) => {
+            setAktivitaet(resp.data);
+            if (resp.data.shape) {
+              setAktivitaetenShape(resp.data.shape);
+            }
+          })
+          .catch(() => alert("Fehler beim Laden der Daten"));
       }
     } else {
-      aktivitaetService
-        .getById(id!)
-        .then((resp) => {
-          setAktivitaet(resp.data);
-          if (resp.data.shape) {
-            setAktivitaetenShape(resp.data.shape);
-          }
-        })
-        .catch(() => alert("Fehler beim Laden der Daten"));
+      setAktivitaet(mockLaufendAktivitaet);
+      setAktivitaetenShape(mockLaufendAktivitaet.shape!);
     }
-  }, [id, aktivitaetFromState]);
+  }, [id, aktivitaetFromState, user.id]);
 
   const handleClose = () => setShow(!show);
 

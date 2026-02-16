@@ -27,6 +27,11 @@ public class BenutzerResource {
 	@Autowired
 	private BenutzerService service;
 
+	@GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Benutzer> getPing() {
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@PostMapping("/login")
 	public ResponseEntity<Benutzer> login(@RequestBody LoginType loginRequest) {
 		Benutzer benutzer = service.authenticate(loginRequest);

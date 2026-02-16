@@ -77,10 +77,13 @@ export default function MapOrganisation() {
   const [kategorieFilter, setKategorieFilter] = useState<{
     [key in Kategorie]: boolean;
   }>(
-    Object.values(Kategorie).reduce((acc, k) => {
-      acc[k] = true; // initial: alle sichtbar
-      return acc;
-    }, {} as { [key in Kategorie]: boolean })
+    Object.values(Kategorie).reduce(
+      (acc, k) => {
+        acc[k] = true; // initial - alle sichtbar
+        return acc;
+      },
+      {} as { [key in Kategorie]: boolean },
+    ),
   );
 
   const [aktivitaetenFilter, setAktivitaetenFilter] = useState<{
@@ -89,11 +92,11 @@ export default function MapOrganisation() {
 
   const [meinStandort, setMeinStandort] = useState<UserModel>();
   const [meineAktivitaeten, setMeineAktivitaeten] = useState<AktivitaetModel[]>(
-    []
+    [],
   );
   const [alleOrganistaionen, setAlleOrganisationen] = useState<UserModel[]>([]);
   const [alleAktivitaeten, setAlleAktivitaeten] = useState<AktivitaetModel[]>(
-    []
+    [],
   );
 
   const [activeTab, setActiveTab] = useState("filter");
@@ -134,47 +137,49 @@ export default function MapOrganisation() {
   }, [tools.routenplaner, tools.distanzberechnung]);
 
   useEffect(() => {
-    if (!initialized.current) {
-      if (UserType.FREIWILLIGE === user.rolle) {
-        initialized.current = true;
-        userService
-          .get(user.id)
-          .then((res) => {
-            if (res.data !== undefined) {
-              setMeinStandort(res.data);
-            }
-          })
-          .then(() => {
-            aktivitaetService
-              .getAktuelleAktivitaeten()
-              .then((res) => {
-                if (res.status === 200) {
-                  const aktivitaetenArray: AktivitaetModel[] = res.data.map(
-                    (aktivitaet: AktivitaetModel) => aktivitaet
-                  );
-                  setMeineAktivitaeten(aktivitaetenArray);
-                  const aktivitaetenMap: {
-                    [id: string]: AktivitaetFilterType;
-                  } = {};
+    if (user.id !== 3000) {
+      if (!initialized.current) {
+        if (UserType.FREIWILLIGE === user.rolle) {
+          initialized.current = true;
+          userService
+            .get(user.id)
+            .then((res) => {
+              if (res.data !== undefined) {
+                setMeinStandort(res.data);
+              }
+            })
+            .then(() => {
+              aktivitaetService
+                .getAktuelleAktivitaeten()
+                .then((res) => {
+                  if (res.status === 200) {
+                    const aktivitaetenArray: AktivitaetModel[] = res.data.map(
+                      (aktivitaet: AktivitaetModel) => aktivitaet,
+                    );
+                    setMeineAktivitaeten(aktivitaetenArray);
+                    const aktivitaetenMap: {
+                      [id: string]: AktivitaetFilterType;
+                    } = {};
 
-                  res.data.forEach((aktivitaet: AktivitaetModel) => {
-                    aktivitaetenMap[aktivitaet.id!] = {
-                      visible: true,
-                      expanded: false,
-                      ressource: true,
-                      organisation: true,
-                    };
-                  });
-                  setAktivitaetenFilter(aktivitaetenMap);
-                } else {
-                  console.log(
-                    "'Meine Aktivitäten konnte nicht geladen werden: Status - " +
-                      res.status
-                  );
-                }
-              })
-              .catch((error) => console.log(error));
-          });
+                    res.data.forEach((aktivitaet: AktivitaetModel) => {
+                      aktivitaetenMap[aktivitaet.id!] = {
+                        visible: true,
+                        expanded: false,
+                        ressource: true,
+                        organisation: true,
+                      };
+                    });
+                    setAktivitaetenFilter(aktivitaetenMap);
+                  } else {
+                    console.log(
+                      "'Meine Aktivitäten konnte nicht geladen werden: Status - " +
+                        res.status,
+                    );
+                  }
+                })
+                .catch((error) => console.log(error));
+            });
+        }
       }
     }
     const el = document.querySelector(".app");
@@ -198,7 +203,10 @@ export default function MapOrganisation() {
       // Polygon / MultiPolygon → Turf centroid
       const center = turf.centroid(meinStandort.shape);
       setCircleCenter(
-        L.latLng(center.geometry.coordinates[1], center.geometry.coordinates[0])
+        L.latLng(
+          center.geometry.coordinates[1],
+          center.geometry.coordinates[0],
+        ),
       );
     }
   }, [toolsRef.current.umkreis, meinStandort]);
@@ -310,7 +318,7 @@ export default function MapOrganisation() {
       circle = turf.circle(
         [circleCenter.lng, circleCenter.lat],
         radius / 1000,
-        { units: "kilometers" }
+        { units: "kilometers" },
       );
     }
 
@@ -326,7 +334,7 @@ export default function MapOrganisation() {
           break;
         case "Polygon":
           points = geom.coordinates[0].map((c: [number, number]) =>
-            turf.point(c)
+            turf.point(c),
           );
           break;
         case "MultiPolygon":
@@ -343,15 +351,15 @@ export default function MapOrganisation() {
       });
     };
     setFilteredMeineAktivitaeten(
-      meineAktivitaeten.filter((e) => isKategorieVisible(e))
+      meineAktivitaeten.filter((e) => isKategorieVisible(e)),
     );
     setFilteredAlleOrganisationen(
-      alleOrganistaionen.filter((e) => isInside(e.shape))
+      alleOrganistaionen.filter((e) => isInside(e.shape)),
     );
     setFilteredAlleAktivitaeten(
       tools.umkreis && circleCenter
         ? alleAktivitaeten.filter((e) => isInside(e.shape))
-        : alleAktivitaeten
+        : alleAktivitaeten,
     );
   }, [
     circleCenter,
@@ -365,7 +373,11 @@ export default function MapOrganisation() {
   ]);
 
   const updateFilter = (filterName: keyof FilterType) => {
-    if (filterName === "alleOrganisationen" && alleOrganistaionen.length < 1) {
+    if (
+      user.id !== 3000 &&
+      filterName === "alleOrganisationen" &&
+      alleOrganistaionen.length < 1
+    ) {
       userService.getOrganisationen().then((resp) => {
         if (resp.status === 200) {
           const organisationenShapes: UserModel[] = resp.data;
@@ -373,7 +385,11 @@ export default function MapOrganisation() {
         }
       });
     }
-    if (filterName === "alleAktivitaeten" && alleAktivitaeten.length < 1) {
+    if (
+      user.id !== 3000 &&
+      filterName === "alleAktivitaeten" &&
+      alleAktivitaeten.length < 1
+    ) {
       aktivitaetService.getAll().then((resp) => {
         if (resp.status === 200) {
           const aktivitaetenShapes: AktivitaetModel[] = resp.data;
@@ -450,7 +466,7 @@ export default function MapOrganisation() {
         acc[0] + lat,
         acc[1] + lng,
       ],
-      [0, 0]
+      [0, 0],
     );
 
     const count = coords.length;
@@ -467,7 +483,7 @@ export default function MapOrganisation() {
     setSelectedPoints((prev) => {
       // Prüfen, ob der Punkt schon gesetzt ist
       const isDuplicate = prev.some(
-        (p) => p.lat === latlng.lat && p.lng === latlng.lng
+        (p) => p.lat === latlng.lat && p.lng === latlng.lng,
       );
 
       if (isDuplicate) {
@@ -945,10 +961,13 @@ export default function MapOrganisation() {
                           variant="outline-secondary"
                           onClick={() =>
                             setKategorieFilter(
-                              Object.values(Kategorie).reduce((acc, k) => {
-                                acc[k] = true;
-                                return acc;
-                              }, {} as { [key in Kategorie]: boolean })
+                              Object.values(Kategorie).reduce(
+                                (acc, k) => {
+                                  acc[k] = true;
+                                  return acc;
+                                },
+                                {} as { [key in Kategorie]: boolean },
+                              ),
                             )
                           }
                         >
@@ -959,10 +978,13 @@ export default function MapOrganisation() {
                           variant="outline-secondary"
                           onClick={() =>
                             setKategorieFilter(
-                              Object.values(Kategorie).reduce((acc, k) => {
-                                acc[k] = false;
-                                return acc;
-                              }, {} as { [key in Kategorie]: boolean })
+                              Object.values(Kategorie).reduce(
+                                (acc, k) => {
+                                  acc[k] = false;
+                                  return acc;
+                                },
+                                {} as { [key in Kategorie]: boolean },
+                              ),
                             )
                           }
                         >
