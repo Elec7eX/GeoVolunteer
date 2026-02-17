@@ -25,7 +25,7 @@ export default function HomePage() {
   >([]);
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (user.id !== 3000 && user.rolle !== UserType.ADMIN) {
       aktivitaetService.getLaufendeAktivitaeten().then((response) => {
         setLaufendeAktivitaeten(response.data);
       });

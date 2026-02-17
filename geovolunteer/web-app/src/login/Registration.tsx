@@ -23,14 +23,13 @@ export function Registration(props: Props) {
   const { _login }: any = useAuth();
   const [initialValues, setInitialValues] = useState<UserModel>();
   const rollenOptionen = [
-    { value: "ADMIN", label: "Admin" },
     { value: "ORGANISATION", label: "Organisation" },
     { value: "FREIWILLIGE", label: "Freiwillige" },
   ];
 
   useEffect(() => {
     setInitialValues({
-      rolle: "ADMIN",
+      rolle: "FREIWILLIGE",
       login: "",
       email: "",
       password: "",

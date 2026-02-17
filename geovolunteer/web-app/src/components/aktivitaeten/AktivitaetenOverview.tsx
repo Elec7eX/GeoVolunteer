@@ -263,7 +263,7 @@ export default function AktivitaetenOverview() {
           </>
         )}
       </div>
-      <Footer displayAddAktivitaet />
+      <Footer />
     </>
   );
 }

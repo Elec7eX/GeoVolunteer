@@ -10,11 +10,7 @@ import { t } from "i18next";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
 
-type Props = {
-  displayAddAktivitaet?: boolean;
-};
-
-export const Footer = (props: Props) => {
+export const Footer = () => {
   const navigate = useNavigate();
   const [user] = useLocalStorage("user", null);
 
@@ -45,18 +41,17 @@ export const Footer = (props: Props) => {
                 </div>
               </Col>
             )}
-            {props.displayAddAktivitaet &&
-              user.rolle === UserType.ORGANISATION && (
-                <Col>
-                  <div>
-                    <GrAddCircle
-                      className="text-white custom-icon"
-                      onClick={() => navigate("/aktivitäten/erstellen")}
-                    />
-                    <div className="text-white">{t("footer.icon.neu")}</div>
-                  </div>
-                </Col>
-              )}
+            {user.rolle === UserType.ORGANISATION && (
+              <Col>
+                <div>
+                  <GrAddCircle
+                    className="text-white custom-icon"
+                    onClick={() => navigate("/aktivitäten/erstellen")}
+                  />
+                  <div className="text-white">{t("footer.icon.neu")}</div>
+                </div>
+              </Col>
+            )}
             {(user.rolle === UserType.ORGANISATION ||
               user.rolle === UserType.FREIWILLIGE) && (
               <Col className="text-center">
