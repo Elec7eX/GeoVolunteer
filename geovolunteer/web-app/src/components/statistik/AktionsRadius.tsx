@@ -40,20 +40,38 @@ export default function AktionsRadius() {
       });
 
       statistikService.getAktionsradiusVerlauf().then((resp) => {
-        const chartData = resp.data.map((d, i) => ({
-          index: i + 1,
-          name: d.name,
-          distanz: d.distanz,
-        }));
+        const chartData = resp.data.map((d) => {
+          const date = new Date(d.datum);
+          return {
+            datum: date,
+            datumLabel: date
+              .toLocaleDateString("de-AT", {
+                day: "2-digit",
+                month: "2-digit",
+              })
+              .replace(/\.$/, ""),
+            name: d.name,
+            distanz: d.distanz,
+          };
+        });
         setVerlaufStats(chartData);
       });
     } else {
       setRadiusStats(radiusMock);
-      const charData = verlaufMock.map((d, i) => ({
-        index: i + 1,
-        name: d.name,
-        distanz: d.distanz,
-      }));
+      const charData = verlaufMock.map((d) => {
+        const date = new Date(d.datum);
+        return {
+          datum: date,
+          datumLabel: date
+            .toLocaleDateString("de-AT", {
+              day: "2-digit",
+              month: "2-digit",
+            })
+            .replace(/\.$/, ""),
+          name: d.name,
+          distanz: d.distanz,
+        };
+      });
       setVerlaufStats(charData);
     }
   }, [user.id]);
@@ -193,9 +211,12 @@ export default function AktionsRadius() {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={verlaufStats}>
                   <XAxis
-                    dataKey="index"
+                    dataKey="datumLabel"
+                    angle={-30}
+                    textAnchor="end"
+                    height={60}
                     label={{
-                      value: "Aktivitäten",
+                      value: "Datum",
                       position: "insideBottom",
                       offset: -5,
                     }}
@@ -208,11 +229,24 @@ export default function AktionsRadius() {
                     }}
                   />
                   <Tooltip
-                    labelFormatter={(label, payload) =>
-                      payload && payload[0]
-                        ? payload[0].payload.name
-                        : `Aktivität ${label}`
-                    }
+                    labelFormatter={(label, payload) => {
+                      if (payload && payload[0]) {
+                        const data = payload[0].payload;
+                        const fullDate = data.datum.toLocaleDateString(
+                          "de-AT",
+                          {
+                            weekday: "short",
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          },
+                        );
+
+                        return `${data.name} (${fullDate})`;
+                      }
+
+                      return `Aktivität ${label}`;
+                    }}
                     formatter={(value) =>
                       typeof value === "number"
                         ? [`${value} km`, "Entfernung"]

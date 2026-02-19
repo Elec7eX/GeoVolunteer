@@ -120,7 +120,14 @@ export default function AktivitaetenByKategorien() {
                       KategorieLabels[value as Kategorie]
                     }
                   />
-                  <YAxis allowDecimals={false} />
+                  <YAxis
+                    allowDecimals={false}
+                    label={{
+                      value: "Anzahl Akt.",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
                   <Tooltip
                     labelFormatter={(label) =>
                       KategorieLabels[label as Kategorie]

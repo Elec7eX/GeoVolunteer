@@ -11,7 +11,7 @@ import {
 import { FreiwilligenAktivitaetenType } from "../../types/Types";
 import statistikService from "../../services/StatistikService";
 import { t } from "i18next";
-import { Card, Collapse } from "react-bootstrap";
+import { Card, Collapse, OverlayTrigger, Popover } from "react-bootstrap";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 
 export default function FreiwilligenAktivitaetenDistanz() {
@@ -59,32 +59,62 @@ export default function FreiwilligenAktivitaetenDistanz() {
           <span className="custom-cardheader_text" style={{ color: "white" }}>
             {t("stat.organisation.freiwilligeAktivitaeten.distanz.title")}
           </span>
-          <span
-            style={{
-              fontSize: "19px",
-              transition: "transform 0.2s ease",
-              transform: show ? "rotate(180deg)" : "rotate(0deg)",
-            }}
-          >
-            ▼
-          </span>
+          <div className="d-flex align-items-center gap-2">
+            <OverlayTrigger
+              trigger="click"
+              placement="left"
+              rootClose
+              overlay={
+                <Popover id="info-popover">
+                  <Popover.Body>
+                    {t(
+                      "stat.organisation.freiwilligeAktivitaeten.distanz.beschreibung",
+                    )}
+                  </Popover.Body>
+                </Popover>
+              }
+            >
+              <i
+                className="bi bi-info-circle info-icon"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </OverlayTrigger>
+            <span
+              style={{
+                fontSize: "19px",
+                transition: "transform 0.2s ease",
+                transform: show ? "rotate(180deg)" : "rotate(0deg)",
+              }}
+            >
+              ▼
+            </span>
+          </div>
         </Card.Header>
         <Collapse in={show}>
           <div id="aktivitaeten-collapse">
             <Card.Body>
-              <Card.Text>
-                {t(
-                  "stat.organisation.freiwilligeAktivitaeten.distanz.beschreibung",
-                )}
-              </Card.Text>
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart
                   data={data}
                   margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="distanz" />
-                  <YAxis allowDecimals={false} />
+                  <XAxis
+                    dataKey="distanz"
+                    label={{
+                      value: "Distanz",
+                      position: "insideBottom",
+                      offset: -5,
+                    }}
+                  />
+                  <YAxis
+                    allowDecimals={false}
+                    label={{
+                      value: "Freiwillige",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
                   <Tooltip formatter={(value) => [`${value}`, "Freiwillige"]} />
                   <Bar dataKey="count" fill="#4e73df" />
                 </BarChart>
@@ -102,32 +132,62 @@ export default function FreiwilligenAktivitaetenDistanz() {
           <span className="custom-cardheader_text" style={{ color: "white" }}>
             {t("stat.organisation.freiwilligeRadiusAktivitaeten.distanz.title")}
           </span>
-          <span
-            style={{
-              fontSize: "19px",
-              transition: "transform 0.2s ease",
-              transform: showRadius ? "rotate(180deg)" : "rotate(0deg)",
-            }}
-          >
-            ▼
-          </span>
+          <div className="d-flex align-items-center gap-2">
+            <OverlayTrigger
+              trigger="click"
+              placement="left"
+              rootClose
+              overlay={
+                <Popover id="info-popover">
+                  <Popover.Body>
+                    {t(
+                      "stat.organisation.freiwilligeRadiusAktivitaeten.distanz.beschreibung",
+                    )}
+                  </Popover.Body>
+                </Popover>
+              }
+            >
+              <i
+                className="bi bi-info-circle info-icon"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </OverlayTrigger>
+            <span
+              style={{
+                fontSize: "19px",
+                transition: "transform 0.2s ease",
+                transform: showRadius ? "rotate(180deg)" : "rotate(0deg)",
+              }}
+            >
+              ▼
+            </span>
+          </div>
         </Card.Header>
         <Collapse in={showRadius}>
           <div id="aktivitaeten-collapse">
             <Card.Body>
-              <Card.Text>
-                {t(
-                  "stat.organisation.freiwilligeRadiusAktivitaeten.distanz.beschreibung",
-                )}
-              </Card.Text>
               <ResponsiveContainer width="100%" height={350}>
                 <BarChart
                   data={radiusData}
                   margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="distanz" />
-                  <YAxis allowDecimals={false} />
+                  <XAxis
+                    dataKey="distanz"
+                    label={{
+                      value: "Distanz",
+                      position: "insideBottom",
+                      offset: -5,
+                    }}
+                  />
+                  <YAxis
+                    allowDecimals={false}
+                    label={{
+                      value: "Freiwillige",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
                   <Tooltip formatter={(value) => [`${value}`, "Freiwillige"]} />
                   <Bar dataKey="count" fill="#4e73df" />
                 </BarChart>

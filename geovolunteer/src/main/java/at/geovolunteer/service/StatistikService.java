@@ -90,6 +90,7 @@ public class StatistikService {
 					double dist = GeoUtil.haversineKm(vLat, vLon, a.getShape().getCoordinate().getY(),
 							a.getShape().getCoordinate().getX());
 					map.put("name", a.getName());
+					map.put("datum", a.getStartDatum().getTime());
 					map.put("distanz", Math.round(dist * 10.0) / 10.0);
 					return map;
 				}).toList();

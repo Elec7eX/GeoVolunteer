@@ -23,14 +23,20 @@ export const radiusMock: RadiusStats = {
 export const verlaufMock: AktionsradiusVerlauf[] = [
     {
         distanz: 0.9,
+        datum: new Date("2026-04-07"),
+        datumLabel: "07.04",
         name: "Lebensmittelverteilung an Bedürftige"
     },
     {
         distanz: 3.1,
+        datum: new Date("2026-04-08"),
+        datumLabel: "08.04",
         name: "Baumpflanzaktion Frühling"
     },
     {
         distanz: 1.5,
+        datum: new Date("2026-04-09"),
+        datumLabel: "09.04",
         name: "Besuchsdienst im Seniorenheim"
     }
 ]

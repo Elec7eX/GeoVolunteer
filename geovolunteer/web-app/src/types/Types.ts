@@ -115,6 +115,8 @@ export interface RadiusStats {
 
 export interface AktionsradiusVerlauf {
   name: string;
+  datum: Date;
+  datumLabel: string;
   distanz: number;
 }
 
