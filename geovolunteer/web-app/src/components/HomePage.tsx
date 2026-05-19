@@ -15,6 +15,13 @@ import { AktivitaetModel } from "../types/Types";
 import aktivitaetService from "../services/AktivitaetService";
 import FreiwilligenDistanz from "./statistik/FreiwilligenDistanz";
 import FreiwilligenAktivitaetenDistanz from "./statistik/FreiwilligenAktivitaetenDistanz";
+import { getDemoRole, isServerOnline } from "../login/Login";
+import {
+  mockLaufendAktivitaet,
+  mockLaufendAktivitaetOrg1,
+  mockLaufendAktivitaetOrg2,
+  mockLaufendAktivitaetOrg3,
+} from "../mockData/aktivitaetMock";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -25,10 +32,20 @@ export default function HomePage() {
   >([]);
 
   useEffect(() => {
-    if (user.id !== 3000 && user.rolle !== UserType.ADMIN) {
+    if (isServerOnline() && user.rolle !== UserType.ADMIN) {
       aktivitaetService.getLaufendeAktivitaeten().then((response) => {
         setLaufendeAktivitaeten(response.data);
       });
+    } else {
+      if (getDemoRole() !== "FREIWILLIGE") {
+        setLaufendeAktivitaeten([
+          mockLaufendAktivitaetOrg1,
+          mockLaufendAktivitaetOrg2,
+          mockLaufendAktivitaetOrg3,
+        ]);
+      } else {
+        setLaufendeAktivitaeten([mockLaufendAktivitaet]);
+      }
     }
   }, [user.id]);
 

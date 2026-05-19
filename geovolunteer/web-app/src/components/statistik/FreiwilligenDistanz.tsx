@@ -12,6 +12,8 @@ import statistikService from "../../services/StatistikService";
 import { t } from "i18next";
 import { Card, Collapse, OverlayTrigger, Popover } from "react-bootstrap";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { isServerOnline } from "../../login/Login";
+import { freiwilligenDistanzMock } from "../../mockData/statistikMock";
 
 const COLORS = ["#4CAF50", "#FFC107", "#F44336"];
 
@@ -33,10 +35,12 @@ export default function FreiwilligenDistanz() {
     : [];
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       statistikService
         .getFreiwilligenDistanz()
         .then((resp) => setStats(resp.data));
+    } else {
+      setStats(freiwilligenDistanzMock);
     }
   }, [user.id]);
 

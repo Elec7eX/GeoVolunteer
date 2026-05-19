@@ -7,7 +7,13 @@ import { useTranslation } from "react-i18next";
 import { Registration } from "./Registration";
 import userService from "../services/UserServices";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { mockUser } from "../mockData/userMock";
+import { mockOrganisationKreuz, mockUser } from "../mockData/userMock";
+
+export const getDemoRole = () =>
+  localStorage.getItem("demoRole") || "FREIWILLIGE";
+
+export const isServerOnline = () =>
+  localStorage.getItem("serverOnline") === "true";
 
 export type LoginType = {
   login?: string;
@@ -26,7 +32,23 @@ export function Login() {
   const [isRegistrationPage, setIsRegistrationPage] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const [serverOnline, setServerOnline] = useState(true);
+  const [serverOnline, setServerOnline] = useState(
+    localStorage.getItem("serverOnline") === "true",
+  );
+
+  const [demoRole, setDemoRole] = useState(
+    localStorage.getItem("demoRole") || "FREIWILLIGE",
+  );
+
+  const handleServerOnlineChange = (online: boolean) => {
+    setServerOnline(online);
+    localStorage.setItem("serverOnline", String(online));
+  };
+
+  const handleDemoRoleChange = (role: string) => {
+    setDemoRole(role);
+    localStorage.setItem("demoRole", role);
+  };
 
   const didRun = useRef(false);
 
@@ -41,9 +63,9 @@ export function Login() {
 
     userService
       .getPing()
-      .then(() => setServerOnline(true))
+      .then(() => handleServerOnlineChange(true))
       .catch(() => {
-        setServerOnline(false);
+        handleServerOnlineChange(false);
         alert(t("alert.demo.login"));
       });
   }, []);
@@ -58,7 +80,11 @@ export function Login() {
   };
 
   const handleDemoLogin = () => {
-    _login(mockUser);
+    if (getDemoRole() === "FREIWILLIGE") {
+      _login(mockUser);
+    } else {
+      _login(mockOrganisationKreuz);
+    }
   };
 
   function validationLogin(): Yup.ObjectSchema<any> {
@@ -97,52 +123,72 @@ export function Login() {
                   isSubmitting,
                 }) => (
                   <FormikForm className="rounded p-4">
-                    <Form.Group className="mb-3">
-                      <Form.Label>{t("label.login.login")}</Form.Label>
-                      <Form.Control
-                        id="login"
-                        name="login"
-                        placeholder={t("placeholder.login.login")}
-                        type="text"
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        className={
-                          errors.login && touched.login
-                            ? "text-input error"
-                            : "text-input"
-                        }
-                      />
-                      <Form.Text className="text-muted"></Form.Text>
-                    </Form.Group>
-                    <Form.Group className="mb-3">
-                      <Form.Label>{t("label.login.passwort")}</Form.Label>
-                      <InputGroup>
-                        <Form.Control
-                          id="password"
-                          name="password"
-                          placeholder={t("placeholder.login.passwort")}
-                          type={showPassword ? "text" : "password"}
-                          onChange={handleChange}
-                          className={
-                            errors.password && touched.password
-                              ? "text-input error"
-                              : "text-input"
-                          }
-                        />
-                        <Button
-                          variant="secondary"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <FaEyeSlash /> : <FaEye />}
-                        </Button>
-                      </InputGroup>
-                      <Form.Text className="text-muted"></Form.Text>
-                      {errors.password && touched.password && (
-                        <div className="input-feedback">{errors.password}</div>
-                      )}
-                    </Form.Group>
+                    {serverOnline && (
+                      <>
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t("label.login.login")}</Form.Label>
+                          <Form.Control
+                            id="login"
+                            name="login"
+                            placeholder={t("placeholder.login.login")}
+                            type="text"
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            className={
+                              errors.login && touched.login
+                                ? "text-input error"
+                                : "text-input"
+                            }
+                          />
+                          <Form.Text className="text-muted"></Form.Text>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                          <Form.Label>{t("label.login.passwort")}</Form.Label>
+                          <InputGroup>
+                            <Form.Control
+                              id="password"
+                              name="password"
+                              placeholder={t("placeholder.login.passwort")}
+                              type={showPassword ? "text" : "password"}
+                              onChange={handleChange}
+                              className={
+                                errors.password && touched.password
+                                  ? "text-input error"
+                                  : "text-input"
+                              }
+                            />
+                            <Button
+                              variant="secondary"
+                              onClick={() => setShowPassword(!showPassword)}
+                            >
+                              {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </Button>
+                          </InputGroup>
+                          <Form.Text className="text-muted"></Form.Text>
+                          {errors.password && touched.password && (
+                            <div className="input-feedback">
+                              {errors.password}
+                            </div>
+                          )}
+                        </Form.Group>
+                      </>
+                    )}
                     <Col>
                       <Row className="mb-3">
+                        {!serverOnline && (
+                          <Form.Group className="mb-3">
+                            <Form.Label>Benutzerrolle auswählen</Form.Label>
+                            <Form.Select
+                              value={demoRole}
+                              onChange={(e) =>
+                                handleDemoRoleChange(e.target.value)
+                              }
+                            >
+                              <option value="FREIWILLIGE">Freiwillige</option>
+                              <option value="ORGANISATION">Organisation</option>
+                            </Form.Select>
+                          </Form.Group>
+                        )}
                         {serverOnline ? (
                           <Button
                             className="shadow"
@@ -167,16 +213,18 @@ export function Login() {
                     </Col>
                     <Col>
                       <Row>
-                        <Button
-                          className="shadow"
-                          id="neuAnmelden"
-                          variant="dark"
-                          type="button"
-                          disabled={isSubmitting}
-                          onClick={() => setIsRegistrationPage(true)}
-                        >
-                          {t("button.anmelden")}
-                        </Button>
+                        {serverOnline && (
+                          <Button
+                            className="shadow"
+                            id="neuAnmelden"
+                            variant="dark"
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={() => setIsRegistrationPage(true)}
+                          >
+                            {t("button.anmelden")}
+                          </Button>
+                        )}
                       </Row>
                     </Col>
                   </FormikForm>

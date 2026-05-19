@@ -10,7 +10,13 @@ import { AktivitaetModel } from "../../types/Types";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
 import StatusIndicator from "../../utils/Utils";
-import { mockLaufendAktivitaet } from "../../mockData/aktivitaetMock";
+import {
+  mockLaufendAktivitaet,
+  mockLaufendAktivitaetOrg1,
+  mockLaufendAktivitaetOrg2,
+  mockLaufendAktivitaetOrg3,
+} from "../../mockData/aktivitaetMock";
+import { getDemoRole, isServerOnline } from "../../login/Login";
 
 export default function AktivitaetenOverview() {
   const navigate = useNavigate();
@@ -31,7 +37,7 @@ export default function AktivitaetenOverview() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       if (!initialized.current) {
         initialized.current = true;
         aktivitaetService
@@ -78,7 +84,15 @@ export default function AktivitaetenOverview() {
           });
       }
     } else {
-      setLaufendeAktivitaeten([mockLaufendAktivitaet]);
+      if (getDemoRole() === "FREIWILLIGE") {
+        setLaufendeAktivitaeten([mockLaufendAktivitaet]);
+      } else {
+        setLaufendeAktivitaeten([
+          mockLaufendAktivitaetOrg1,
+          mockLaufendAktivitaetOrg2,
+          mockLaufendAktivitaetOrg3,
+        ]);
+      }
       setLoading(false);
     }
   }, [user.id, user.rolle]);

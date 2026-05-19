@@ -17,7 +17,8 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import MapEditComponent from "../karte/MapEditComponent";
-import { mockUser } from "../../mockData/userMock";
+import { mockOrganisationKreuz, mockUser } from "../../mockData/userMock";
+import { getDemoRole, isServerOnline } from "../../login/Login";
 
 interface FormularResult {
   values: UserModel;
@@ -43,7 +44,7 @@ export default function Profil() {
   ];
 
   useEffect(() => {
-    if (user.id !== undefined && user.id !== 3000) {
+    if (user.id !== undefined && isServerOnline()) {
       userService.get(user.id).then((response) => {
         var benutzer = response.data;
         setInitialValues({
@@ -84,41 +85,77 @@ export default function Profil() {
         }
       });
     } else {
-      const shape: GeoJsonFeature = {
-        geometry: {
-          coordinates: mockUser.shape.geometry.coordinates,
-          type: "Point",
-        },
-        type: "Feature",
-        properties: {},
-      };
-      setInitialValues({
-        id: mockUser.id,
-        rolle: mockUser.rolle,
-        login: mockUser.login,
-        password: mockUser.password,
-        email: mockUser.email,
-        telefon: mockUser.telefon,
-        addresseInput: AdressInputEnum.Manual,
-        strasse: mockUser.strasse,
-        hausnummer: mockUser.hausnummer,
-        plz: mockUser.plz,
-        ort: mockUser.ort,
-        shape: shape,
-        radius: mockUser.radius === null ? 0 : mockUser.radius,
-        einheit:
-          mockUser.einheit == null
-            ? einheitOptions.find((e) => e.value === "M")?.value
-            : mockUser.einheit,
-        beschreibung: mockUser.beschreibung,
-        vorname: mockUser.vorname,
-        nachname: mockUser.nachname,
-        geburtsDatum: mockUser.geburtsDatum,
-        verfuegbarVonDatum: mockUser.verfuegbarVonDatum,
-        verfuegbarBisDatum: mockUser.verfuegbarBisDatum,
-        verfuegbarVonZeit: mockUser.verfuegbarVonZeit,
-        verfuegbarBisZeit: mockUser.verfuegbarBisZeit,
-      });
+      if (getDemoRole() === "FREIWILLIGE") {
+        const shape: GeoJsonFeature = {
+          geometry: {
+            coordinates: mockUser.shape.geometry.coordinates,
+            type: "Point",
+          },
+          type: "Feature",
+          properties: {},
+        };
+        setInitialValues({
+          id: mockUser.id,
+          rolle: mockUser.rolle,
+          login: mockUser.login,
+          password: mockUser.password,
+          email: mockUser.email,
+          telefon: mockUser.telefon,
+          addresseInput: AdressInputEnum.Manual,
+          strasse: mockUser.strasse,
+          hausnummer: mockUser.hausnummer,
+          plz: mockUser.plz,
+          ort: mockUser.ort,
+          shape: shape,
+          radius: mockUser.radius === null ? 0 : mockUser.radius,
+          einheit:
+            mockUser.einheit == null
+              ? einheitOptions.find((e) => e.value === "M")?.value
+              : mockUser.einheit,
+          beschreibung: mockUser.beschreibung,
+          vorname: mockUser.vorname,
+          nachname: mockUser.nachname,
+          geburtsDatum: mockUser.geburtsDatum,
+          verfuegbarVonDatum: mockUser.verfuegbarVonDatum,
+          verfuegbarBisDatum: mockUser.verfuegbarBisDatum,
+          verfuegbarVonZeit: mockUser.verfuegbarVonZeit,
+          verfuegbarBisZeit: mockUser.verfuegbarBisZeit,
+        });
+      } else {
+        const shape: GeoJsonFeature = {
+          geometry: {
+            coordinates: mockOrganisationKreuz.shape.geometry.coordinates,
+            type: "Point",
+          },
+          type: "Feature",
+          properties: {},
+        };
+        setInitialValues({
+          id: mockOrganisationKreuz.id,
+          rolle: mockOrganisationKreuz.rolle,
+          login: mockOrganisationKreuz.login,
+          password: mockOrganisationKreuz.password,
+          email: mockOrganisationKreuz.email,
+          telefon: mockOrganisationKreuz.telefon,
+          addresseInput: AdressInputEnum.Manual,
+          strasse: mockOrganisationKreuz.strasse,
+          hausnummer: mockOrganisationKreuz.hausnummer,
+          plz: mockOrganisationKreuz.plz,
+          ort: mockOrganisationKreuz.ort,
+          shape: shape,
+          radius:
+            mockOrganisationKreuz.radius === null
+              ? 0
+              : mockOrganisationKreuz.radius,
+          einheit:
+            mockOrganisationKreuz.einheit == null
+              ? einheitOptions.find((e) => e.value === "M")?.value
+              : mockOrganisationKreuz.einheit,
+          beschreibung: mockOrganisationKreuz.beschreibung,
+          name: mockOrganisationKreuz.name,
+          webseite: mockOrganisationKreuz.webseite,
+        });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user.id]);

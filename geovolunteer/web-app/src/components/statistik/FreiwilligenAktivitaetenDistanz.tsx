@@ -13,6 +13,11 @@ import statistikService from "../../services/StatistikService";
 import { t } from "i18next";
 import { Card, Collapse, OverlayTrigger, Popover } from "react-bootstrap";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { isServerOnline } from "../../login/Login";
+import {
+  freiwilligenAktivitaetenMock,
+  freiwilligenRadiusAktivitaetenMock,
+} from "../../mockData/statistikMock";
 
 export default function FreiwilligenAktivitaetenDistanz() {
   const [user] = useLocalStorage("user", null);
@@ -25,7 +30,7 @@ export default function FreiwilligenAktivitaetenDistanz() {
   const [showRadius, setShowRadius] = useState(false);
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       statistikService.getFreiwilligenAktivitaetenDistanz().then((resp) => {
         const histogramData = Object.entries(resp.data).map(
           ([distanz, count]) => ({
@@ -46,6 +51,9 @@ export default function FreiwilligenAktivitaetenDistanz() {
           );
           setRadiusData(histogramData);
         });
+    } else {
+      setData(freiwilligenAktivitaetenMock);
+      setRadiusData(freiwilligenRadiusAktivitaetenMock);
     }
   }, [user.id]);
   return (

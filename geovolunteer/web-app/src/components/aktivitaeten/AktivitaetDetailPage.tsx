@@ -14,13 +14,18 @@ import { UserType } from "../../enums/Enums";
 import { BsHeartPulse } from "react-icons/bs";
 import { Feature, Geometry } from "geojson";
 import MapComponent from "../karte/MapComponent";
-import { mockLaufendAktivitaet } from "../../mockData/aktivitaetMock";
+import {
+  mockLaufendAktivitaet,
+  mockLaufendAktivitaetOrg1,
+} from "../../mockData/aktivitaetMock";
+import { getDemoRole, isServerOnline } from "../../login/Login";
 
 export default function AktivitaetDetailPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const [user] = useLocalStorage("user", null);
+  const demoRole = getDemoRole();
 
   const { aktivitaetFromState = null, isTeilnehmer = false } =
     location.state || {};
@@ -33,7 +38,7 @@ export default function AktivitaetDetailPage() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       if (aktivitaetFromState) {
         setAktivitaet(aktivitaetFromState);
         if (aktivitaetFromState.shape) {
@@ -51,8 +56,13 @@ export default function AktivitaetDetailPage() {
           .catch(() => alert("Fehler beim Laden der Daten"));
       }
     } else {
-      setAktivitaet(mockLaufendAktivitaet);
-      setAktivitaetenShape(mockLaufendAktivitaet.shape!);
+      if (demoRole === "FREIWILLIGE") {
+        setAktivitaet(mockLaufendAktivitaet);
+        setAktivitaetenShape(mockLaufendAktivitaet.shape!);
+      } else {
+        setAktivitaet(mockLaufendAktivitaetOrg1);
+        setAktivitaetenShape(mockLaufendAktivitaetOrg1.shape!);
+      }
     }
   }, [id, aktivitaetFromState, user.id]);
 

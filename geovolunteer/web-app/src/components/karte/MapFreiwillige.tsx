@@ -40,6 +40,7 @@ import {
 } from "./MapIcons";
 import { MapPopup } from "./MapPopup";
 import React from "react";
+import { isServerOnline } from "../../login/Login";
 
 interface FilterType {
   meineAktivitaeten: boolean;
@@ -137,7 +138,7 @@ export default function MapOrganisation() {
   }, [tools.routenplaner, tools.distanzberechnung]);
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       if (!initialized.current) {
         if (UserType.FREIWILLIGE === user.rolle) {
           initialized.current = true;
@@ -374,7 +375,7 @@ export default function MapOrganisation() {
 
   const updateFilter = (filterName: keyof FilterType) => {
     if (
-      user.id !== 3000 &&
+      isServerOnline() &&
       filterName === "alleOrganisationen" &&
       alleOrganistaionen.length < 1
     ) {
@@ -386,7 +387,7 @@ export default function MapOrganisation() {
       });
     }
     if (
-      user.id !== 3000 &&
+      isServerOnline() &&
       filterName === "alleAktivitaeten" &&
       alleAktivitaeten.length < 1
     ) {

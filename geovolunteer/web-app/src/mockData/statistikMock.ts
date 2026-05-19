@@ -1,4 +1,4 @@
-import { AktionsradiusVerlauf, AktivitaetenByKategorienStatistik, Kategorie, OrganisationenDistanz, RadiusStats } from "../types/Types";
+import { AktionsradiusVerlauf, AktivitaetenByKategorienStatistik, FreiwilligenAktivitaetenType, FreiwilligenDistanzType, Kategorie, OrganisationenDistanz, RadiusStats } from "../types/Types";
 
 export const statistikKategorieMock: AktivitaetenByKategorienStatistik[] = [{
     count: 2,
@@ -72,3 +72,55 @@ export const organisationDistanzMock: OrganisationenDistanz =
             }
         ]
     }
+
+export const freiwilligenDistanzMock: FreiwilligenDistanzType = {
+    aUnter5: 33,
+    cUeber10: 1,
+    bZwischen5und10: 1
+}
+
+export const freiwilligenAktivitaetenMock: FreiwilligenAktivitaetenType[] = [
+    {
+        count: 22,
+        distanz: "0-1 km"
+    },
+    {
+        count: 11,
+        distanz: "1-3 km"
+    },
+    {
+        count: 0,
+        distanz: "3-5 km"
+    },
+    {
+        count: 1,
+        distanz: "5-10 km"
+    },
+    {
+        count: 1,
+        distanz: ">10 km"
+    },
+]
+
+export const freiwilligenRadiusAktivitaetenMock: FreiwilligenAktivitaetenType[] = [
+    {
+        count: 15,
+        distanz: "0-1 km"
+    },
+    {
+        count: 8,
+        distanz: "1-3 km"
+    },
+    {
+        count: 0,
+        distanz: "3-5 km"
+    },
+    {
+        count: 0,
+        distanz: "5-10 km"
+    },
+    {
+        count: 0,
+        distanz: ">10 km"
+    },
+]

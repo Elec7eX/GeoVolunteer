@@ -16,6 +16,7 @@ import userService from "../../services/UserServices";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { UserType } from "../../enums/Enums";
 import { AktivitaetModel } from "../../types/Types";
+import { isServerOnline } from "../../login/Login";
 
 type Props = {
   title: string;
@@ -33,7 +34,7 @@ export const Header = (props: Props) => {
   const [user] = useLocalStorage("user", null);
 
   const handleLogout = () => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       userService.logout().then(() => _logout());
     } else {
       _logout();

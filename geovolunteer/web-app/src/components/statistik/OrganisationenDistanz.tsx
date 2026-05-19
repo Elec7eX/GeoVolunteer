@@ -12,6 +12,7 @@ import {
 import { t } from "i18next";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { organisationDistanzMock } from "../../mockData/statistikMock";
+import { getDemoRole, isServerOnline } from "../../login/Login";
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AA66CC"];
 
@@ -22,7 +23,7 @@ export default function OrganisationenDistanz() {
   const [showStatistik, setShowStatistik] = useState<boolean>(false);
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       statistikService.getOrganisationenDistanz().then((res) => {
         setData(res.data.organisationen);
         setAvg(res.data.durchschnittsDistanz);

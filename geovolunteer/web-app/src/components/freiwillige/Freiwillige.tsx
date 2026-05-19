@@ -10,6 +10,13 @@ import userService from "../../services/UserServices";
 import aktivitaetService from "../../services/AktivitaetService";
 import { UserType } from "../../enums/Enums";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
+import { isServerOnline } from "../../login/Login";
+import {
+  mockFreiwillige1,
+  mockFreiwillige2,
+  mockFreiwillige3,
+} from "../../mockData/userMock";
+import { mockLaufendAktivitaetOrg1 } from "../../mockData/aktivitaetMock";
 
 export default function Freiwillige() {
   const navigate = useNavigate();
@@ -20,31 +27,37 @@ export default function Freiwillige() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    if (user.rolle !== UserType.ADMIN) {
-      aktivitaetService
-        .getLaufendeUndBevorstehendeAktivitaeten()
-        .then((resp) => {
-          setAktivitaet(resp.data);
-        })
-        .then(() => {
-          userService
-            .getFreiwillige()
-            .then((response) => {
-              setFreiwillige(response.data);
-              setLoading(false);
-            })
-            .catch(() => {
-              setLoading(false);
-            });
-        })
-        .catch(() => {
+    if (isServerOnline()) {
+      if (user.rolle !== UserType.ADMIN) {
+        aktivitaetService
+          .getLaufendeUndBevorstehendeAktivitaeten()
+          .then((resp) => {
+            setAktivitaet(resp.data);
+          })
+          .then(() => {
+            userService
+              .getFreiwillige()
+              .then((response) => {
+                setFreiwillige(response.data);
+                setLoading(false);
+              })
+              .catch(() => {
+                setLoading(false);
+              });
+          })
+          .catch(() => {
+            setLoading(false);
+          });
+      } else {
+        userService.getAllFreiwillige().then((resp) => {
+          setFreiwillige(resp.data);
           setLoading(false);
         });
+      }
     } else {
-      userService.getAllFreiwillige().then((resp) => {
-        setFreiwillige(resp.data);
-        setLoading(false);
-      });
+      setAktivitaet([mockLaufendAktivitaetOrg1]);
+      setFreiwillige([mockFreiwillige3]);
+      setLoading(false);
     }
   }, [user.rolle]);
 

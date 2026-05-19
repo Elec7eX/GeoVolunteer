@@ -10,6 +10,7 @@ import userService from "../../services/UserServices";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { mockOrganisation } from "../../mockData/userMock";
 import { AdressInputEnum } from "../../enums/Enums";
+import { isServerOnline } from "../../login/Login";
 
 export default function Organisation() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function Organisation() {
   };
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       userService
         .getOrganisationen()
         .then((response) => {

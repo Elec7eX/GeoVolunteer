@@ -20,6 +20,7 @@ import { AktionsradiusVerlauf, RadiusStats } from "../../types/Types";
 import { t } from "i18next";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { radiusMock, verlaufMock } from "../../mockData/statistikMock";
+import { getDemoRole, isServerOnline } from "../../login/Login";
 
 export default function AktionsRadius() {
   const [user] = useLocalStorage("user", null);
@@ -34,7 +35,7 @@ export default function AktionsRadius() {
   const [showVerlauf, setShowVerlauf] = useState(false);
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       statistikService.getAktionsradius().then((resp) => {
         setRadiusStats(resp.data);
       });

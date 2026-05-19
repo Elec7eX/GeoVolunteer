@@ -18,6 +18,7 @@ import statistikService from "../../services/StatistikService";
 import { t } from "i18next";
 import { useLocalStorage } from "../../hooks/useLocalStorage";
 import { statistikKategorieMock } from "../../mockData/statistikMock";
+import { getDemoRole, isServerOnline } from "../../login/Login";
 
 export const KategorieColors: Record<Kategorie, string> = {
   [Kategorie.SOZIALES]: "#0d6efd",
@@ -37,7 +38,7 @@ export default function AktivitaetenByKategorien() {
   const buildCompleteCategoryStatistics = (
     backendData: AktivitaetenByKategorienStatistik[],
   ): AktivitaetenByKategorienStatistik[] => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       return Object.values(Kategorie).map((kategorie) => {
         const found = backendData.find((d) => d.kategorie === kategorie);
 
@@ -52,7 +53,7 @@ export default function AktivitaetenByKategorien() {
   };
 
   useEffect(() => {
-    if (user.id !== 3000) {
+    if (isServerOnline()) {
       statistikService.getAktivitaetenByKategorien().then((resp) => {
         const completedData = buildCompleteCategoryStatistics(resp.data);
         setData(completedData);
