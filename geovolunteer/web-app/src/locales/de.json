@@ -36,7 +36,7 @@
   "aktivitaeten.detail.kontaktinfo.title": "Kontakt Informationen",
   "aktivitaeten.detail.button.teilnehmen": "Teilnehmen",
   "aktivitaeten.detail.button.nichtTeilnehmen": "Nicht mehr teilnehmen",
-  "alert.demo.login": "Server nicht erreichbar. Klicke auf 'Demo Login', um als Freiwillige fortzufahren.",
+  "alert.demo.login": "Server derzeit nicht erreichbar. Für den Demo-Zugang bitte zuerst eine Benutzerrolle auswählen und anschließend auf „Demo Login“ klicken.",
   "button.login": "Login",
   "button.login.demo": "Demo Login",
   "button.anmelden": "Neu Anmelden",
